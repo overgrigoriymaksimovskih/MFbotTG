@@ -5,7 +5,7 @@
             <PatternLayout pattern="%p - %m%n"/>
         </Console>
 
-        <RollingFile name="DEBUG_LOG" fileName="logs/debug.log" filePattern="Logs/info-%i.log">
+        <RollingFile name="DEBUG_LOG" fileName="logs/dispatcher.log" filePattern="Logs/info-%i.log">
             <Filters>
                 <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>

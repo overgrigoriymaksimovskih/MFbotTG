@@ -28,6 +28,6 @@ public class RabbitConfiguration {
     }
     @Bean
     public Queue answerMessageQueue(){
-        return new Queue(ANSWER_MESSAGE_UPDATE);
+        return new Queue(ANSWER_MESSAGE);
     }
 }
