@@ -83,6 +83,13 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-jpa-->
+        <dependency>
+            <groupId>pro.masterfood</groupId>
+            <artifactId>common-jpa</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- Для Jakarta Bean Validation (не обязательно, позволяет расставлять над сущностями аннотации типа @NotNull чтоб в БД не попали неправильные значения)-->
         <dependency>
             <groupId>org.hibernate.validator</groupId>

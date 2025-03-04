@@ -3,9 +3,12 @@ package pro.masterfood.entity;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import jakarta.persistence.*;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "raw_data")
@@ -70,6 +73,19 @@ public class RawData {
             rawData.setEvent(event);
             return rawData;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        RawData rawData = (RawData) o;
+        return id != null && Objects.equals(id, rawData.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
 }
