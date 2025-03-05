@@ -12,7 +12,7 @@ public class BinaryContent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
+//    @Lob
     private byte[] fileAsArrayOfBytes;
 
     public BinaryContent() {
