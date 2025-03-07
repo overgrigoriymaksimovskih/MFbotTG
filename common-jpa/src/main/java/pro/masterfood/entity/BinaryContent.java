@@ -12,7 +12,7 @@ public class BinaryContent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Lob
+    @Column(name = "file_as_array_of_bytes", columnDefinition = "bytea")
     private byte[] fileAsArrayOfBytes;
 
     public BinaryContent() {

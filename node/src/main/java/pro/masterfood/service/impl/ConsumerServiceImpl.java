@@ -24,6 +24,8 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Override
     @RabbitListener(queues = TEXT_MESSAGE_UPDATE)
     public void consumeTextMessageUpdates(Update update) {
+        System.out.println("TEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXT");
+
         log.debug("NODE: text message is received");
         mainService.processTextMessage(update);
     }
@@ -31,6 +33,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Override
     @RabbitListener(queues = DOC_MESSAGE_UPDATE)
     public void consumeDocMessageUpdates(Update update) {
+        System.out.println("DOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOC");
         log.debug("NODE: document message is received");
         mainService.processDocMessage(update);
     }

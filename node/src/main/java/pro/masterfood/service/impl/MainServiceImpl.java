@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dao.RawDataDAO;
 import pro.masterfood.entity.AppDocument;
+import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.entity.RawData;
 import pro.masterfood.exceptions.UploadFileException;
@@ -89,9 +90,17 @@ public class MainServiceImpl implements MainService {
         if (isNotAllowToSendContent(chatId, appUser)){
             return;
         }
-        //TODO реализовать сохранение фото
-        var answer = "Фото успешно загружено. Ссылка для скачивания: hhtp://test.test";
-        sendAnswer(answer, chatId);
+
+        try{
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            //TODO добавить генерацию ссылки для скачивания фото
+            var answer = "Фото успешно загружено. Ссылка для скачивания: hhtp://test.test";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException ex) {
+            log.error("Произошла ошибка при загрузке фото", ex);
+            String error = "Не удалось загрузить ФОТО...";
+            sendAnswer(error, chatId);
+        }
 
     }
 

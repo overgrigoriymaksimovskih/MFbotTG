@@ -43,10 +43,13 @@ public class UpdateController {
         Message message = update.getMessage();
         if(message.hasText()){
             processTextMessage(update);
+            System.out.println("TextMessageTextMessageTextMessageTextMessageTextMessageTextMessageTextMessageTextMessageTextMessage");
         }else if (message.hasDocument()){
             processDocMessage(update);
+            System.out.println("DocMessageDocMessageDocMessageDocMessageDocMessageDocMessageDocMessageDocMessageDocMessageDocMessage");
         }else if (message.hasPhoto()){
             processPhotoMessage(update);
+            System.out.println("PhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessage");
         }else{
             setUnsupportedMessageTypeView(update);
         }
