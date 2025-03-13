@@ -13,9 +13,11 @@ import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.entity.RawData;
 import pro.masterfood.exceptions.UploadFileException;
+import pro.masterfood.service.AppUserService;
 import pro.masterfood.service.FileService;
 import pro.masterfood.service.MainService;
 import pro.masterfood.service.ProducerService;
+import pro.masterfood.service.enums.LinkType;
 import pro.masterfood.service.enums.ServiceCommand;
 
 import static pro.masterfood.entity.enums.UserState.BASIC_STATE;
@@ -29,12 +31,14 @@ public class MainServiceImpl implements MainService {
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
+    private final AppUserService appUserService;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.fileService = fileService;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -51,7 +55,7 @@ public class MainServiceImpl implements MainService {
         } else if (BASIC_STATE.equals(userState)) {
             output = processServiceCommand(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
-            //TODO добавить обработку емайла
+            output = appUserService.setEmail(appUser, text);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! введите /cancel и попробуйте снова...";
@@ -71,9 +75,9 @@ public class MainServiceImpl implements MainService {
         }
         try{
             AppDocument doc = fileService.processDoc(update.getMessage());
-            //TODO Добавить генерацию ссылки для скачивания документа
+            String link = fileService.generateLink(doc.getId(), LinkType.GET_DOC);
             var answer = "Документ успешно загружен "
-                    + "Ссылка для скачивания: http://test.downlosd";
+                    + "Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Произошла ошибка при загрузке файла", ex);
@@ -93,8 +97,8 @@ public class MainServiceImpl implements MainService {
 
         try{
             AppPhoto photo = fileService.processPhoto(update.getMessage());
-            //TODO добавить генерацию ссылки для скачивания фото
-            var answer = "Фото успешно загружено. Ссылка для скачивания: hhtp://test.test";
+            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
+            var answer = "Фото успешно загружено. Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Произошла ошибка при загрузке фото", ex);
@@ -106,7 +110,7 @@ public class MainServiceImpl implements MainService {
 
     private boolean isNotAllowToSendContent(Long chatId, AppUser appUser) {
         var userState = appUser.getState();
-        if(!appUser.getActive()){
+        if(!appUser.getIsActive()){
             var error = "Зарегистрируйтесь или активируйте "
                 + "свою учетную запись для загрузки контента";
             sendAnswer(error, chatId);
@@ -132,8 +136,7 @@ public class MainServiceImpl implements MainService {
     private String processServiceCommand(AppUser appUser, String cmd) {
         var serviceCommand = ServiceCommand.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)){
-            //TODO добавить регистрацию
-            return "Временно недоступно...";
+            return appUserService.registerUser(appUser);
         } else if (HELP.equals(serviceCommand)) {
             return help();
         } else if (START.equals(serviceCommand)) {
@@ -157,20 +160,19 @@ public class MainServiceImpl implements MainService {
 
     private AppUser findOrSaveAppUser(Update update){
         User telegramUser = update.getMessage().getFrom();
-        AppUser persistentAppUser = appUserDAO.findAppUserByTelegramUserId(telegramUser.getId());
-        if (persistentAppUser == null){
+        var optional = appUserDAO.findByTelegramUserId(telegramUser.getId());
+        if (optional.isEmpty()){
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .username(telegramUser.getUserName())
                     .firstName(telegramUser.getFirstName())
                     .lastName(telegramUser.getLastName())
-                    //TODO изменить значение по умолчанию после добавления регистрации
-                    .isActive(true)
+                    .isActive(false)
                     .state(BASIC_STATE)
                     .build();
             return appUserDAO.save(transientAppUser);
         }
-        return persistentAppUser;
+        return optional.get();
     }
     private void saveRawData(Update update) {
         RawData rawData = RawData.builder()

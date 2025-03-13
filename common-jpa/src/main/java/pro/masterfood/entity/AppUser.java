@@ -93,11 +93,11 @@ public class AppUser {
         this.email = email;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
+    public void setIsActive(Boolean active) {
         isActive = active;
     }
 
@@ -203,7 +203,7 @@ public class AppUser {
             appUser.setLastName(lastName);
             appUser.setUsername(username);
             appUser.setEmail(email);
-            appUser.setActive(isActive);
+            appUser.setIsActive(isActive);
             appUser.setState(state);
             return appUser;
         }

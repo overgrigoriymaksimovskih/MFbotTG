@@ -20,16 +20,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <!--Для РАБОТЫ С БД ПО ORM-->
         <dependency>
@@ -90,6 +80,13 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-utils-->
+        <dependency>
+            <groupId>pro.masterfood</groupId>
+            <artifactId>common-utils</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- Для Jakarta Bean Validation (не обязательно, позволяет расставлять над сущностями аннотации типа @NotNull чтоб в БД не попали неправильные значения)-->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -109,6 +106,13 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20180813</version>
+        </dependency>
+
+        <!-- Для валидации введенной эл. почты типа 123@mail.com -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
         </dependency>
 
     </dependencies>
