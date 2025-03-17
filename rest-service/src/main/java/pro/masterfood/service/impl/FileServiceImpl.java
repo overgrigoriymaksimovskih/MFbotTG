@@ -1,10 +1,8 @@
 package pro.masterfood.service.impl;
 
 import pro.masterfood.service.FileService;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 import pro.masterfood.dao.AppDocumentDAO;
 import pro.masterfood.dao.AppPhotoDAO;
@@ -45,19 +43,5 @@ public class FileServiceImpl implements FileService {
             return null;
         }
         return appPhotoDAO.findById(id).orElse(null);
-    }
-
-    @Override
-    public FileSystemResource getFileSystemResource(BinaryContent binaryContent) {
-        try{
-            //TODO добавить генерацию имен временного файла
-            File temp = File.createTempFile("tempFile",".bin");
-            temp.deleteOnExit();
-            FileUtils.writeByteArrayToFile(temp, binaryContent.getFileAsArrayOfBytes());
-            return new FileSystemResource(temp);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            return (null);
-        }
     }
 }

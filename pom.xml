@@ -22,6 +22,7 @@
         <module>rest-service</module>
         <module>common-utils</module>
         <module>mail-service</module>
+        <module>shared-db-migrations</module>
     </modules>
 
     <properties>
@@ -45,6 +46,12 @@
                     <artifactId>log4j-to-slf4j</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!--Для БД>-->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
         </dependency>
 
         <!--Для логов-->

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="1" author="user1">
+        <createTable tableName="raw_data">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="event" type="JSONB">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Сначала создаем binary_content -->
+    <changeSet id="5" author="user1">
+        <createTable tableName="binary_content">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="file_as_array_of_bytes" type="BYTEA">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Затем создаем app_document, которая ссылается на binary_content -->
+    <changeSet id="2" author="user1">
+        <createTable tableName="app_document">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="telegram_field" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="doc_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="binary_content_id" type="BIGINT">
+                <constraints nullable="true"
+                             foreignKeyName="fk_app_document_binary_content"
+                             references="binary_content(id)"/>
+            </column>
+            <column name="mime_type" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="file_size" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="user1">
+        <createTable tableName="app_photo">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="telegram_field" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="binary_content_id" type="BIGINT">
+                <constraints nullable="true"
+                             foreignKeyName="fk_app_photo_binary_content"
+                             references="binary_content(id)"/>
+            </column>
+            <column name="file_size" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" author="user1">
+        <createTable tableName="app_user">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="telegram_user_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="first_login_date" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_active" type="BOOLEAN">
+                <constraints nullable="true"/>
+            </column>
+            <column name="state" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
