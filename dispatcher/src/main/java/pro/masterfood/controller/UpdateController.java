@@ -4,15 +4,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import pro.masterfood.service.UpdateProducer;
 import pro.masterfood.utils.MessageUtils;
+
+import java.util.List;
 
 import static pro.masterfood.model.RabbitQueue.*;
 
 @Component
 public class UpdateController {
+    private static final long MAX_MESSAGE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final Logger log = LoggerFactory.getLogger(UpdateController.class);
     private TelegramBot telegramBot;
     private final MessageUtils messageUtils;
@@ -40,25 +45,33 @@ public class UpdateController {
     }
 
     private void distributeMessageByType (Update update){
+        //TODO реализовать ограничение запросов в еденицу времени (redis или Token Bucket Algorithm...)
         Message message = update.getMessage();
-        if(message.hasText()){
-            processTextMessage(update);
-            System.out.println("TextMessageTextMessageTextMessageTextMessageTextMessageTextMessageTextMessageTextMessageTextMessage");
-        }else if (message.hasDocument()){
-            processDocMessage(update);
-            System.out.println("DocMessageDocMessageDocMessageDocMessageDocMessageDocMessageDocMessageDocMessageDocMessageDocMessage");
-        }else if (message.hasPhoto()){
-            processPhotoMessage(update);
-            System.out.println("PhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessagePhotoMessage");
-        }else{
-            setUnsupportedMessageTypeView(update);
+        if (checkMessageSize(update)) {
+            if(message.hasText()){
+                processTextMessage(update);
+            }else if (message.hasDocument()){
+                processDocMessage(update);
+            }else if (message.hasPhoto()){
+                processPhotoMessage(update);
+            }else{
+                setUnsupportedMessageTypeView(update);
+            }
+        } else {
+            setTooBigMessageView(update);
         }
+    }
+
+    private void setTooBigMessageView(Update update){
+        var sendMessage = messageUtils.generateSendMessageWithText(update, "Размер сообщения не должен превышать 5мб.");
+        setView(sendMessage);
     }
 
     private void setUnsupportedMessageTypeView(Update update){
         var sendMessage = messageUtils.generateSendMessageWithText(update, "Не поддерживаемый тип сообщения");
         setView(sendMessage);
     }
+
     private void setFileIsReceivedView(Update update) {
         var sendMessage = messageUtils.generateSendMessageWithText(update, "Файл получен и обрабатывается ...");
         setView(sendMessage);
@@ -79,5 +92,35 @@ public class UpdateController {
     }
     private void processTextMessage (Update update){
         updateProducer.produce(TEXT_MESSAGE_UPDATE, update);
+    }
+
+    private boolean checkMessageSize(Update update){
+        Message message = update.getMessage();
+        long totalSize = 0; // Инициализируем общий размер сообщения
+
+        // 1. Проверяем размер текста (если он есть)
+        if (message.hasText()) {
+            totalSize += message.getText().length(); // Количество символов (примерное представление размера)
+        }
+
+        // 2. Проверяем размер документа (если он есть)
+        if (message.hasDocument()) {
+            Document document = message.getDocument();
+            totalSize += document.getFileSize(); // Получаем размер файла в байтах
+        }
+
+        // 3. Проверяем размер фотографии (если она есть)
+        if (message.hasPhoto()) {
+            // Photos представляют собой массив разных размеров, нужно выбрать самый большой
+            List<PhotoSize> photos = message.getPhoto();
+            long maxSize = 0;
+            for (PhotoSize photo : photos) {
+                maxSize = Math.max(maxSize, photo.getFileSize());
+            }
+            totalSize += maxSize;
+        }
+
+        // 4. Проверяем общий размер сообщения
+        return totalSize <= MAX_MESSAGE_SIZE; // Сравниваем с максимальным допустимым размером
     }
 }

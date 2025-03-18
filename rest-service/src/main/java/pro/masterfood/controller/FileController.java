@@ -37,10 +37,8 @@ public class FileController {
 
 
         var binaryContent = doc.getBinaryContent();
-        try{
-            var out = response.getOutputStream();
+        try (var out = response.getOutputStream()) {
             out.write(binaryContent.getFileAsArrayOfBytes());
-            out.close();
         } catch (IOException e) {
             log.error(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -60,10 +58,8 @@ public class FileController {
         response.setStatus(HttpServletResponse.SC_OK);
 
         var binaryContent = photo.getBinaryContent();
-        try{
-            var out = response.getOutputStream();
+        try (var out = response.getOutputStream()) {
             out.write(binaryContent.getFileAsArrayOfBytes());
-            out.close();
         } catch (IOException e) {
             log.error(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
