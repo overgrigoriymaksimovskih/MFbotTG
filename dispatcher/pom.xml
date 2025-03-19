@@ -28,13 +28,6 @@
             <version>${telegrambot.version}</version>
         </dependency>
 
-        <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-rabbitmq-->
-        <dependency>
-            <groupId>pro.masterfood</groupId>
-            <artifactId>common-rabbitmq</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
         <!--Для RabbitMQ-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,6 +45,13 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>8.0.1.Final</version> <!-- Используйте последнюю версию -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version> <!-- Используйте последнюю версию -->
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

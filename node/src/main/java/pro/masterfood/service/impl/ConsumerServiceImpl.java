@@ -10,8 +10,6 @@ import pro.masterfood.service.ConsumerService;
 import pro.masterfood.service.MainService;
 import pro.masterfood.service.ProducerService;
 
-import static pro.masterfood.model.RabbitQueue.*;
-
 @Component
 public class ConsumerServiceImpl implements ConsumerService {
     private static final Logger log = LoggerFactory.getLogger(ConsumerServiceImpl.class);
@@ -22,24 +20,21 @@ public class ConsumerServiceImpl implements ConsumerService {
     }
 
     @Override
-    @RabbitListener(queues = TEXT_MESSAGE_UPDATE)
+    @RabbitListener(queues = "${spring.rabbitmq.queues.text-message-update}")
     public void consumeTextMessageUpdates(Update update) {
-        System.out.println("TEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXT");
-
         log.debug("NODE: text message is received");
         mainService.processTextMessage(update);
     }
 
     @Override
-    @RabbitListener(queues = DOC_MESSAGE_UPDATE)
+    @RabbitListener(queues = "${spring.rabbitmq.queues.doc-message-update}")
     public void consumeDocMessageUpdates(Update update) {
-        System.out.println("DOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOCDOC");
         log.debug("NODE: document message is received");
         mainService.processDocMessage(update);
     }
 
     @Override
-    @RabbitListener(queues = PHOTO_MESSAGE_UPDATE)
+    @RabbitListener(queues = "${spring.rabbitmq.queues.photo-message-update}")
     public void consumePhotoMessageUpdates(Update update) {
         log.debug("NODE: photo message is received");
         mainService.processPhotoMessage(update);;

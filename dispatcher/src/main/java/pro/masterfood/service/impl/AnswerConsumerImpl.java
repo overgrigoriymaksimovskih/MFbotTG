@@ -6,8 +6,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.controller.UpdateController;
 import pro.masterfood.service.AnswerConsumer;
 
-import static pro.masterfood.model.RabbitQueue.ANSWER_MESSAGE;
-
 @Component
 public class AnswerConsumerImpl implements AnswerConsumer {
     private final UpdateController updateController;
@@ -17,7 +15,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
     }
 
     @Override
-    @RabbitListener(queues = ANSWER_MESSAGE)
+    @RabbitListener(queues = "${spring.rabbitmq.queues.answer-message}")
     public void consume(SendMessage sendMessage) {
         updateController.setView(sendMessage);
     }
