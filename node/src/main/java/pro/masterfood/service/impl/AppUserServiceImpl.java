@@ -2,6 +2,7 @@ package pro.masterfood.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -19,15 +20,21 @@ import javax.mail.internet.InternetAddress;
 @Component
 public class AppUserServiceImpl implements AppUserService {
     private static final Logger log = LoggerFactory.getLogger(AppUserServiceImpl.class);
+    private final RabbitTemplate rabbitTemplate;
     private final AppUserDAO appUserDAO;
     private final CryptoTool cryptoTool;
     @Value("${service.mail.uri}")
     private String mailServiceUri;
 
-    public AppUserServiceImpl(AppUserDAO appUserDAO, CryptoTool cryptoTool) {
+    public AppUserServiceImpl(AppUserDAO appUserDAO, CryptoTool cryptoTool, RabbitTemplate rabbitTemplate) {
         this.appUserDAO = appUserDAO;
         this.cryptoTool = cryptoTool;
+        this.rabbitTemplate = rabbitTemplate;
     }
+
+    @Value("${spring.rabbitmq.queues.registration-mail}")
+    private String registrationMailQueue;
+
 
     @Override
     public String registerUser(AppUser appUser) {
@@ -50,21 +57,14 @@ public class AppUserServiceImpl implements AppUserService {
         } catch (AddressException e){
             return "Введите пожалуйста корректный адрес. Для отмены команды введите /cancel";
         }
-        var optional = appUserDAO.findByEmail(email);
-        if (optional.isEmpty()){
+        var appUserOpt = appUserDAO.findByEmail(email);
+        if (appUserOpt.isEmpty()) {
             appUser.setEmail(email);
             appUser.setState(UserState.BASIC_STATE);
             appUser = appUserDAO.save(appUser);
 
             var cryptoUserId = cryptoTool.hashOf(appUser.getId());
-            var response = sendRequestToMailService(cryptoUserId, email);
-            if (response.getStatusCode() != HttpStatus.OK){
-                var msg = String.format("Отправка эл. письма на почту %s не удалась.", email);
-                log.error(msg);
-                appUser.setEmail(null);
-                appUserDAO.save(appUser);
-                return msg;
-            }
+            sendRegistrationMail(cryptoUserId, email);
             return "Вам на почту было выслано письмо \n"
                     + " перейдите по ссылке в письме для завершения регистрации";
         } else {
@@ -73,18 +73,11 @@ public class AppUserServiceImpl implements AppUserService {
         }
     }
 
-    private ResponseEntity<String> sendRequestToMailService(String cryptoUserId, String email) {
-        var restTemplate = new RestTemplate();
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    private void sendRegistrationMail(String cryptoUserId, String email) {
         var mailParams = MailParams.builder()
                 .id(cryptoUserId)
                 .emailTo(email)
                 .build();
-        var request = new HttpEntity<>(mailParams, headers);
-        return restTemplate.exchange(mailServiceUri,
-                HttpMethod.POST,
-                request,
-                String.class);
+        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }
 }
