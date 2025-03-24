@@ -22,6 +22,7 @@
         <module>common-utils</module>
         <module>mail-service</module>
         <module>shared-db-migrations</module>
+        <module>common</module>
     </modules>
 
     <properties>

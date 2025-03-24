@@ -1,4 +1,4 @@
-package pro.masterfood.entity.enums;
+package pro.masterfood.enums;
 
 public enum UserState {
     BASIC_STATE,

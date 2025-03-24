@@ -3,7 +3,7 @@ package pro.masterfood.entity;
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
-import pro.masterfood.entity.enums.UserState;
+import pro.masterfood.enums.UserState;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

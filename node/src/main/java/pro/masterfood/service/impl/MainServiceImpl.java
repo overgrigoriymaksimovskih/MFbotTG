@@ -20,8 +20,8 @@ import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.enums.LinkType;
 import pro.masterfood.service.enums.ServiceCommand;
 
-import static pro.masterfood.entity.enums.UserState.BASIC_STATE;
-import static pro.masterfood.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
+import static pro.masterfood.enums.UserState.BASIC_STATE;
+import static pro.masterfood.enums.UserState.WAIT_FOR_EMAIL_STATE;
 import static pro.masterfood.service.enums.ServiceCommand.*;
 
 @Component

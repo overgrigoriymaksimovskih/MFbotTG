@@ -28,17 +28,10 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-jpa-->
+        <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-->
         <dependency>
             <groupId>pro.masterfood</groupId>
-            <artifactId>common-jpa</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-utils-->
-        <dependency>
-            <groupId>pro.masterfood</groupId>
-            <artifactId>common-utils</artifactId>
+            <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -68,6 +61,20 @@
             <version>2.4</version>
         </dependency>
 
+        <!--Для генерации хешей-->
+        <dependency>
+            <groupId>org.hashids</groupId>
+            <artifactId>hashids</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version> <!-- Используйте последнюю версию -->
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 </project>

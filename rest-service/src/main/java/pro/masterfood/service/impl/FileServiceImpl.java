@@ -8,29 +8,25 @@ import pro.masterfood.dao.AppDocumentDAO;
 import pro.masterfood.dao.AppPhotoDAO;
 import pro.masterfood.entity.AppDocument;
 import pro.masterfood.entity.AppPhoto;
-import pro.masterfood.entity.BinaryContent;
-import pro.masterfood.utils.CryptoTool;
-
-import java.io.File;
-import java.io.IOException;
+import pro.masterfood.utils.Decoder;
 
 @Component
 public class FileServiceImpl implements FileService {
     private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
     private final AppPhotoDAO appPhotoDAO;
     private final AppDocumentDAO appDocumentDAO;
-    private final CryptoTool cryptoTool;
+    private final Decoder decoder;
 
-    public FileServiceImpl(AppPhotoDAO appPhotoDAO, AppDocumentDAO appDocumentDAO, CryptoTool cryptoTool) {
+    public FileServiceImpl(AppPhotoDAO appPhotoDAO, AppDocumentDAO appDocumentDAO, Decoder decoder) {
         this.appPhotoDAO = appPhotoDAO;
         this.appDocumentDAO = appDocumentDAO;
-        this.cryptoTool = cryptoTool;
+        this.decoder = decoder;
     }
 
     @Override
     public AppDocument getDocument(String hash) {
-        var id = cryptoTool.idOf(hash);
-        if (id == null){
+        var id = decoder.idOf(hash);
+        if (id == null) {
             return null;
         }
         return appDocumentDAO.findById(id).orElse(null);
@@ -38,8 +34,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public AppPhoto getPhoto(String hash) {
-        var id = cryptoTool.idOf(hash);
-        if (id == null){
+        var id = decoder.idOf(hash);
+        if (id == null) {
             return null;
         }
         return appPhotoDAO.findById(id).orElse(null);

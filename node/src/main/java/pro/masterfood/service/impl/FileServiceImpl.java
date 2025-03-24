@@ -2,14 +2,16 @@ package pro.masterfood.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.hashids.Hashids;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Document;
-
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
+
 import pro.masterfood.dao.AppDocumentDAO;
 import pro.masterfood.dao.AppPhotoDAO;
 import pro.masterfood.dao.BinaryContentDAO;
@@ -18,16 +20,12 @@ import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.BinaryContent;
 import pro.masterfood.exceptions.UploadFileException;
 import pro.masterfood.service.FileService;
+import pro.masterfood.service.enums.LinkType;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
-
-import org.json.JSONObject;
-import pro.masterfood.service.enums.LinkType;
-import pro.masterfood.utils.CryptoTool;
-
 
 @Component
 public class FileServiceImpl implements FileService {
@@ -39,18 +37,18 @@ public class FileServiceImpl implements FileService {
     @Value("${service.file_storage.uri}")
     private String fileStorageUri;
     @Value("${link.adress}")
-    private String linkAdress;
+    private String linkAddress;
 
     private final AppDocumentDAO appDocumentDAO;
     private final AppPhotoDAO appPhotoDAO;
     private final BinaryContentDAO binaryContentDAO;
-    private final CryptoTool cryptoTool;
+    private final Hashids hashids;
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO, CryptoTool cryptoTool) {
+    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO, Hashids hashids) {
         this.appDocumentDAO = appDocumentDAO;
         this.appPhotoDAO = appPhotoDAO;
         this.binaryContentDAO = binaryContentDAO;
-        this.cryptoTool = cryptoTool;
+        this.hashids = hashids;
     }
 
     @Override
@@ -151,7 +149,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String generateLink(Long docId, LinkType linkType) {
-        var hash = cryptoTool.hashOf(docId);
-        return "http://" + linkAdress + "/" + linkType + "?id=" + hash;
+        var hash = hashids.encode(docId);
+        return linkAddress + "/api/" + linkType + "?id=" + hash;
     }
 }
