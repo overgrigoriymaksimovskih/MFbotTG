@@ -29,6 +29,7 @@ public class FileServiceImpl implements FileService {
         if (id == null) {
             return null;
         }
+        System.out.println("fff " + appDocumentDAO.findById(id));
         return appDocumentDAO.findById(id).orElse(null);
     }
 

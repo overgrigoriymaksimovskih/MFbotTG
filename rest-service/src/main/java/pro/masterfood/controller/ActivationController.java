@@ -16,6 +16,11 @@ public class ActivationController {
         this.userActivatonService = userActivatonService;
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
+    public String hello() {
+        return "Hello from ActivationController!";
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/activation")
     public ResponseEntity<?> activation(@RequestParam("id") String id){
         var res = userActivatonService.activation(id);

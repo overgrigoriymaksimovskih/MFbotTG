@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,7 +12,7 @@ import pro.masterfood.service.FileService;
 
 import java.io.IOException;
 
-@RequestMapping("/file")
+@RequestMapping("/api")
 @RestController
 public class FileController {
     private static final Logger log = LoggerFactory.getLogger(FileController.class);
@@ -23,10 +22,24 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/get-doc")
+    @RequestMapping(method = RequestMethod.GET, value = "/hello")
+    public String hello() {
+        return "Hello from FileController!";
+    }
+
+//    @RequestMapping(method = RequestMethod.GET, value = "/get-doc")
+//    public String getDoc(@RequestParam("id") String id, HttpServletResponse response) {
+//        if (id == "999"){
+//            return "999";
+//        }else{
+//            return "fuck you";
+//        }
+//    }
+    @RequestMapping(method = RequestMethod.GET, value = "/file/get-doc")
     public void getDoc(@RequestParam("id") String id, HttpServletResponse response){
         //TODO для формирования БадРеквест добавить ControllerAdvice
         var doc = fileService.getDocument(id);
+
         if (doc == null){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -45,7 +58,7 @@ public class FileController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/get-photo")
+    @RequestMapping(method = RequestMethod.GET, value = "/file/get-photo")
     public void getPhoto(@RequestParam("id") String id, HttpServletResponse response){
         //TODO для формирования БадРеквест добавить ControllerAdvice
         var photo = fileService.getPhoto(id);

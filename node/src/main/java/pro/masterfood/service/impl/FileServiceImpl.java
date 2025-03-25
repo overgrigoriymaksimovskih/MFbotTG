@@ -131,7 +131,6 @@ public class FileServiceImpl implements FileService {
     private byte[] downloadFile(String filePath) {
         String fullUri = fileStorageUri.replace("{token}", token)
                 .replace("{filePath}", filePath);
-        System.out.println("qwertytyuo " + fullUri);
         URL urlObj = null;
         try{
             urlObj = new URL(fullUri);
