@@ -31,6 +31,7 @@
         <javax-mail.version>1.4</javax-mail.version>
         <hashids.version>1.0.1</hashids.version>
         <liquibase-core.version>4.24.0</liquibase-core.version>
+        <io.github.cdimascio.version>3.0.0</io.github.cdimascio.version>
 
     </properties>
 
@@ -158,6 +159,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
             <!--Spring Boot сам управляет версиями зависимости-->
+        </dependency>
+
+        <!-- Для того, чтобы idea смогла считать переменные из .env
+        так же в классе Application добавлены импорты и установка переменных
+        чтобы загрузить системные свойства перед запуском Spring Boot: -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>${io.github.cdimascio.version}</version>
         </dependency>
 
     </dependencies>

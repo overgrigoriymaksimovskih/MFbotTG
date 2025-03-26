@@ -22,8 +22,8 @@
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <pro.masterfood.common.version>0.0.1</pro.masterfood.common.version>
         <liquibase-core.version>4.24.0</liquibase-core.version>
-
         <lombok.servion>1.18.30</lombok.servion>
+        <io.github.cdimascio.version>3.0.0</io.github.cdimascio.version>
     </properties>
 
     <dependencies>
@@ -93,6 +93,15 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.servion}</version> <!-- Используйте последнюю версию -->
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Для того, чтобы idea смогла считать переменные из .env
+        так же в классе Application добавлены импорты и установка переменных
+        чтобы загрузить системные свойства перед запуском Spring Boot: -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>${io.github.cdimascio.version}</version>
         </dependency>
 
     </dependencies>
