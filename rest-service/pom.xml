@@ -1,38 +1,50 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
-        <groupId>pro.masterfood</groupId>
-        <artifactId>MFbotTG</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.1</version>
+        <relativePath/>
     </parent>
 
+    <groupId>pro.masterfood</groupId>
     <artifactId>rest-service</artifactId>
-    <packaging>jar</packaging>
-
+    <version>0.0.1</version>
     <name>rest-service</name>
-    <url>http://maven.apache.org</url>
+    <description>rest-service</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+        <pro.masterfood.common.version>0.0.1</pro.masterfood.common.version>
+        <pro.masterfood.shared-db-migrations.version>0.0.1</pro.masterfood.shared-db-migrations.version>
+        <postgresql.version>42.2.18</postgresql.version>
+        <common-io.version>2.4</common-io.version>
+        <hashids.version>1.0.1</hashids.version>
+        <liquibase-core.version>4.24.0</liquibase-core.version>
+
+        <lombok.servion>1.18.30</lombok.servion>
     </properties>
 
     <dependencies>
 
-        <!--Для того чтобы наше приложение знало что есть еще модуль shared-db-migrations для создания таблиц в БД-->
         <dependency>
-            <groupId>pro.masterfood</groupId>
-            <artifactId>shared-db-migrations</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-->
-        <dependency>
-            <groupId>pro.masterfood</groupId>
-            <artifactId>common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-to-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--Для РАБОТЫ С БД ПО ORM-->
@@ -47,34 +59,78 @@
             </exclusions>
         </dependency>
 
+        <!--Для того чтобы наше приложение знало что есть еще модуль shared-db-migrations для создания таблиц в БД-->
+        <dependency>
+            <groupId>pro.masterfood</groupId>
+            <artifactId>shared-db-migrations</artifactId>
+            <version>${pro.masterfood.shared-db-migrations.version}</version>
+        </dependency>
+
+        <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-->
+        <dependency>
+            <groupId>pro.masterfood</groupId>
+            <artifactId>common</artifactId>
+            <version>${pro.masterfood.common.version}</version>
+        </dependency>
+
         <!--Драйвер постгреса чтобы приложение на уровне операционки могло общаться именно с прогрессом-->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.18</version>
+            <version>${postgresql.version}</version>
         </dependency>
 
         <!--Для работы с файлами-->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.4</version>
+            <version>${common-io.version}</version>
         </dependency>
 
         <!--Для генерации хешей-->
         <dependency>
             <groupId>org.hashids</groupId>
             <artifactId>hashids</artifactId>
-            <version>1.0.1</version>
+            <version>${hashids.version}</version>
+            <scope>provided</scope>
         </dependency>
 
+        <!--Для БД>-->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibase-core.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--Для логов-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+            <!--Spring Boot сам управляет версиями зависимости-->
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version> <!-- Используйте последнюю версию -->
+            <version>${lombok.servion}</version> <!-- Используйте последнюю версию -->
             <scope>provided</scope>
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
