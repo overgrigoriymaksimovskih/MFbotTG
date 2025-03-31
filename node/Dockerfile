@@ -6,6 +6,15 @@ RUN mkdir -p $HOME
 ADD ./settings.xml /usr/share/maven/ref/
 ENV MVN_SETTINGS=/usr/share/maven/ref/settings.xml
 
+RUN mkdir -p $HOME/shared-db-migrations
+ADD ./shared-db-migrations $HOME/shared-db-migrations
+RUN mvn -f $HOME/shared-db-migrations/pom.xml -s $MVN_SETTINGS clean package
+RUN mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=$HOME/shared-db-migrations/target/shared-db-migrations-0.0.1.jar \
+    -DgroupId=pro.masterfood \
+    -DartifactId=shared-db-migrations \
+    -Dversion=0.0.1 \
+    -Dpackaging=jar
+
 RUN mkdir -p $HOME/common
 ADD ./common $HOME/common
 RUN mvn -f $HOME/common/pom.xml -s $MVN_SETTINGS clean package
