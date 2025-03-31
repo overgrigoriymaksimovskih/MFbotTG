@@ -11,4 +11,4 @@ ADD ./dispatcher/pom.xml $HOME/dispatcher
 ADD ./dispatcher/src $HOME/dispatcher/src
 RUN mvn -f $HOME/dispatcher/pom.xml -s $MVN_SETTINGS clean package --debug
 
-CMD java -jar $HOME/dispatcher/target/dispatcher-0.0.1.ja
+CMD java -jar $HOME/dispatcher/target/dispatcher-0.0.1.jar
