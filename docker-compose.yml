@@ -31,12 +31,6 @@ services:
       RABBIT_DOC_MESSAGE_UPDATE_QUEUE: ${RABBIT_DOC_MESSAGE_UPDATE_QUEUE}
       RABBIT_PHOTO_MESSAGE_UPDATE_QUEUE: ${RABBIT_PHOTO_MESSAGE_UPDATE_QUEUE}
       RABBIT_ANSWER_MESSAGE_QUEUE: ${RABBIT_ANSWER_MESSAGE_QUEUE}
-        #labels:
-        #  - "traefik.enable=true"
-        #  - "traefik.http.services.dispatcher.loadbalancer.server.port=${DISPATCHER_PORT}"
-        #  - "traefik.http.routers.dispatcher.rule=Host(`${HOST_URL}`) && PathPrefix(`/callback`)"
-        #  - "traefik.http.routers.dispatcher.entrypoints=websecure8"
-    #   - "traefik.http.routers.dispatcher.tls=true"
     logging:
       driver: 'json-file'
       options:
@@ -89,20 +83,14 @@ services:
       context: ./
       dockerfile: ./rest-service/Dockerfile
     #    TODO нужно откомментировать для локального запуска без traefik
-    #    ports:
-    #      - ${REST_SERVICE_PORT}:${REST_SERVICE_PORT}
+    ports:
+    - ${REST_SERVICE_PORT}:${REST_SERVICE_PORT}
     environment:
       REST_SERVICE_PORT: ${REST_SERVICE_PORT}
       POSTGRES_URL: ${POSTGRES_URL}
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SALT: ${SALT}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.rest-service.loadbalancer.server.port=${REST_SERVICE_PORT}"
-      - "traefik.http.routers.rest-service.rule=Host(`${HOST_URL}`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.rest-service.entrypoints=websecure8"
-      - "traefik.http.routers.rest-service.tls=true"
     logging:
       driver: 'json-file'
       options:
