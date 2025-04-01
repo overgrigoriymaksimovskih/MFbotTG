@@ -16,6 +16,13 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Override
     @RabbitListener(queues = "${spring.rabbitmq.queues.registration-mail}")
     public void consumeRegistrationMail(MailParams mailParams) {
-        mailSenderService.send(mailParams);
+        try {
+            mailSenderService.send(mailParams);
+            System.out.println("Письмо успешно отправлено для: " + mailParams.getId()); // Добавьте логирование успеха
+        } catch (Exception e) {
+            System.err.println("Ошибка при отправке письма: " + e.getMessage());
+            e.printStackTrace();
+            // Здесь можно добавить логику повторной отправки или отправки в DLQ
+        }
     }
 }
