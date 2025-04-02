@@ -36,8 +36,8 @@ public class UserActivationImpl implements UserActivatonService {
         return false;
     }
     @Override
-    public boolean activationMf(String id) {
-        if (id.equals("a")){
+    public boolean activationMf(String id, String pass) {
+        if (id.equals("a") && pass.equals("b")){
             return true;
         }else{
             return false;

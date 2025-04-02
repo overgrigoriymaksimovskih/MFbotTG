@@ -17,11 +17,11 @@ public class ActivationController {
     }
 
     //ссылка по которой происходит проверка регистрации пользователя на master-food.pro
-    @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
-    public ResponseEntity<?> activationMf(@RequestParam("id") String id){
-        var res = userActivatonService.activationMf(id);
+    @RequestMapping(method = RequestMethod.POST, value = "/hellooo")
+    public ResponseEntity<?> activationMf(@RequestParam("id") String id, @RequestParam("pass") String pass){
+        var res = userActivatonService.activationMf(id, pass);
         if (res == true){
-            return ResponseEntity.ok().body("Регистрация успешно завершена");
+            return ResponseEntity.ok().body("Регистрация MF успешно MF завершена");
         }
         return ResponseEntity.internalServerError().build();
     }
