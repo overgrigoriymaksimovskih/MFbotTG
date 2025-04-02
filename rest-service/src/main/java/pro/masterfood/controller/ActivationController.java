@@ -25,9 +25,15 @@ public class ActivationController {
     //пост запрос на сайт мастерфуда
     @PostMapping("/checkPostMf")
     public ResponseEntity<Boolean> checkPostMf(@RequestParam("action") String action,
-                                               @RequestParam("email") String email) {
+                                               @RequestParam("email") String email,
+                                               @RequestParam("password") String password,
+                                               @RequestParam("check_num") String check_num,
+                                               @RequestParam("token") String token) {
         if (action.equals("a")
-                && email.equals("b")){
+                && email.equals("b")
+                && password.equals("c")
+                && check_num.equals("d")
+                && token.equals("e")){
             return ResponseEntity.ok(true);
         }else{
             return ResponseEntity.ok(false);
@@ -48,11 +54,14 @@ public class ActivationController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
     public ResponseEntity<?> activationMf(@RequestParam("action") String action,
-                                          @RequestParam("email") String email)
+                                          @RequestParam("email") String email,
+                                          @RequestParam("password") String password,
+                                          @RequestParam("check_num") String check_num,
+                                          @RequestParam("token") String token)
     {
-        var res = userActivatonService.activationMf(action, email);
+        var res = userActivatonService.activationMf(action, email, password, check_num, token);
         if (res == true){
-            return ResponseEntity.ok().body("Регистрация успешно завершена");
+            return ResponseEntity.ok().body("Пользователь MF авторизован");
         }
         return ResponseEntity.internalServerError().build();
     }

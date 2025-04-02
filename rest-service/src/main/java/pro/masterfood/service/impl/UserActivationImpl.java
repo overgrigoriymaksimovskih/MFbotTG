@@ -43,9 +43,13 @@ public class UserActivationImpl implements UserActivatonService {
         return false;
     }
     @Override
-    public boolean activationMf(String action, String email) {
+    public boolean activationMf(String action,
+                                String email,
+                                String password,
+                                String check_num,
+                                String token) {
         // 1. Создаем POST-запрос
-        HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(action, email);
+        HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(action, email, password, check_num, token);
         // 2. Отправляем POST-запрос
         ResponseEntity<Boolean> response = sendPostRequest(request);
         //3. Обрабатываем результат
