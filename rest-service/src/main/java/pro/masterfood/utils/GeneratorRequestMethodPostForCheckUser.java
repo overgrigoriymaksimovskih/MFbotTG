@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Component
 public class GeneratorRequestMethodPostForCheckUser {
     // Метод для создания POST-запроса
-    public HttpEntity<MultiValueMap<String, String>> buildPostRequest(String action, String email, String password, String checkNum, String token) {
+    public HttpEntity<MultiValueMap<String, String>> buildPostRequest(String action,
+                                                                      String email,
+                                                                      String password,
+                                                                      String checkNum,
+                                                                      String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 

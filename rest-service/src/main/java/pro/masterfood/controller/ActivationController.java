@@ -38,6 +38,7 @@ public class ActivationController {
         }else{
             return ResponseEntity.ok(false);
         }
+
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,7 +56,7 @@ public class ActivationController {
     public ResponseEntity<?> activationMf(@RequestParam("action") String action,
                                           @RequestParam("email") String email,
                                           @RequestParam("password") String password,
-                                          @RequestParam("checkNum") String checkNum,
+                                          @RequestParam("check_num") String checkNum,
                                           @RequestParam("token") String token){
         var res = userActivatonService.activationMf(action, email, password, checkNum, token);
         if (res == true){
