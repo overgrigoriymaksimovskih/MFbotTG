@@ -25,15 +25,9 @@ public class ActivationController {
     //пост запрос на сайт мастерфуда
     @PostMapping("/checkPostMf")
     public ResponseEntity<Boolean> checkPostMf(@RequestParam("action") String action,
-                                               @RequestParam("email") String email,
-                                               @RequestParam("password") String password,
-                                               @RequestParam("checkNum") String checkNum,
-                                               @RequestParam("token") String token) {
+                                               @RequestParam("email") String email) {
         if (action.equals("a")
-                && email.equals("b")
-                && password.equals("c")
-                && checkNum.equals("d")
-                && token.equals("e")){
+                && email.equals("b")){
             return ResponseEntity.ok(true);
         }else{
             return ResponseEntity.ok(false);
@@ -54,11 +48,9 @@ public class ActivationController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
     public ResponseEntity<?> activationMf(@RequestParam("action") String action,
-                                          @RequestParam("email") String email,
-                                          @RequestParam("password") String password,
-                                          @RequestParam("check_num") String checkNum,
-                                          @RequestParam("token") String token){
-        var res = userActivatonService.activationMf(action, email, password, checkNum, token);
+                                          @RequestParam("email") String email)
+    {
+        var res = userActivatonService.activationMf(action, email);
         if (res == true){
             return ResponseEntity.ok().body("Регистрация успешно завершена");
         }
