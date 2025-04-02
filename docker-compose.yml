@@ -15,7 +15,7 @@ services:
     build:
       context: ./
       dockerfile: ./dispatcher/Dockerfile
-    #    TODO нужно откомментировать для локального запуска без traefik
+
     ports:
       - ${DISPATCHER_PORT}:${DISPATCHER_PORT}
     environment:
@@ -82,7 +82,7 @@ services:
     build:
       context: ./
       dockerfile: ./rest-service/Dockerfile
-    #    TODO нужно откомментировать для локального запуска без traefik
+
     ports:
     - ${REST_SERVICE_PORT}:${REST_SERVICE_PORT}
     environment:
