@@ -16,10 +16,16 @@ public class ActivationController {
         this.userActivatonService = userActivatonService;
     }
 
+    //ссылка по которой происходит проверка регистрации пользователя на master-food.pro
     @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
-    public String hello() {
-        return "Hello from ActivationController!";
+    public ResponseEntity<?> activationMf(@RequestParam("id") String id){
+        var res = userActivatonService.activationMf(id);
+        if (res == true){
+            return ResponseEntity.ok().body("Регистрация успешно завершена");
+        }
+        return ResponseEntity.internalServerError().build();
     }
+
 
     @RequestMapping(method = RequestMethod.GET, value = "/activation")
     public ResponseEntity<?> activation(@RequestParam("id") String id){

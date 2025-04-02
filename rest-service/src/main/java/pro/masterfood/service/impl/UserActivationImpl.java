@@ -35,4 +35,12 @@ public class UserActivationImpl implements UserActivatonService {
         }
         return false;
     }
+    @Override
+    public boolean activationMf(String id) {
+        if (id.equals("a")){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
