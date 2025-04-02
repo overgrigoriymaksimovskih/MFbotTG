@@ -29,9 +29,9 @@ public class ActivationController {
     //ссылка по которой происходит проверка регистрации пользователя на master-food.pro
     // 1. Пользователь вбивает в адресную строку: 81.200.158.74:8086/user/hellooo
     @GetMapping("/hellooo") // Используем GET, чтобы пользователь просто вводил URL в браузере
-    public ResponseEntity<?> createPostMf() {
+    public ResponseEntity<?> createPostMf(@RequestParam("id") String id, @RequestParam("pass") String pass) {
         // 1. Создаем POST-запрос
-        HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest();
+        HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(id, pass);
 
         // 2. Отправляем POST-запрос
         ResponseEntity<Boolean> response = sendPostRequest(request);

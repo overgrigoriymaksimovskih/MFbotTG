@@ -8,18 +8,19 @@ import org.springframework.util.LinkedMultiValueMap;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequiredArgsConstructor
 @Component
 public class GeneratorRequestMethodPostForCheckUser {
     // Метод для создания POST-запроса
-    public HttpEntity<MultiValueMap<String, String>> buildPostRequest() {
+    public HttpEntity<MultiValueMap<String, String>> buildPostRequest(String id, String pass) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("id", "a");
-        map.add("pass", "b");
+        map.add("id", id);
+        map.add("pass", pass);
 
         return new HttpEntity<>(map, headers);
     }
