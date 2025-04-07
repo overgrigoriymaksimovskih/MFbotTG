@@ -68,6 +68,7 @@ public class UserActivationImpl implements UserActivatonService {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--ignore-certificate-errors"); // Игнорируем ошибки сертификатов SSL/TLS
             options.addArguments("--headless"); // Запуск Chrome в headless режиме (без GUI)
+            options.addArguments("--enable-javascript");
             options.addArguments("--no-sandbox"); // Обязательно для Docker
             options.addArguments("--disable-dev-shm-usage");  // Рекомендуется для Docker
             options.setBinary("/usr/local/bin/chrome-headless-shell"); // Укажите ПРАВИЛЬНЫЙ путь!
@@ -75,8 +76,8 @@ public class UserActivationImpl implements UserActivatonService {
 
             driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
-            driver.manage().window().setSize(new Dimension(1920, 1080));
             String loginPageUrl = "https://master-food.pro/private/";
+            driver.manage().window().setSize(new Dimension(1920, 1080));
             driver.get(loginPageUrl);
 
 
@@ -95,11 +96,10 @@ public class UserActivationImpl implements UserActivatonService {
             String token = tokenInput.getAttribute("value");
 
             // 5. Отправка формы
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.className("btn-wrap")));
-            System.out.println("Кнопка найдена и кликабельна.");
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+            WebElement submitButton = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(By.className("btn-wrap")));
             submitButton.click();
-            System.out.println("Кнопка нажата.");
 
 //            wait.until(ExpectedConditions.urlContains("URL_СЛЕДУЮЩЕЙ_СТРАНИЦЫ")); // Замените!
 //            System.out.println("Перешли на следующую страницу.");
