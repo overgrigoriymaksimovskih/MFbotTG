@@ -1,5 +1,6 @@
 package pro.masterfood.service.impl;
 
+import org.openqa.selenium.Dimension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -72,6 +73,7 @@ public class UserActivationImpl implements UserActivatonService {
 
             driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+            driver.manage().window().setSize(new Dimension(1920, 1080));
             String loginPageUrl = "https://master-food.pro/private/";
             driver.get(loginPageUrl);
 
@@ -91,7 +93,9 @@ public class UserActivationImpl implements UserActivatonService {
             String token = tokenInput.getAttribute("value");
 
             // 5. Отправка формы
+
             WebElement submitButton = driver.findElement(By.className("btn-wrap"));
+            Thread.sleep(5000);
             submitButton.click();
             Thread.sleep(2000); // Даем время загрузиться следующей странице
 
