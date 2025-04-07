@@ -52,16 +52,6 @@ public class UserActivationImpl implements UserActivatonService {
     }
     @Override
     public ResponseEntity activationMf(String email, String password) {
-//        // 1. Создаем POST-запрос
-//        HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(action, email, password, check_num, token);
-//        // 2. Отправляем POST-запрос
-//        ResponseEntity<Boolean> response = sendPostRequest(request);
-//        //3. Обрабатываем результат
-//        if (response.getBody() != null && response.getBody()) {
-//            return true;
-//        } else {
-//            return false;
-//        }
         WebDriver driver = null;
         try {
             // 1. Настройка Selenium и ChromeDriver
@@ -78,12 +68,11 @@ public class UserActivationImpl implements UserActivatonService {
             options.addArguments("--disable-dev-shm-usage");  // Рекомендуется для Docker
             options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
 
-
+            driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
             String loginPageUrl = "https://master-food.pro/private/";
             driver.get(loginPageUrl);
 
-//            System.out.println("--driver.page success");
 
             // 3. Заполнение формы логина
             WebElement emailField = driver.findElement(By.name("email"));
