@@ -128,6 +128,13 @@
             <version>${io.github.cdimascio.version}</version>
         </dependency>
 
+        <!-- Для прохождения авторизации будет эмулировать браузер с вводом логина пароля -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.19.1</version> <!-- Используйте актуальную версию -->
+        </dependency>
+
     </dependencies>
 
     <build>
