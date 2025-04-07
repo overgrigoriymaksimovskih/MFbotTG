@@ -46,8 +46,8 @@ RUN wget -q -O /tmp/chrome-headless-shell-linux64.zip ${CHROME_HEADLESS_SHELL_UR
 # Загрузите, распакуйте и установите ChromeDriver
 RUN wget -q -O /tmp/chromedriver_linux64.zip ${CHROMEDRIVER_URL} && \
     unzip /tmp/chromedriver_linux64.zip -d /opt/chromedriver && \
-    chmod +x /opt/chromedriver/chromedriver && \
-    ln -s /opt/chromedriver/chromedriver /usr/local/bin/chromedriver
+    chmod +x /opt/chromedriver/chromedriver-linux64/chromedriver && \
+        ln -s /opt/chromedriver/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
 
 # Установите переменную окружения для пути к ChromeDriver
 ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
