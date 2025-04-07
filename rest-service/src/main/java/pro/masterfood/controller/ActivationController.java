@@ -42,17 +42,16 @@ public class ActivationController {
 //    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
-    public ResponseEntity<?> activationMf(@RequestParam("action") String action,// no using
-                                          @RequestParam("email") String email,
-                                          @RequestParam("password") String password,
-                                          @RequestParam("check_num") String check_num,// no using
-                                          @RequestParam("token") String token)// no using
+    public ResponseEntity<?> activationMf(@RequestParam("email") String email,
+                                          @RequestParam("password") String password)
     {
-        var res = userActivatonService.activationMf(email, password);
-        if (res == true){
-            return ResponseEntity.ok().body("Пользователь MF авторизован");
-        }
-        return ResponseEntity.internalServerError().build();
+//        var res = userActivatonService.activationMf(email, password);
+        ResponseEntity response = userActivatonService.activationMf(email, password);
+        return response;
+//        if (res == true){
+//            return ResponseEntity.ok().body("Пользователь MF авторизован");
+//        }
+//        return ResponseEntity.internalServerError().build();
     }
 //----------------------------------------------------------------------------------------------------------------------
 

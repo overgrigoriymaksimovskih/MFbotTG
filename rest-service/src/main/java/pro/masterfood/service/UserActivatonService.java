@@ -1,6 +1,8 @@
 package pro.masterfood.service;
 
+import org.springframework.http.ResponseEntity;
+
 public interface UserActivatonService {
     boolean activation(String cryptoUserId);
-    boolean activationMf(String email, String password);
+    ResponseEntity activationMf(String email, String password);
 }

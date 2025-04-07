@@ -51,7 +51,7 @@ public class UserActivationImpl implements UserActivatonService {
         return false;
     }
     @Override
-    public boolean activationMf(String email, String password) {
+    public ResponseEntity activationMf(String email, String password) {
 //        // 1. Создаем POST-запрос
 //        HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(action, email, password, check_num, token);
 //        // 2. Отправляем POST-запрос
@@ -109,13 +109,13 @@ public class UserActivationImpl implements UserActivatonService {
 
             // 7. Обработка ответа (анализ pageSource)
             if (pageSource.contains("Личный кабинет")) {
-                return true;
+                return ResponseEntity.ok().body("Пользователь MF авторизован");
             } else {
-                return false;
+                return ResponseEntity.ok().body("Пользователь MF НЕ АВТОРИЗОВАН!");
             }
         } catch (Exception e) {
-            log.error("Ошибка при авторизации: " + e.getMessage());
-            return false;
+//            log.error("Ошибка при авторизации: " + e.getMessage());
+            return ResponseEntity.ok().body("Ошибка при авторизации: " + e.getMessage());
         } finally {
             if (driver != null) {
                 driver.quit(); // Закрываем браузер
