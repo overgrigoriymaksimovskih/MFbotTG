@@ -52,6 +52,9 @@ RUN wget -q -O /tmp/chromedriver_linux64.zip ${CHROMEDRIVER_URL} && \
 # Установите переменную окружения для пути к ChromeDriver (не обязательно, но рекомендуется)
 ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
 
+# Добавьте переменную окружения CHROME_BIN
+ENV CHROME_BIN=/usr/local/bin/chrome-headless-shell
+
 #-----------------------------------------------------------------------------------------------------------------------
 RUN mvn -f $HOME/rest-service/pom.xml -s $MVN_SETTINGS clean package --debug
 

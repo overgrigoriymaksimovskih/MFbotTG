@@ -61,11 +61,13 @@ public class UserActivationImpl implements UserActivatonService {
             }
             System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
+
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--ignore-certificate-errors"); // Игнорируем ошибки сертификатов SSL/TLS
             options.addArguments("--headless"); // Запуск Chrome в headless режиме (без GUI)
             options.addArguments("--no-sandbox"); // Обязательно для Docker
             options.addArguments("--disable-dev-shm-usage");  // Рекомендуется для Docker
+            options.setBinary("/usr/local/bin/chrome-headless-shell"); // Укажите ПРАВИЛЬНЫЙ путь!
             options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
 
             driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
