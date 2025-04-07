@@ -1,6 +1,8 @@
 package pro.masterfood.service.impl;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -93,11 +95,16 @@ public class UserActivationImpl implements UserActivatonService {
             String token = tokenInput.getAttribute("value");
 
             // 5. Отправка формы
-
-            WebElement submitButton = driver.findElement(By.className("btn-wrap"));
-            Thread.sleep(5000);
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.className("btn-wrap")));
+            System.out.println("Кнопка найдена и кликабельна.");
             submitButton.click();
-            Thread.sleep(2000); // Даем время загрузиться следующей странице
+            System.out.println("Кнопка нажата.");
+
+//            wait.until(ExpectedConditions.urlContains("URL_СЛЕДУЮЩЕЙ_СТРАНИЦЫ")); // Замените!
+//            System.out.println("Перешли на следующую страницу.");
+
+//            return new ResponseEntity<>("Авторизация прошла успешно", HttpStatus.OK);
 
             // 6. Получение HTML-кода после отправки формы (для анализа ответа)
             String pageSource = driver.getPageSource();
