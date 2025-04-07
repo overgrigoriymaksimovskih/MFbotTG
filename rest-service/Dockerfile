@@ -41,7 +41,7 @@ ENV CHROMEDRIVER_URL=https://storage.googleapis.com/chrome-for-testing-public/${
 # Загрузите, распакуйте и установите chrome-headless-shell
 RUN wget -q -O /tmp/chrome-headless-shell-linux64.zip ${CHROME_HEADLESS_SHELL_URL} && \
     unzip /tmp/chrome-headless-shell-linux64.zip -d /opt/chrome-headless-shell && \
-    mv /opt/chrome-headless-shell/chrome-headless-shell /usr/bin/chrome-headless-shell
+    mv /opt/chrome-headless-shell/chrome-headless-shell-linux64/chrome-headless-shell /usr/bin/chrome-headless-shell
 
 # Загрузите, распакуйте и установите ChromeDriver
 RUN wget -q -O /tmp/chromedriver_linux64.zip ${CHROMEDRIVER_URL} && \
