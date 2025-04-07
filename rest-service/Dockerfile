@@ -24,11 +24,9 @@ RUN mkdir -p $HOME/rest-service
 ADD ./rest-service/pom.xml $HOME/rest-service
 ADD ./rest-service/src $HOME/rest-service/src
 
-
-#-----------------------------------------------------------------------------------------------------------------------
 # Установите зависимости для Chrome и ChromeDriver + необходимые библиотеки!
 RUN apt-get update && \
-    apt-get install -y wget unzip apt-transport-https ca-certificates libglib2.0-0 libnss3 libgconf-2-4 && \
+    apt-get install -y wget unzip apt-transport-https ca-certificates libglib2.0-0 libnss3 libgconf-2-4 libatk1.0-0 && \
     apt-get clean
 
 # Определите версию Chrome и ChromeDriver
