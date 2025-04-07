@@ -26,7 +26,7 @@ ADD ./rest-service/src $HOME/rest-service/src
 
 # Установите зависимости для Chrome и ChromeDriver + необходимые библиотеки!
 RUN apt-get update && \
-    apt-get install -y wget unzip apt-transport-https ca-certificates libglib2.0-0 libnss3 libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libxcomposite1 libxdamage1 && \
+    apt-get install -y wget unzip apt-transport-https ca-certificates libglib2.0-0 libnss3 libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libxcomposite1 libxdamage1 libxfixes3 && \
     apt-get clean
 
 # Определите версию Chrome и ChromeDriver
