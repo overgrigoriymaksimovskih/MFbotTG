@@ -30,6 +30,9 @@ public class UserActivationImpl implements UserActivatonService {
     private final AppUserDAO appUserDAO;
     private final Decoder decoder;
 
+    private String num = null;
+    private String token = null;
+
     public UserActivationImpl(GeneratorRequestMethodPostForCheckUser generatorRequestMethodPostForCheckUser, AppUserDAO appUserDAO, Decoder decoder) {
         this.generatorRequestMethodPostForCheckUser = generatorRequestMethodPostForCheckUser;
         this.appUserDAO = appUserDAO;
@@ -66,6 +69,7 @@ public class UserActivationImpl implements UserActivatonService {
 
 
             ChromeOptions options = new ChromeOptions();
+            options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36");
             options.addArguments("--ignore-certificate-errors"); // Игнорируем ошибки сертификатов SSL/TLS
             options.addArguments("--headless"); // Запуск Chrome в headless режиме (без GUI)
             options.addArguments("--enable-javascript");
@@ -73,6 +77,7 @@ public class UserActivationImpl implements UserActivatonService {
             options.addArguments("--disable-dev-shm-usage");  // Рекомендуется для Docker
             options.setBinary("/usr/local/bin/chrome-headless-shell"); // Укажите ПРАВИЛЬНЫЙ путь!
             options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+            options.setCapability("strictFileInteractability", false);
 
             driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
@@ -91,9 +96,11 @@ public class UserActivationImpl implements UserActivatonService {
             // 4. Получение check_num и token (после выполнения JavaScript)
             WebElement checkNumInput = driver.findElement(By.name("check_num"));
             String checkNum = checkNumInput.getAttribute("value");
+            this.num = checkNum;
 
             WebElement tokenInput = driver.findElement(By.name("token"));
             String token = tokenInput.getAttribute("value");
+            this.token = token;
 
             // 5. Отправка формы
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
@@ -117,7 +124,7 @@ public class UserActivationImpl implements UserActivatonService {
             }
         } catch (Exception e) {
 //            log.error("Ошибка при авторизации: " + e.getMessage());
-            return ResponseEntity.ok().body("Ошибка при авторизации: " + e.getMessage());
+            return ResponseEntity.ok().body("Ошибка при авторизации: " + e.getMessage() + "-------> " + num +  "    " + token);
         } finally {
             if (driver != null) {
                 driver.quit(); // Закрываем браузер
