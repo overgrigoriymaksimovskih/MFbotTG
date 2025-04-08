@@ -94,6 +94,7 @@ public class GeneratorRequestMethodPostForCheckUser {
         map.add("password", password);
         map.add("check_num", check_num);
         map.add("token", token);
+        //--//
 
         return new HttpEntity<>(map, headers);
     }
