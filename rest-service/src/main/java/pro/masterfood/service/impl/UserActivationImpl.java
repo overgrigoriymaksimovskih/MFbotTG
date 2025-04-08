@@ -1,5 +1,6 @@
 package pro.masterfood.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -11,6 +12,9 @@ import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.service.UserActivatonService;
 import pro.masterfood.utils.Decoder;
 import pro.masterfood.utils.GeneratorRequestMethodPostForCheckUser;
+
+import java.util.Map;
+import java.util.HashMap;
 
 @Component
 public class UserActivationImpl implements UserActivatonService {
@@ -43,26 +47,60 @@ public class UserActivationImpl implements UserActivatonService {
         return false;
     }
     @Override
-    public boolean activationMf(String email,
+    public String activationMf(String email,
                                 String password) {
+//        // 1. Создаем POST-запрос
+//        HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(email, password);
+//        // 2. Отправляем POST-запрос
+//        ResponseEntity<Boolean> response = sendPostRequest(request);
+//        //3. Обрабатываем результат
+//        if (response.getBody() != null && response.getBody()) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+
+
         // 1. Создаем POST-запрос
         HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(email, password);
+        // Получаем параметры из request
+        Map<String, String> params = new HashMap<>();
+        if (request != null && request.getBody() != null) {
+            MultiValueMap<String, String> body = request.getBody();
+            for (Map.Entry<String, java.util.List<String>> entry : body.entrySet()) {
+                params.put(entry.getKey(), entry.getValue().get(0)); // Берем первое значение
+            }
+        }
+
+        // Преобразуем параметры в JSON
+        String jsonParams = convertMapToJson(params);
+
         // 2. Отправляем POST-запрос
         ResponseEntity<Boolean> response = sendPostRequest(request);
-        //3. Обрабатываем результат
+
+        //3. Обрабатываем результат (теперь возвращаем JSON с параметрами)
         if (response.getBody() != null && response.getBody()) {
-            return true;
+            return "Успешно!\n" + jsonParams;  // Возвращаем параметры вместе с "Успешно!"
         } else {
-            return false;
+            return "Ошибка!\n" + jsonParams; // Возвращаем параметры вместе с "Ошибка!"
         }
+
     }
     // Метод для отправки POST-запроса
     private ResponseEntity<Boolean> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
-//        String url = "http://81.200.158.74:8086/user/checkPostMf"; // URL checkPostMf
-
-
-        String url = "https://master-food.pro/";
+        String url = "http://81.200.158.74:8086/user/checkPostMf"; // URL checkPostMf
         return restTemplate.postForEntity(url, request, Boolean.class);
+    }
+
+    // Метод для преобразования Map в JSON строку (используем Jackson)
+    private String convertMapToJson(Map<String, String> map) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Ошибка при преобразовании Map в JSON: " + e.getMessage();
+        }
     }
 }
