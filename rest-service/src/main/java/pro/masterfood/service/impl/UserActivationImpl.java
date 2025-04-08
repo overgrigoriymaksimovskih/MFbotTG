@@ -46,6 +46,7 @@ public class UserActivationImpl implements UserActivatonService {
         }
         return false;
     }
+    //
     @Override
     public String activationMf(String email,
                                 String password) {
