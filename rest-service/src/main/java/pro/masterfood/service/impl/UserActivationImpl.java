@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
@@ -89,24 +90,38 @@ public class UserActivationImpl implements UserActivatonService {
         return result;
     }
     // Метод для отправки POST-запроса
+//    private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
+//        RestTemplate restTemplate = new RestTemplate();
+//        String url = "https://master-food.pro/";
+//        try {
+//            ResponseEntity<Object> response = restTemplate.postForEntity(url, request, Object.class);
+//
+//            if (response.getBody() instanceof Map) {
+//                return (Map<String, Object>) response.getBody();
+//            } else {
+//                Map<String, Object> result = new HashMap<>();
+//                result.put("Error", "Не удалось преобразовать тело ответа в Map");
+//                return result;
+//            }
+//        } catch (RestClientException e) {
+//            Map<String, Object> result = new HashMap<>();
+//            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
+//            return result;
+//        }
+//    }
     private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "https://master-food.pro/";
-        try {
-            ResponseEntity<Object> response = restTemplate.postForEntity(url, request, Object.class);
+        restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
 
-            if (response.getBody() instanceof Map) {
-                return (Map<String, Object>) response.getBody();
-            } else {
-//                System.err.println("Не удалось преобразовать тело ответа в Map");
-//                return null;
-                Map<String, Object> result = new HashMap<>();
-                result.put("Error", "Не удалось преобразовать тело ответа в Map");
-                return result;
-            }
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class);
+            String html = response.getBody();
+            Map<String, Object> result = new HashMap<>();
+            result.put("Result", html);
+            return result;
+
+
         } catch (RestClientException e) {
-//            System.err.println("Ошибка при отправке POST-запроса: " + e.getMessage());
-//            return null;
             Map<String, Object> result = new HashMap<>();
             result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
             return result;
