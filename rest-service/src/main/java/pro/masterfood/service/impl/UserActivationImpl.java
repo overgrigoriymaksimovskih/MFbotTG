@@ -98,12 +98,18 @@ public class UserActivationImpl implements UserActivatonService {
             if (response.getBody() instanceof Map) {
                 return (Map<String, Object>) response.getBody();
             } else {
-                System.err.println("Не удалось преобразовать тело ответа в Map");
-                return null;
+//                System.err.println("Не удалось преобразовать тело ответа в Map");
+//                return null;
+                Map<String, Object> result = new HashMap<>();
+                result.put("Error", "Не удалось преобразовать тело ответа в Map");
+                return result;
             }
         } catch (RestClientException e) {
-            System.err.println("Ошибка при отправке POST-запроса: " + e.getMessage());
-            return null;
+//            System.err.println("Ошибка при отправке POST-запроса: " + e.getMessage());
+//            return null;
+            Map<String, Object> result = new HashMap<>();
+            result.put("Error", "Ошибка при отправке POST-запроса: \" + e.getMessage()");
+            return result;
         }
     }
 }
