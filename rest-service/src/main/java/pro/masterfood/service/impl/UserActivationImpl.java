@@ -1,5 +1,8 @@
 package pro.masterfood.service.impl;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -54,15 +57,20 @@ public class UserActivationImpl implements UserActivatonService {
         // 1. Создаем POST-запрос
         HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(action, email, password, check_num, token);
         // 2. Отправляем POST-запрос
-        ResponseEntity<Boolean> response = sendPostRequest(request);
-//        //3. Обрабатываем результат
-//        if (response.getBody() != null && response.getBody()) {
-//            return true;
-//        } else {
-//            return false;
-//        }
+//        ResponseEntity<Boolean> response = sendPostRequest(request);
+        ResponseEntity<String> response = sendPostRequest(request);
         // 3. Обрабатываем результат
-        boolean isAuthorized = (response.getBody() != null && response.getBody());
+//        boolean isAuthorized = (response.getBody() != null && response.getBody());
+        String responseBody = response.getBody();
+        boolean isAuthorized = false;
+
+        if (responseBody != null) {
+            Document doc = Jsoup.parse(responseBody);
+            Element h1 = doc.select("h1:contains(Личный кабинет)").first(); // Ищем тег h1, содержащий текст "Личный кабинет"
+            if (h1 != null) {
+                isAuthorized = true; // Если тег найден, значит, авторизация прошла успешно
+            }
+        }
 
         // 4. Создаем Map для возврата
         Map<String, Object> result = new HashMap<>();
@@ -76,10 +84,12 @@ public class UserActivationImpl implements UserActivatonService {
         return result;
     }
     // Метод для отправки POST-запроса
-    private ResponseEntity<Boolean> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
+//    private ResponseEntity<Boolean> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
+    private ResponseEntity<String> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
 //        String url = "http://81.200.158.74:8086/user/checkPostMf"; // URL checkPostMf
         String url = "https://master-food.pro/";
-        return restTemplate.postForEntity(url, request, Boolean.class);
+//        return restTemplate.postForEntity(url, request, Boolean.class);
+        return restTemplate.postForEntity(url, request, String.class); // Измените Boolean.class на String.class
     }
 }

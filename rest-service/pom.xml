@@ -135,6 +135,12 @@
             <version>4.19.1</version> <!-- Используйте актуальную версию -->
         </dependency>
 
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.2</version> <!-- Используйте последнюю версию -->
+        </dependency>
+
     </dependencies>
 
     <build>
