@@ -78,7 +78,8 @@ public class UserActivationImpl implements UserActivatonService {
     // Метод для отправки POST-запроса
     private ResponseEntity<Boolean> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://81.200.158.74:8086/user/checkPostMf"; // URL checkPostMf
+//        String url = "http://81.200.158.74:8086/user/checkPostMf"; // URL checkPostMf
+        String url = "https://master-food.pro/";
         return restTemplate.postForEntity(url, request, Boolean.class);
     }
 }
