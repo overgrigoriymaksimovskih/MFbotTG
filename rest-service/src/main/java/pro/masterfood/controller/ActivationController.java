@@ -77,7 +77,8 @@ public class ActivationController {
             return ResponseEntity.ok(res);
         } else {
             // Если не авторизован, возвращаем данные и статус 500 Internal Server Error
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+            return ResponseEntity.ok(res);
         }
     }
 }
