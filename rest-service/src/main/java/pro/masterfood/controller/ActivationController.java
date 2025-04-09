@@ -68,9 +68,11 @@ public class ActivationController {
 //            return ResponseEntity.ok().body("Пользователь MF авторизован");
 //        }
 //        return ResponseEntity.internalServerError().build();
-        boolean isAuthorized = (boolean) res.get("isAuthorized"); // Получаем статус авторизации
 
-        if (isAuthorized) {
+//        boolean isAuthorized = (boolean) res.get("isAuthorized"); // Получаем статус авторизации
+        String isAuthorized = res.get("isAuthorized").toString();
+
+        if (!isAuthorized.equals("empty")) {
             // Если авторизован, возвращаем данные и статус 200 OK
             return ResponseEntity.ok(res);
         } else {
