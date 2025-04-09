@@ -9,6 +9,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.service.UserActivatonService;
@@ -60,28 +61,12 @@ public class UserActivationImpl implements UserActivatonService {
         // 1. Создаем POST-запрос
         HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(action, email, password, check_num, token);
         // 2. Отправляем POST-запрос
-//        ResponseEntity<Boolean> response = sendPostRequest(request);
-//        ResponseEntity<String> response = sendPostRequest(request);
-        ResponseEntity<Map<String, Object>> response = sendPostRequest(request);
+        Map<String, Object> response = sendPostRequest(request);
         // 3. Обрабатываем результат
-//        boolean isAuthorized = (response.getBody() != null && response.getBody());
-
-
-//        String responseBody = response.getBody();
-//        boolean isAuthorized = false;
-//
-//        if (responseBody != null) {
-//            Document doc = Jsoup.parse(responseBody);
-//            Element h1 = doc.select("h1:contains(Личный кабинет)").first(); // Ищем тег h1, содержащий текст "Личный кабинет"
-//            if (h1 != null) {
-//                isAuthorized = true; // Если тег найден, значит, авторизация прошла успешно
-//            }
-//        }
-
         boolean isAuthorized = false;
 
-        if (response.getBody() != null && response.getBody().containsKey("Status")) {
-            String status = (String) response.getBody().get("Status");
+        if (response != null && response.containsKey("Status")) {
+            String status = (String) response.get("Status");
             isAuthorized = "success".equals(status); // Проверяем, что Status равен "success"
         }
 
@@ -97,18 +82,21 @@ public class UserActivationImpl implements UserActivatonService {
         return result;
     }
     // Метод для отправки POST-запроса
-//    private ResponseEntity<Boolean> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
-    private ResponseEntity<Map<String, Object>> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
+    private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
-//        String url = "http://81.200.158.74:8086/user/checkPostMf"; // URL checkPostMf
         String url = "https://master-food.pro/";
-//        return restTemplate.postForEntity(url, request, Boolean.class);
-//        return restTemplate.postForEntity(url, request, String.class); // Измените Boolean.class на String.class
-        return restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                request,
-                new ParameterizedTypeReference<Map<String, Object>>() {}
-        );
+        try {
+            ResponseEntity<Object> response = restTemplate.postForEntity(url, request, Object.class);
+
+            if (response.getBody() instanceof Map) {
+                return (Map<String, Object>) response.getBody();
+            } else {
+                System.err.println("Не удалось преобразовать тело ответа в Map");
+                return null;
+            }
+        } catch (RestClientException e) {
+            System.err.println("Ошибка при отправке POST-запроса: " + e.getMessage());
+            return null;
+        }
     }
 }
