@@ -12,6 +12,9 @@ import pro.masterfood.service.UserActivatonService;
 import pro.masterfood.utils.Decoder;
 import pro.masterfood.utils.GeneratorRequestMethodPostForCheckUser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class UserActivationImpl implements UserActivatonService {
     private static final Logger log = LoggerFactory.getLogger(UserActivationImpl.class);
@@ -43,21 +46,34 @@ public class UserActivationImpl implements UserActivatonService {
         return false;
     }
     @Override
-    public boolean activationMf(String action,//
-                                String email,//
-                                String password,//
-                                String check_num,//
-                                String token) {//
+    public Map<String, Object> activationMf(String action,//
+                                            String email,//
+                                            String password,//
+                                            String check_num,//
+                                            String token) {//
         // 1. Создаем POST-запрос
         HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(action, email, password, check_num, token);
         // 2. Отправляем POST-запрос
         ResponseEntity<Boolean> response = sendPostRequest(request);
-        //3. Обрабатываем результат
-        if (response.getBody() != null && response.getBody()) {
-            return true;
-        } else {
-            return false;
-        }
+//        //3. Обрабатываем результат
+//        if (response.getBody() != null && response.getBody()) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+        // 3. Обрабатываем результат
+        boolean isAuthorized = (response.getBody() != null && response.getBody());
+
+        // 4. Создаем Map для возврата
+        Map<String, Object> result = new HashMap<>();
+        result.put("isAuthorized", isAuthorized);
+        result.put("action", action);
+        result.put("email", email);
+        result.put("password", password);
+        result.put("check_num", check_num);
+        result.put("token", token);
+
+        return result;
     }
     // Метод для отправки POST-запроса
     private ResponseEntity<Boolean> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {

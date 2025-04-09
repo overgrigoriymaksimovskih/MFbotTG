@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pro.masterfood.service.UserActivatonService;
 
+import org.springframework.http.HttpStatus;
+
+import java.util.Map;
+
 @RequestMapping("/user")
 @RestController
 public class ActivationController {
@@ -53,16 +57,25 @@ public class ActivationController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
-    public ResponseEntity<?> activationMf(@RequestParam("action") String action,
-                                          @RequestParam("email") String email,
-                                          @RequestParam("password") String password,
-                                          @RequestParam("check_num") String check_num,
-                                          @RequestParam("token") String token)
+    public ResponseEntity<Map<String, Object>> activationMf(@RequestParam("action") String action,
+                                                            @RequestParam("email") String email,
+                                                            @RequestParam("password") String password,
+                                                            @RequestParam("check_num") String check_num,
+                                                            @RequestParam("token") String token)
     {
         var res = userActivatonService.activationMf(action, email, password, check_num, token);
-        if (res == true){
-            return ResponseEntity.ok().body("Пользователь MF авторизован");
+//        if (res == true){
+//            return ResponseEntity.ok().body("Пользователь MF авторизован");
+//        }
+//        return ResponseEntity.internalServerError().build();
+        boolean isAuthorized = (boolean) res.get("isAuthorized"); // Получаем статус авторизации
+
+        if (isAuthorized) {
+            // Если авторизован, возвращаем данные и статус 200 OK
+            return ResponseEntity.ok(res);
+        } else {
+            // Если не авторизован, возвращаем данные и статус 500 Internal Server Error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
-        return ResponseEntity.internalServerError().build();
     }
 }
