@@ -108,7 +108,7 @@ public class UserActivationImpl implements UserActivatonService {
 //            System.err.println("Ошибка при отправке POST-запроса: " + e.getMessage());
 //            return null;
             Map<String, Object> result = new HashMap<>();
-            result.put("Error", "Ошибка при отправке POST-запроса: \" + e.getMessage()");
+            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
             return result;
         }
     }
