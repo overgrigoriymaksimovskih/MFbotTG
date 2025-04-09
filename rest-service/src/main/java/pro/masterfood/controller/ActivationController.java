@@ -64,21 +64,21 @@ public class ActivationController {
                                                             @RequestParam("token") String token)
     {
         var res = userActivatonService.activationMf(action, email, password, check_num, token);
-//        if (res == true){
-//            return ResponseEntity.ok().body("Пользователь MF авторизован");
-//        }
-//        return ResponseEntity.internalServerError().build();
-
-//        boolean isAuthorized = (boolean) res.get("isAuthorized"); // Получаем статус авторизации
-        String isAuthorized = res.get("isAuthorized").toString();
-
-        if (!isAuthorized.equals("empty")) {
-            // Если авторизован, возвращаем данные и статус 200 OK
-            return ResponseEntity.ok(res);
-        } else {
-            // Если не авторизован, возвращаем данные и статус 500 Internal Server Error
+        return ResponseEntity.ok(res);
+////        if (res == true){
+////            return ResponseEntity.ok().body("Пользователь MF авторизован");
+////        }
+////        return ResponseEntity.internalServerError().build();
+//
+////        boolean isAuthorized = (boolean) res.get("isAuthorized"); // Получаем статус авторизации
+//        String isAuthorized = res.get("isAuthorized").toString();
+//
+//        if (!isAuthorized.equals("empty")) {
+//            // Если авторизован, возвращаем данные и статус 200 OK
+//            return ResponseEntity.ok(res);
+//        } else {
+//            // Если не авторизован, возвращаем данные и статус 500 Internal Server Error
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
-            return ResponseEntity.ok(res);
-        }
+//        }
     }
 }

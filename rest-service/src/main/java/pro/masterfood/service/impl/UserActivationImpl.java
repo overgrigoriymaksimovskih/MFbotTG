@@ -63,27 +63,28 @@ public class UserActivationImpl implements UserActivatonService {
         // 2. Отправляем POST-запрос
         Map<String, Object> response = sendPostRequest(request);
         // 3. Обрабатываем результат
-//        boolean isAuthorized = false;
+
         String isAuthorized = "empty";
 
-        if (response != null) {
-            try {
-                isAuthorized = response.toString(); // Записываем весь ответ в виде строки
-            } catch (Exception e) {
-                isAuthorized = "cannot translate response to string" + e.getMessage();
-            }
+        if(response == null){
+            isAuthorized = "null";
+        }else{
+            isAuthorized = response.toString();
         }
 
-//        // 4. Создаем Map для возврата
-//        Map<String, Object> result = new HashMap<>();
-//        result.put("isAuthorized", isAuthorized);
-//        result.put("action", action);
-//        result.put("email", email);
-//        result.put("password", password);
-//        result.put("check_num", check_num);
-//        result.put("token", token);
-        Map<String, Object> result = new HashMap<>(response); // Создаем копию оригинального response (ВАЖНО!)
-        result.put("isAuthorized", isAuthorized); // Добавляем или перезаписываем isAuthorized
+//        if (response != null && response.containsKey("Status")) {
+//            String status = (String) response.get("Status");
+//            isAuthorized = "success".equals(status); // Проверяем, что Status равен "success"
+//        }
+
+        // 4. Создаем Map для возврата
+        Map<String, Object> result = new HashMap<>();
+        result.put("isAuthorized", isAuthorized);
+        result.put("action", action);
+        result.put("email", email);
+        result.put("password", password);
+        result.put("check_num", check_num);
+        result.put("token", token);
 
         return result;
     }
