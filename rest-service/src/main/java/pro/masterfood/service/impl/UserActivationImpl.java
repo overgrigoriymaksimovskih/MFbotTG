@@ -63,13 +63,17 @@ public class UserActivationImpl implements UserActivatonService {
         // 2. Отправляем POST-запрос
         Map<String, Object> response = sendPostRequest(request);
         // 3. Обрабатываем результат
-        String isAuthorized = "false";
+//        boolean isAuthorized = false;
+        String isAuthorized = "empty";
 
         if (response != null && response.containsKey("Status")) {
-            String status = (String) response.get("Status");
-            String msg = (String) response.get("Msg");
+//            String status = (String) response.get("Status");
 //            isAuthorized = "success".equals(status); // Проверяем, что Status равен "success"
-            isAuthorized = status + "  " + msg;
+            try {
+                isAuthorized = response.toString();
+            } catch (Exception e) {
+                isAuthorized = "cannot translate response to string";
+            }
         }
 
         // 4. Создаем Map для возврата
