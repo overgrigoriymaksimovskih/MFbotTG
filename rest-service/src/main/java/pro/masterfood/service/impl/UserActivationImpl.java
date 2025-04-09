@@ -20,6 +20,8 @@ import pro.masterfood.utils.GeneratorRequestMethodPostForCheckUser;
 import org.springframework.http.HttpMethod;
 import org.springframework.core.ParameterizedTypeReference;
 
+import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,7 +113,10 @@ public class UserActivationImpl implements UserActivatonService {
 //    }
     private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+
+        StringHttpMessageConverter stringConverter = new StringHttpMessageConverter(Charset.forName("windows-1251"));
+        stringConverter.setSupportedMediaTypes(Collections.singletonList(org.springframework.http.MediaType.TEXT_HTML));  // Очень важно указать тип контента
+        restTemplate.getMessageConverters().add(stringConverter);
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class);
