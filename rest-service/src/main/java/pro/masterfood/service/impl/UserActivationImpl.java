@@ -140,30 +140,22 @@ public class UserActivationImpl implements UserActivatonService {
 //        }//---
 
         try {
-            ResponseEntity<byte[]> response = restTemplate.postForEntity("https://master-food.pro/", request, byte[].class);
-            byte[] gzippedHtml = response.getBody();
-            // Decompress gzip manually
-            String html = "empty";
+            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class); // Get response as String
+            String html = response.getBody();
             Map<String, Object> result = new HashMap<>();
-            try {
-                html = decompressGzip(gzippedHtml);
-            } catch (IOException e) {
-                result.put("Result", e.getMessage());
-                return result;
-            }
 
+            // Parse JSON from the HTML string
             ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> answer = null;
             try {
-                result = mapper.readValue(html, Map.class);
+                answer = mapper.readValue(html, Map.class);
             } catch (JsonProcessingException e) {
-                result.put("Result", e.getMessage());
+                result.put("Result", "Cannot read value with mapper from answer");
                 return result;
             }
-            result.put("Result", html);
+
+            result.put("Result", answer);
             return result;
-
-
-
 
         } catch (RestClientException e) {
             Map<String, Object> result = new HashMap<>();
@@ -171,21 +163,4 @@ public class UserActivationImpl implements UserActivatonService {
             return result;
         }
     }
-    // Helper function to decompress gzip
-    private String decompressGzip(byte[] compressed) throws IOException {
-        if ((compressed == null) || (compressed.length == 0)) {
-            return "";
-        }
-        ByteArrayInputStream bis = new ByteArrayInputStream(compressed);
-        GZIPInputStream gis = new GZIPInputStream(bis);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = gis.read(buffer)) != -1) {
-            baos.write(buffer, 0, len);
-        }
-        // Convert to String using windows-1251
-        return new String(baos.toByteArray(), "windows-1251");
-    }
-
 }
