@@ -120,25 +120,6 @@ public class UserActivationImpl implements UserActivatonService {
     private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
 
-//        try {
-//            ResponseEntity<byte[]> response = restTemplate.postForEntity("https://master-food.pro/", request, byte[].class);
-//            byte[] gzippedHtml = response.getBody();
-//
-//            // Decompress gzip manually
-//            String html = decompressGzip(gzippedHtml);
-//
-//            //Parse JSON
-//            ObjectMapper mapper = new ObjectMapper();
-//            Map<String, Object> result = mapper.readValue(html, Map.class);
-//
-//            return result;
-//
-//        } catch (Exception e) {
-//            Map<String, Object> result = new HashMap<>();
-//            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
-//            return result;
-//        }//---
-
         try {
             ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class); // Get response as String
             String html = response.getBody();
@@ -150,7 +131,7 @@ public class UserActivationImpl implements UserActivatonService {
             try {
                 answer = mapper.readValue(html, Map.class);
             } catch (JsonProcessingException e) {
-                result.put("Result", "Cannot read value with mapper from answer");
+                result.put("Result", "Cannot read value with mapper from answer (selenium not worked....)");
                 return result;
             }
 
