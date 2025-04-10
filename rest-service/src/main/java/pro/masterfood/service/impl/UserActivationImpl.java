@@ -1,5 +1,7 @@
 package pro.masterfood.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,10 +22,14 @@ import pro.masterfood.utils.GeneratorRequestMethodPostForCheckUser;
 import org.springframework.http.HttpMethod;
 import org.springframework.core.ParameterizedTypeReference;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 @Component
 public class UserActivationImpl implements UserActivatonService {
@@ -114,16 +120,49 @@ public class UserActivationImpl implements UserActivatonService {
     private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
 
-        StringHttpMessageConverter stringConverter = new StringHttpMessageConverter(Charset.forName("windows-1251"));
-        stringConverter.setSupportedMediaTypes(Collections.singletonList(org.springframework.http.MediaType.TEXT_HTML));  // Очень важно указать тип контента
-        restTemplate.getMessageConverters().add(stringConverter);
+//        try {
+//            ResponseEntity<byte[]> response = restTemplate.postForEntity("https://master-food.pro/", request, byte[].class);
+//            byte[] gzippedHtml = response.getBody();
+//
+//            // Decompress gzip manually
+//            String html = decompressGzip(gzippedHtml);
+//
+//            //Parse JSON
+//            ObjectMapper mapper = new ObjectMapper();
+//            Map<String, Object> result = mapper.readValue(html, Map.class);
+//
+//            return result;
+//
+//        } catch (Exception e) {
+//            Map<String, Object> result = new HashMap<>();
+//            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
+//            return result;
+//        }//---
 
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class);
-            String html = response.getBody();
-            Map<String, Object> result = new HashMap<>();
+            ResponseEntity<byte[]> response = restTemplate.postForEntity("https://master-food.pro/", request, byte[].class);
+            byte[] gzippedHtml = response.getBody();
+            // Decompress gzip manually
+            String html = "empty";
+            Map<String, Object> result = null;
+            try {
+                html = decompressGzip(gzippedHtml);
+            } catch (IOException e) {
+                result.put("Result", e.getMessage());
+                return result;
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                result = mapper.readValue(html, Map.class);
+            } catch (JsonProcessingException e) {
+                result.put("Result", e.getMessage());
+                return result;
+            }
             result.put("Result", html);
             return result;
+
+
 
 
         } catch (RestClientException e) {
@@ -132,4 +171,21 @@ public class UserActivationImpl implements UserActivatonService {
             return result;
         }
     }
+    // Helper function to decompress gzip
+    private String decompressGzip(byte[] compressed) throws IOException {
+        if ((compressed == null) || (compressed.length == 0)) {
+            return "";
+        }
+        ByteArrayInputStream bis = new ByteArrayInputStream(compressed);
+        GZIPInputStream gis = new GZIPInputStream(bis);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = gis.read(buffer)) != -1) {
+            baos.write(buffer, 0, len);
+        }
+        // Convert to String using windows-1251
+        return new String(baos.toByteArray(), "windows-1251");
+    }
+
 }
