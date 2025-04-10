@@ -144,7 +144,7 @@ public class UserActivationImpl implements UserActivatonService {
             byte[] gzippedHtml = response.getBody();
             // Decompress gzip manually
             String html = "empty";
-            Map<String, Object> result = null;
+            Map<String, Object> result = new HashMap<>();
             try {
                 html = decompressGzip(gzippedHtml);
             } catch (IOException e) {
