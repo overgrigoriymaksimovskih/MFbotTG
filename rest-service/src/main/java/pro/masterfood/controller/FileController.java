@@ -27,7 +27,7 @@ public class FileController {
         return "Hello from FileController!";
     }
 
-//    @RequestMapping(method = RequestMethod.GET, value = "/get-doc")
+    //    @RequestMapping(method = RequestMethod.GET, value = "/get-doc")
 //    public String getDoc(@RequestParam("id") String id, HttpServletResponse response) {
 //        if (id == "999"){
 //            return "999";

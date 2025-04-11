@@ -30,7 +30,7 @@ public class GeneratorRequestMethodPostForCheckUser {
 
 
 
-    // Метод для создания POST-запроса 09,04,25
+    // Метод для создания POST-запроса
     public HttpEntity<MultiValueMap<String, String>> buildPostRequest(String action,
                                                                       String email,
                                                                       String password,
@@ -101,7 +101,7 @@ public class GeneratorRequestMethodPostForCheckUser {
                 driver.quit(); // Закрываем браузер
             }
 
-    }
+        }
 
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
