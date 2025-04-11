@@ -1,43 +1,53 @@
 package pro.masterfood.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.openqa.selenium.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.LinkedMultiValueMap;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.time.Duration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @RequiredArgsConstructor
 @Component
-public class GeneratorRequestMethodPostForCheckUser {
+public class SendPostForCheckUser {
+    public Map<String, Object> getLoginResponse(String email,
+                                                String password) {
 
+        // 1. Создаем POST-запрос
+        HttpEntity<MultiValueMap<String, String>> request = buildPostRequest(email,password);
+        // 2. Отправляем POST-запрос и получаем ответ
+        Map<String, Object> response = getRequest(request);
+        // 3. Возвращаем ответ
+        return response;
+    }
 
 
     // Метод для создания POST-запроса
-    public HttpEntity<MultiValueMap<String, String>> buildPostRequest(String action,
-                                                                      String email,
-                                                                      String password,
-                                                                      String check_num,
-                                                                      String token) {
+    private HttpEntity<MultiValueMap<String, String>> buildPostRequest(String email,
+                                                                      String password) {
         WebDriver driver = null;
         HttpHeaders headers = null;
+
+        String parsedCheckNum = null;
+        String parsedToken = null;
+
         try {
             // 1. Настройка Selenium и ChromeDriver
             String chromeDriverPath = System.getenv("CHROMEDRIVER_PATH");
@@ -64,18 +74,28 @@ public class GeneratorRequestMethodPostForCheckUser {
             driver.manage().window().setSize(new Dimension(1920, 1080));
             driver.get(loginPageUrl);
 
-            // Find the CSRF token (adjust the selector if needed)
-            WebElement tokenElement = driver.findElement(By.cssSelector("meta[name='csrf-token']"));  // Example: <meta name="csrf-token" content="YOUR_TOKEN">
-            String csrfToken = tokenElement.getAttribute("content");
+//            // Find the CSRF token (adjust the selector if needed)
+//            WebElement tokenElement = driver.findElement(By.cssSelector("meta[name='csrf-token']"));  // Example: <meta name="csrf-token" content="YOUR_TOKEN">
+//            String csrfToken = tokenElement.getAttribute("content");
+            //-----------------------------------------------------------
+            // Execute JavaScript to get check_num and token
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            parsedCheckNum = (String) js.executeScript("return document.querySelector('input[name=\"check_num\"]').value;");
+            parsedToken = (String) js.executeScript("return document.querySelector('input[name=\"token\"]').value;");
 
-            // Get all cookies
+            // Get CSRF token
+            WebElement tokenElement = driver.findElement(By.cssSelector("meta[name='csrf-token']"));
+            String parsedCsrfToken = tokenElement.getAttribute("content");
+
+            // Get cookies
             Set<Cookie> cookies = driver.manage().getCookies();
 
-            // Convert cookies to a string
             StringBuilder cookieString = new StringBuilder();
             for (Cookie cookie : cookies) {
                 cookieString.append(cookie.getName()).append("=").append(cookie.getValue()).append("; ");
             }
+            String parsedCookieString = cookieString.toString();
+            //----------------------------------------------------------
 
             // 2. Set headers, including CSRF token and cookies
             headers = new HttpHeaders();
@@ -85,12 +105,12 @@ public class GeneratorRequestMethodPostForCheckUser {
             headers.add("Origin", "https://master-food.pro");
             headers.add("Referer", "https://master-food.pro/private/");
             headers.add("X-Requested-With", "XMLHttpRequest");
-            headers.add("x-csrf-token", csrfToken); // Use the token from Selenium
+            headers.add("x-csrf-token", parsedCsrfToken); // Use the token from Selenium
             headers.add("http_x_requested_with", "XMLHttpRequest");
             headers.add("sec-ch-ua", "\"Not_A Brand\";v=\"99\", \"Google Chrome\";v=\"109\", \"Chromium\";v=\"109\"");
             headers.add("sec-ch-ua-mobile", "?0");
             headers.add("sec-ch-ua-platform", "\"Windows\"");
-            headers.add("Cookie", String.valueOf(cookieString)); // Use cookies from Selenium
+            headers.add("Cookie", parsedCookieString); // Use cookies from Selenium
 
 
         } catch (Exception e) {
@@ -105,12 +125,39 @@ public class GeneratorRequestMethodPostForCheckUser {
 
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("action", action);
+        map.add("action", "login");
         map.add("email", email);
         map.add("password", password);
-        map.add("check_num", check_num);
-        map.add("token", token);
+        map.add("check_num", parsedCheckNum);
+        map.add("token", parsedToken);
 
         return new HttpEntity<>(map, headers);
+    }
+    private Map<String, Object> getRequest(HttpEntity<MultiValueMap<String, String>> request) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class); // Get response as String
+            String html = response.getBody();
+            Map<String, Object> result = new HashMap<>();
+
+            // Parse JSON from the HTML string
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> answer = null;
+            try {
+                answer = mapper.readValue(html, Map.class);
+            } catch (JsonProcessingException e) {
+                result.put("Result", "Cannot read value with mapper from answer (selenium not worked....)");
+                return result;
+            }
+
+            result.put("Result", answer);
+            return result;
+
+        } catch (RestClientException e) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
+            return result;
+        }
     }
 }
