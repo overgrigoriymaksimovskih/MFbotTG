@@ -1,18 +1,14 @@
 package pro.masterfood.utils;
 
+import org.openqa.selenium.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.LinkedMultiValueMap;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
@@ -38,6 +34,10 @@ public class GeneratorRequestMethodPostForCheckUser {
                                                                       String token) {
         WebDriver driver = null;
         HttpHeaders headers = null;
+
+        String parsedCheckNum = null;
+        String parsedToken = null;
+
         try {
             // 1. Настройка Selenium и ChromeDriver
             String chromeDriverPath = System.getenv("CHROMEDRIVER_PATH");
@@ -67,6 +67,11 @@ public class GeneratorRequestMethodPostForCheckUser {
             // Find the CSRF token (adjust the selector if needed)
             WebElement tokenElement = driver.findElement(By.cssSelector("meta[name='csrf-token']"));  // Example: <meta name="csrf-token" content="YOUR_TOKEN">
             String csrfToken = tokenElement.getAttribute("content");
+
+            // Execute JavaScript to get check_num and token
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            parsedCheckNum = (String) js.executeScript("return document.querySelector('input[name=\"check_num\"]').value;");
+            parsedToken = (String) js.executeScript("return document.querySelector('input[name=\"token\"]').value;");
 
             // Get all cookies
             Set<Cookie> cookies = driver.manage().getCookies();
@@ -105,11 +110,11 @@ public class GeneratorRequestMethodPostForCheckUser {
 
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("action", action);
+        map.add("action", "login");
         map.add("email", email);
         map.add("password", password);
-        map.add("check_num", check_num);
-        map.add("token", token);
+        map.add("check_num", parsedCheckNum);
+        map.add("token", parsedToken);
 
         return new HttpEntity<>(map, headers);
     }
