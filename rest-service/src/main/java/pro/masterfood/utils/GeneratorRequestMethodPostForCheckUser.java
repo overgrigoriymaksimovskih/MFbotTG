@@ -16,6 +16,7 @@ import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
+import pro.masterfood.RestService;
 
 import java.util.Collections;
 import java.util.Set;
@@ -36,26 +37,29 @@ public class GeneratorRequestMethodPostForCheckUser {
         String parsedToken = null;
 
         try {
-            // 1. Настройка Selenium и ChromeDriver
-            String chromeDriverPath = System.getenv("CHROMEDRIVER_PATH");
-            if (chromeDriverPath == null) {
-                chromeDriverPath = "/usr/local/bin/chromedriver"; // Значение по умолчанию (если переменная окружения не установлена)
-            }
-            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+//            // 1. Настройка Selenium и ChromeDriver
+//            String chromeDriverPath = System.getenv("CHROMEDRIVER_PATH");
+//            if (chromeDriverPath == null) {
+//                chromeDriverPath = "/usr/local/bin/chromedriver"; // Значение по умолчанию (если переменная окружения не установлена)
+//            }
+//            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
 
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36");
-            options.addArguments("--ignore-certificate-errors"); // Игнорируем ошибки сертификатов SSL/TLS
-            options.addArguments("--headless"); // Запуск Chrome в headless режиме (без GUI)
-            options.addArguments("--enable-javascript");
-            options.addArguments("--no-sandbox"); // Обязательно для Docker
-            options.addArguments("--disable-dev-shm-usage");  // Рекомендуется для Docker
-            options.setBinary("/usr/local/bin/chrome-headless-shell"); // Укажите ПРАВИЛЬНЫЙ путь!
-            options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-            options.setCapability("strictFileInteractability", false);
+//            ChromeOptions options = new ChromeOptions();
+//            options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36");
+//            options.addArguments("--ignore-certificate-errors"); // Игнорируем ошибки сертификатов SSL/TLS
+//            options.addArguments("--headless"); // Запуск Chrome в headless режиме (без GUI)
+//            options.addArguments("--enable-javascript");
+//            options.addArguments("--no-sandbox"); // Обязательно для Docker
+//            options.addArguments("--disable-dev-shm-usage");  // Рекомендуется для Docker
+//            options.setBinary("/usr/local/bin/chrome-headless-shell"); // Укажите ПРАВИЛЬНЫЙ путь!
+//            options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+//            options.setCapability("strictFileInteractability", false);
+//
+//            driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
 
-            driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
+            driver = RestService.getWebDriverPool().borrowObject();
+
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
             String loginPageUrl = "https://master-food.pro/private/";
             driver.manage().window().setSize(new Dimension(1920, 1080));
@@ -100,7 +104,8 @@ public class GeneratorRequestMethodPostForCheckUser {
 
         } finally {
             if (driver != null) {
-                driver.quit(); // Закрываем браузер
+//                driver.quit(); // Закрываем браузер
+                RestService.getWebDriverPool().returnObject(driver);// Возвращаем WebDriver в пул (важно!)
             }
 
         }

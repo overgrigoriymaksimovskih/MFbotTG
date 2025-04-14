@@ -39,6 +39,7 @@ public class ActivationController {
         // 2. Извлекаем значение "Status" из isAuthorizedMap
         String status = "failure"; // Значение по умолчанию
         String message = "Не удалось связаться с сервисом авторизации...";
+        String sessionId = null;
         if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
             Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
             if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
