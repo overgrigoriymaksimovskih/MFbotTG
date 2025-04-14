@@ -38,6 +38,7 @@ public class ActivationController {
 
         // 2. Извлекаем значение "Status" из isAuthorizedMap
         String status = "failure"; // Значение по умолчанию
+        String message = "Не удалось связаться с сервисом авторизации...";
         if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
             Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
             if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
@@ -46,10 +47,14 @@ public class ActivationController {
                     status = "success";
                 }
             }
+            if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
+                message = (String) resultMap.get("Msg");
+            }
         }
 
         // 3. Заменяем isAuthorized на статус
         res.put("isAuthorized", status);
+        res.put("Message", message);
 
         return ResponseEntity.ok(res);
     }
