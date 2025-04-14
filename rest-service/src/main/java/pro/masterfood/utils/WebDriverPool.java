@@ -1,76 +1,51 @@
 package pro.masterfood.utils;
 
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-public class WebDriverPool {
+@Component
+public class WebDriverPool implements DisposableBean {
 
-    private final BlockingQueue<WebDriver> pool;
-    private final int maxSize;
+    private static final Logger logger = LoggerFactory.getLogger(WebDriverPool.class);
 
-    public WebDriverPool(int maxSize) {
-        this.maxSize = maxSize;
-        this.pool = new LinkedBlockingQueue<>(maxSize);
+    private final ObjectPool<WebDriver> objectPool;
 
-        // Инициализация пула
-        for (int i = 0; i < maxSize; i++) {
-            pool.add(createWebDriver());
-        }
+    public WebDriverPool(@Value("${webdriver.pool.size:5}") int poolSize) {
+        WebDriverFactory factory = new WebDriverFactory();
+        this.objectPool = new GenericObjectPool<>(factory);
+        ((GenericObjectPool<WebDriver>) this.objectPool).setMaxTotal(poolSize);
+        logger.info("Initializing WebDriverPool with size: {}", poolSize);
     }
 
-    private WebDriver createWebDriver() {
-        // 1. Настройка Selenium и ChromeDriver
-        String chromeDriverPath = System.getenv("CHROMEDRIVER_PATH");
-        if (chromeDriverPath == null) {
-            chromeDriverPath = "/usr/local/bin/chromedriver"; // Значение по умолчанию (если переменная окружения не установлена)
-        }
-        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-
-
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36");
-        options.addArguments("--ignore-certificate-errors"); // Игнорируем ошибки сертификатов SSL/TLS
-        options.addArguments("--headless"); // Запуск Chrome в headless режиме (без GUI)
-        options.addArguments("--enable-javascript");
-        options.addArguments("--no-sandbox"); // Обязательно для Docker
-        options.addArguments("--disable-dev-shm-usage"); // Предотвращает использование /dev/shm (может вызывать проблемы в Docker)
-        options.addArguments("--disable-gpu"); // Отключаем GPU (графический процессор), что полезно для сред без графического интерфейса.
-        options.addArguments("--window-size=1920,1080");
-        // Отключаем логирование
-        options.setExperimentalOption("excludeSwitches", new String[]{"enable-logging"});
-
-        // Добавляем capabilities
-        //DesiredCapabilities capabilities = new DesiredCapabilities();
-        //capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-        //options.merge(capabilities);
-
-        //options.setBinary("/usr/bin/google-chrome");
-
-        return new ChromeDriver(options);
-    }
-
-    public WebDriver borrowObject() throws InterruptedException {
-        return pool.take(); // Блокируется, если пул пуст
+    public WebDriver borrowObject() throws Exception {
+        logger.debug("Borrowing WebDriver from pool.");
+        return objectPool.borrowObject();
     }
 
     public void returnObject(WebDriver driver) {
-        if (driver != null) {
-            pool.offer(driver); // Не блокируется, если пул полон
+        try {
+            objectPool.returnObject(driver);
+            logger.debug("Returning WebDriver to pool.");
+        } catch (Exception e) {
+            logger.error("Error returning WebDriver to pool: {}", e.getMessage(), e);
+            // Если не удалось вернуть объект в пул, уничтожаем его
+            try {
+                objectPool.invalidateObject(driver);
+            } catch (Exception ex) {
+                logger.error("Error invalidating WebDriver: {}", ex.getMessage(), ex);
+            }
         }
     }
 
-    public void closeAll() {
-        for (WebDriver driver : pool) {
-            try {
-                driver.quit(); // Закрываем браузер
-            } catch (Exception e) {
-                // Обрабатываем исключения при закрытии браузера
-                System.err.println("Error closing WebDriver: " + e.getMessage());
-            }
-        }
-        pool.clear(); // Очищаем пул
+    @Override
+    public void destroy() throws Exception {
+        logger.info("Closing WebDriverPool.");
+        objectPool.close();
     }
 }

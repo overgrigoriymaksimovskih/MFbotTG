@@ -44,7 +44,7 @@ public class UserActivationImpl implements UserActivationService {
         this.decoder = decoder;
     }
 
-//    @Override
+    //    @Override
 //    public boolean activation(String cryptoUserId) {
 //        var userId = decoder.idOf(cryptoUserId);
 //        log.debug(String.format("User activation with user-id=%s", userId));

@@ -141,6 +141,11 @@
             <version>1.17.2</version> <!-- Используйте последнюю версию -->
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
