@@ -33,6 +33,24 @@ public class ActivationController {
                                                             @RequestParam("password") String password)
     {
         var res = userActivatonService.activationFromSite(email, password);
+        // 1. Извлекаем Map "isAuthorized"
+        Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");
+
+        // 2. Извлекаем значение "Status" из isAuthorizedMap
+        String status = "failure"; // Значение по умолчанию
+        if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
+            Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
+            if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
+                String statusValue = (String) resultMap.get("Status");
+                if ("success".equalsIgnoreCase(statusValue)) {
+                    status = "success";
+                }
+            }
+        }
+
+        // 3. Заменяем isAuthorized на статус
+        res.put("isAuthorized", status);
+
         return ResponseEntity.ok(res);
     }
 }

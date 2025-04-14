@@ -68,19 +68,10 @@ public class UserActivationImpl implements UserActivationService {
         HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(email, password);
         // 2. Отправляем POST-запрос
         Map<String, Object> response = sendPostRequest(request);
-        // 3. Обрабатываем результат
 
-        String isAuthorized = "empty";
-
-        if(response == null){
-            isAuthorized = "null";
-        }else{
-            isAuthorized = response.toString();
-        }
-
-        // 4. Создаем Map для возврата
+        // 3. Создаем Map для возврата
         Map<String, Object> result = new HashMap<>();
-        result.put("isAuthorized", isAuthorized);
+        result.put("isAuthorized", response);
         result.put("action", "login");
         result.put("email", email);
         result.put("password", password);
