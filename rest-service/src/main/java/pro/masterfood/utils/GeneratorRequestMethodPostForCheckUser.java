@@ -24,8 +24,6 @@ import java.util.Set;
 @Component
 public class GeneratorRequestMethodPostForCheckUser {
 
-    private final WebDriverPool webDriverPool;
-
 
 
     // Метод для создания POST-запроса
@@ -39,9 +37,25 @@ public class GeneratorRequestMethodPostForCheckUser {
 
         try {
             // 1. Настройка Selenium и ChromeDriver
-            // Получаем WebDriver из пула
-            driver = webDriverPool.borrowObject();
+            String chromeDriverPath = System.getenv("CHROMEDRIVER_PATH");
+            if (chromeDriverPath == null) {
+                chromeDriverPath = "/usr/local/bin/chromedriver"; // Значение по умолчанию (если переменная окружения не установлена)
+            }
+            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
+
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36");
+            options.addArguments("--ignore-certificate-errors"); // Игнорируем ошибки сертификатов SSL/TLS
+            options.addArguments("--headless"); // Запуск Chrome в headless режиме (без GUI)
+            options.addArguments("--enable-javascript");
+            options.addArguments("--no-sandbox"); // Обязательно для Docker
+            options.addArguments("--disable-dev-shm-usage");  // Рекомендуется для Docker
+            options.setBinary("/usr/local/bin/chrome-headless-shell"); // Укажите ПРАВИЛЬНЫЙ путь!
+            options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+            options.setCapability("strictFileInteractability", false);
+
+            driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
             String loginPageUrl = "https://master-food.pro/private/";
             driver.manage().window().setSize(new Dimension(1920, 1080));
