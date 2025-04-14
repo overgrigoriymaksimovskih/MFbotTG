@@ -4,5 +4,6 @@ import java.util.Map;
 
 public interface UserActivationService {
 //    boolean activation(String cryptoUserId);
-    Map<String, Object> activation(String email, String password);
+    Map<String, Object> activationFromSite(String email,
+                                           String password);
 }

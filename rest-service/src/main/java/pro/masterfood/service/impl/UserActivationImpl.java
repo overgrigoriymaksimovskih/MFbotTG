@@ -62,29 +62,30 @@ public class UserActivationImpl implements UserActivationService {
 //        return false;
 //    }
     @Override
-    public Map<String, Object> activation(String email,
-                                          String password) {
+    public Map<String, Object> activationFromSite(String email,
+                                                  String password) {
         // 1. Создаем POST-запрос
         HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(email, password);
         // 2. Отправляем POST-запрос
         Map<String, Object> response = sendPostRequest(request);
         // 3. Обрабатываем результат
 
-//        String isAuthorized;
-//
-//        if(response == null){
-//            isAuthorized = "null";
-//        }else{
-//            isAuthorized = response.toString();
-//        }
-//
-//        // 4. Создаем Map для возврата
-//        Map<String, Object> result = new HashMap<>();
-//        result.put("isAuthorized", isAuthorized);
-//        result.put("email", email);
-//        result.put("password", password);
+        String isAuthorized = "empty";
 
-        return response;
+        if(response == null){
+            isAuthorized = "null";
+        }else{
+            isAuthorized = response.toString();
+        }
+
+        // 4. Создаем Map для возврата
+        Map<String, Object> result = new HashMap<>();
+        result.put("isAuthorized", isAuthorized);
+        result.put("action", "login");
+        result.put("email", email);
+        result.put("password", password);
+
+        return result;
     }
 
     private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {

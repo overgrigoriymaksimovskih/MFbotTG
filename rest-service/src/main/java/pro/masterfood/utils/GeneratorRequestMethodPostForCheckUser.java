@@ -27,7 +27,8 @@ public class GeneratorRequestMethodPostForCheckUser {
 
 
     // Метод для создания POST-запроса
-    public HttpEntity<MultiValueMap<String, String>> buildPostRequest(String email, String password) {
+    public HttpEntity<MultiValueMap<String, String>> buildPostRequest(String email,
+                                                                      String password) {
         WebDriver driver = null;
         HttpHeaders headers = null;
 
@@ -93,6 +94,7 @@ public class GeneratorRequestMethodPostForCheckUser {
             headers.add("sec-ch-ua-platform", "\"Windows\"");
             headers.add("Cookie", String.valueOf(cookieString)); // Use cookies from Selenium
 
+
         } catch (Exception e) {
 
 
@@ -102,6 +104,7 @@ public class GeneratorRequestMethodPostForCheckUser {
             }
 
         }
+
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("action", "login");

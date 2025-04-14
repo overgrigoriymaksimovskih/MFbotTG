@@ -7,17 +7,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pro.masterfood.service.UserActivationService;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RequestMapping("/user")
 @RestController
 public class ActivationController {
-    private final UserActivationService userActivationService;
+    private final UserActivationService userActivatonService;
 
 
-    public ActivationController(UserActivationService userActivationService) {
-        this.userActivationService = userActivationService;
+    public ActivationController(UserActivationService userActivatonService) {
+        this.userActivatonService = userActivatonService;
     }
 
 //    @RequestMapping(method = RequestMethod.GET, value = "/activation")
@@ -33,20 +32,7 @@ public class ActivationController {
     public ResponseEntity<Map<String, Object>> activationMf(@RequestParam("email") String email,
                                                             @RequestParam("password") String password)
     {
-        var res = userActivationService.activation(email, password);
-
-        String status = (String) res.get("Status");
-        String msg = (String) res.get("msg");
-
-        Map<String, Object> result = new HashMap<>();
-        if (status.equals("success")){
-            result.put("Status", "ok");
-            result.put("Message", "WELCOME!");
-            return ResponseEntity.ok(result);
-        }else{
-            result.put("Status", "failed");
-            result.put("Message", msg);
-            return ResponseEntity.ok(result);
-        }
+        var res = userActivatonService.activationFromSite(email, password);
+        return ResponseEntity.ok(res);
     }
 }
