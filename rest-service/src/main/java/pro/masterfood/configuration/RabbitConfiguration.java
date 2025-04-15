@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfiguration {
 
-    @Value("${spring.rabbitmq.queues.registration-mail}")
+    @Value("${spring.rabbitmq.queues.login}")
     private String registrationMailQueue;
 
     @Bean
