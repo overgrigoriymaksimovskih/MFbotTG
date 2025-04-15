@@ -20,8 +20,7 @@ import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.enums.LinkType;
 import pro.masterfood.service.enums.ServiceCommand;
 
-import static pro.masterfood.enums.UserState.BASIC_STATE;
-import static pro.masterfood.enums.UserState.WAIT_FOR_EMAIL_STATE;
+import static pro.masterfood.enums.UserState.*;
 import static pro.masterfood.service.enums.ServiceCommand.*;
 
 @Component
@@ -56,6 +55,8 @@ public class MainServiceImpl implements MainService {
             output = processServiceCommand(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
+        } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
+            output = appUserService.checkPassword(appUser, text);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! введите /cancel и попробуйте снова...";

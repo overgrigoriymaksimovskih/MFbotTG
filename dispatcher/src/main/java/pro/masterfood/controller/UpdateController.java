@@ -88,7 +88,7 @@ public class UpdateController {
     }
 
     private void processDocMessage (Update update){
-        updateProducer.produce(rabbitConfiguration.getDocMessageUpdateQueue(), update);;
+        updateProducer.produce(rabbitConfiguration.getDocMessageUpdateQueue(), update);
         setFileIsReceivedView(update);
     }
     private void processTextMessage (Update update){
