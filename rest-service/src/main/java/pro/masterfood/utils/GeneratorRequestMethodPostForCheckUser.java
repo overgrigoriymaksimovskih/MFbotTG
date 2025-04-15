@@ -9,15 +9,10 @@ import org.springframework.util.LinkedMultiValueMap;
 
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import java.time.Duration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.Collections;
+import java.time.Duration;
 import java.util.Set;
 
 @RequiredArgsConstructor
