@@ -20,7 +20,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     private final AppUserDAO appUserDAO;
 
     @Override
-    @RabbitListener(queues = "${spring.rabbitmq.queues.registration-mail}")
+    @RabbitListener(queues = "${spring.rabbitmq.queues.login}")
     public void consumeLogin(LoginParams mailParams) {
 
         var optional = appUserDAO.findById(1L);

@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfiguration {
 
     @Value("${spring.rabbitmq.queues.login}")
-    private String registrationMailQueue;
+    private String loginQueue;
 
     @Bean
     public MessageConverter jsonMessageConverter() {
@@ -23,7 +23,7 @@ public class RabbitConfiguration {
 
     @Bean
     public Queue textMessageQueue() {
-        return new Queue(registrationMailQueue);
+        return new Queue(loginQueue);
     }
 
 }
