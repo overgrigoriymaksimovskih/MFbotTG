@@ -30,8 +30,8 @@ public class AppUserServiceImpl implements AppUserService {
         this.hashids = hashids;
     }
 
-    @Value("${spring.rabbitmq.queues.registration-mail}")
-    private String registrationMailQueue;
+    @Value("${spring.rabbitmq.queues.login}")
+    private String registrationLoginQueue;
 
 
     @Override
@@ -87,7 +87,7 @@ public class AppUserServiceImpl implements AppUserService {
                 .email(email)
                 .password(password)
                 .build();
-        rabbitTemplate.convertAndSend(registrationMailQueue, loginParams);
+        rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
     }
 
 //    private void sendRegistrationMail(String cryptoUserId, String email) {
