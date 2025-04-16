@@ -56,11 +56,7 @@ public class MainServiceImpl implements MainService {
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
         } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
-            var chatId = update.getMessage().getChatId();
-            //Здесь передаем в сигнатуру дополнительно chatId, потому как пароль нигде не сохраняем,
-            //он будет отправлен в очередь слушающую пароль для авторизации и обработан
-            //сервисе rest-service откуда нужно будет вернуть ответ пользователю
-            output = appUserService.checkPassword(chatId, appUser, text);
+            output = appUserService.checkPassword(appUser, text);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! введите /cancel и попробуйте снова...";
