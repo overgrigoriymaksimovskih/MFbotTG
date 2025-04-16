@@ -75,6 +75,7 @@ public class AppUserServiceImpl implements AppUserService {
         appUserDAO.save(appUser);
         return "Введите пароль";
     }
+
     @Override
     public String checkPassword(Long chatId, AppUser appUser, String password) {
 //        String email = appUser.getEmail();

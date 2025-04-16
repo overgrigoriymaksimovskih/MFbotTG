@@ -157,6 +157,9 @@ public class MainServiceImpl implements MainService {
     }
 
     private String cancelProcess(AppUser appUser) {
+        if(WAIT_FOR_PASSWORD_STATE.equals(appUser.getState())){
+            appUser.setEmail(null);
+        }
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
         return "Команда отменена!";
