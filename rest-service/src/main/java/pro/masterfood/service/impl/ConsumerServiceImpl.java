@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static pro.masterfood.enums.UserState.BASIC_STATE;
+import static pro.masterfood.enums.UserState.WAIT_FOR_EMAIL_STATE;
 
 @RequiredArgsConstructor
 @Service
@@ -29,10 +30,6 @@ public class ConsumerServiceImpl implements ConsumerService {
     public void consumeLogin(LoginParams loginParams) {
 
         var optional = appUserDAO.findById(1L);
-
-
-
-
 
         String email = loginParams.getEmail();
         String password = loginParams.getPassword();
@@ -58,16 +55,17 @@ public class ConsumerServiceImpl implements ConsumerService {
                         sendAnswer("Успешно", loginParams.getChatId());
                     }
 
-                }
-            }
-            if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
-                message = (String) resultMap.get("Msg");
-                if (optional.isPresent()) {
-                    var user = optional.get();
-                    user.setIsActive(true);
-                    user.setState(BASIC_STATE);
-                    appUserDAO.save(user);
-                    sendAnswer(message, loginParams.getChatId());
+                }else{
+                    if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
+                        message = (String) resultMap.get("Msg");
+                        if (optional.isPresent()) {
+                            var user = optional.get();
+                            user.setEmail(null);
+                            user.setState(WAIT_FOR_EMAIL_STATE);
+                            appUserDAO.save(user);
+                            sendAnswer(message + " введите email", loginParams.getChatId());
+                        }
+                    }
                 }
             }
         }
