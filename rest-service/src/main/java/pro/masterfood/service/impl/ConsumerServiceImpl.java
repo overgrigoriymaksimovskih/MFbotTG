@@ -3,10 +3,12 @@ package pro.masterfood.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dto.LoginParams;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.service.ConsumerService;
+import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.UserActivationService;
 
 import java.util.Map;
@@ -18,21 +20,27 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     private final UserActivationService userActivationService;
     private final AppUserDAO appUserDAO;
+    private final ProducerService producerService;
 
     @Override
     @RabbitListener(queues = "${spring.rabbitmq.queues.login}")
-    public void consumeLogin(LoginParams mailParams) {
+    public void consumeLogin(LoginParams loginParams) {
 
         var optional = appUserDAO.findById(1L);
         if (optional.isPresent()) {
             var user = optional.get();
             user.setIsActive(true);
             appUserDAO.save(user);
+            Long chatId = loginParams.getChatId();
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(chatId);
+            sendMessage.setText("Успешная авторизация!");
+            producerService.producerAnswer(sendMessage);
         }
 
 
-        String email = mailParams.getEmail();
-        String password = mailParams.getPassword();
+        String email = loginParams.getEmail();
+        String password = loginParams.getPassword();
         var res = userActivationService.activationFromSite(email, password);
         // 1. Извлекаем Map "isAuthorized"
         Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");

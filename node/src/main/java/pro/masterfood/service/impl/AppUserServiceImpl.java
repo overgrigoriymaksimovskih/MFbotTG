@@ -76,18 +76,14 @@ public class AppUserServiceImpl implements AppUserService {
         return "Введите пароль";
     }
     @Override
-    public String checkPassword(AppUser appUser, String password) {
-        String email = appUser.getEmail();
-        sendLoginPassword(email, password);
-        return "Отправлено на проверку...";
-    }
-
-    private void sendLoginPassword(String email, String password) {
+    public String checkPassword(Long chatId, AppUser appUser, String password) {
         var loginParams = LoginParams.builder()
-                .email(email)
+                .email(appUser.getEmail())
                 .password(password)
+                .chatId(chatId)
                 .build();
         rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
+        return "Отправлено на проверку...";
     }
 
 //    private void sendRegistrationMail(String cryptoUserId, String email) {
