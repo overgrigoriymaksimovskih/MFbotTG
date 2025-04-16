@@ -14,6 +14,8 @@ import pro.masterfood.service.UserActivationService;
 import java.util.Map;
 import java.util.Optional;
 
+import static pro.masterfood.enums.UserState.BASIC_STATE;
+
 @RequiredArgsConstructor
 @Service
 public class ConsumerServiceImpl implements ConsumerService {
@@ -27,12 +29,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     public void consumeLogin(LoginParams loginParams) {
 
         var optional = appUserDAO.findById(1L);
-        if (optional.isPresent()) {
-            var user = optional.get();
-            user.setIsActive(true);
-            appUserDAO.save(user);
-            sendAnswer("Успешно", loginParams.getChatId());
-        }
+
 
 
 
@@ -53,11 +50,25 @@ public class ConsumerServiceImpl implements ConsumerService {
                 String statusValue = (String) resultMap.get("Status");
                 if ("success".equalsIgnoreCase(statusValue)) {
                     status = "success";
+                    if (optional.isPresent()) {
+                        var user = optional.get();
+                        user.setIsActive(true);
+                        user.setState(BASIC_STATE);
+                        appUserDAO.save(user);
+                        sendAnswer("Успешно", loginParams.getChatId());
+                    }
 
                 }
             }
             if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
                 message = (String) resultMap.get("Msg");
+                if (optional.isPresent()) {
+                    var user = optional.get();
+                    user.setIsActive(true);
+                    user.setState(BASIC_STATE);
+                    appUserDAO.save(user);
+                    sendAnswer(message, loginParams.getChatId());
+                }
             }
         }
     }
