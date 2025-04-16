@@ -10,6 +10,7 @@ import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dto.LoginParams;
 import pro.masterfood.dto.MailParams;
 import pro.masterfood.entity.AppUser;
+import pro.masterfood.enums.RequestsToREST;
 import pro.masterfood.service.AppUserService;
 
 import javax.mail.internet.AddressException;
@@ -83,6 +84,7 @@ public class AppUserServiceImpl implements AppUserService {
 //        String email = appUser.getEmail();
 //        sendLoginPassword(email, password);
         var loginParams = LoginParams.builder()
+                .requestType(RequestsToREST.LOGIN_REQUEST)
                 .id(appUser.getId())
                 .chatId(chatId)
                 .email(appUser.getEmail())

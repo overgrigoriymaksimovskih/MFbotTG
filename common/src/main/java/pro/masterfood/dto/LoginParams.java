@@ -1,6 +1,7 @@
 package pro.masterfood.dto;
 
 import lombok.*;
+import pro.masterfood.enums.RequestsToREST;
 
 @Getter
 @Setter
@@ -8,6 +9,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginParams {
+
+    private RequestsToREST requestType;
+
     private Long id;
 
     private Long chatId;

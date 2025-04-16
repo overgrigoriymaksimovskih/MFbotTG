@@ -4,5 +4,5 @@ import pro.masterfood.dto.LoginParams;
 
 public interface ConsumerService {
 
-    void consumeLogin(LoginParams loginParams);
+    void consumeRequestToREST(LoginParams loginParams);
 }
