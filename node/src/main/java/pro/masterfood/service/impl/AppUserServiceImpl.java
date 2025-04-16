@@ -38,7 +38,7 @@ public class AppUserServiceImpl implements AppUserService {
     public String registerUser(AppUser appUser) {
         if (appUser.getIsActive()){
             return "Вы уже зарегистрированы";
-        } else if (appUser.getEmail() != null && appUser.getIsActive()){
+        } else if (appUser.getEmail() != null && !appUser.getIsActive()){
             appUser.setState(WAIT_FOR_EMAIL_STATE);
             appUserDAO.save(appUser);
             return  "Ваш email " +  appUser.getEmail() +"\n"
