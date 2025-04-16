@@ -61,11 +61,12 @@ public class ConsumerServiceImpl implements ConsumerService {
                 }
             }
             if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
-                message = (String) resultMap.get("Msg");
+                message = (String) resultMap.get("Msg" + " введите email...");
                 if (optional.isPresent()) {
                     var user = optional.get();
-                    user.setIsActive(true);
+                    user.setIsActive(false);
                     user.setState(BASIC_STATE);
+                    user.setEmail(null);
                     appUserDAO.save(user);
                     sendAnswer(message, loginParams.getChatId());
                 }
