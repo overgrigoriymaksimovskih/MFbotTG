@@ -141,6 +141,8 @@ public class MainServiceImpl implements MainService {
         var serviceCommand = ServiceCommand.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)){
             return appUserService.registerUser(appUser);
+        } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
+            return helpIsActive();
         } else if (HELP.equals(serviceCommand)) {
             return help();
         } else if (START.equals(serviceCommand)) {
@@ -148,6 +150,13 @@ public class MainServiceImpl implements MainService {
         } else {
             return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
         }
+    }
+
+    private String helpIsActive() {
+        return "Список доступных команд: \n"
+                + "/cancel - отмена выполнения текущей команды\n"
+                + "/present - накоплено на подарок\n"
+                + "/quit - выйти\n";
     }
 
     private String help() {
