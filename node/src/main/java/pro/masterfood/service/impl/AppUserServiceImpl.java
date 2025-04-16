@@ -38,11 +38,10 @@ public class AppUserServiceImpl implements AppUserService {
     public String registerUser(AppUser appUser) {
         if (appUser.getIsActive()){
             return "Вы уже зарегистрированы";
+        } else if (appUser.getEmail() != null){
+            return  "Вам на почту уже было выслано письмо \n"
+                    + " перейдите по ссылке для завершения регистрации";
         }
-//        else if (appUser.getEmail() != null){
-//            return  "Вам на почту уже было выслано письмо \n"
-//                    + " перейдите по ссылке для завершения регистрации";
-//        }
         appUser.setState(WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);
         return "Введите e-mail";
@@ -78,6 +77,8 @@ public class AppUserServiceImpl implements AppUserService {
     }
     @Override
     public String checkPassword(Long chatId, AppUser appUser, String password) {
+//        String email = appUser.getEmail();
+//        sendLoginPassword(email, password);
         var loginParams = LoginParams.builder()
                 .chatId(chatId)
                 .email(appUser.getEmail())
@@ -87,6 +88,13 @@ public class AppUserServiceImpl implements AppUserService {
         return "Отправлено на проверку...";
     }
 
+//    private void sendLoginPassword(String email, String password) {
+//        var loginParams = LoginParams.builder()
+//                .email(email)
+//                .password(password)
+//                .build();
+//        rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
+//    }
 
 //    private void sendRegistrationMail(String cryptoUserId, String email) {
 //        var mailParams = MailParams.builder()

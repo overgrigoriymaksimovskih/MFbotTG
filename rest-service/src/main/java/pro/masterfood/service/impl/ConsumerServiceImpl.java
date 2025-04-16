@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static pro.masterfood.enums.UserState.BASIC_STATE;
-import static pro.masterfood.enums.UserState.WAIT_FOR_EMAIL_STATE;
 
 @RequiredArgsConstructor
 @Service
@@ -62,11 +61,11 @@ public class ConsumerServiceImpl implements ConsumerService {
                 }
             }
             if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
-                message = (String) resultMap.get("Msg" + " введите email:");
+                message = (String) resultMap.get("Msg");
                 if (optional.isPresent()) {
                     var user = optional.get();
-                    user.setEmail(null);
-                    user.setState(WAIT_FOR_EMAIL_STATE);
+                    user.setIsActive(true);
+                    user.setState(BASIC_STATE);
                     appUserDAO.save(user);
                     sendAnswer(message, loginParams.getChatId());
                 }
