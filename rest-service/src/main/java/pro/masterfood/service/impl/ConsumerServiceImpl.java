@@ -39,17 +39,16 @@ public class ConsumerServiceImpl implements ConsumerService {
 
 
         // 2. Извлекаем значение "Status" из isAuthorizedMap
-        String currentEmail = "failure"; // Значение по умолчанию
         String message = "Не удалось связаться с сервисом авторизации...";
         if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
             Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
             if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
                 String statusValue = (String) resultMap.get("Status");
-                if ("success".equalsIgnoreCase(statusValue)) {
-                    currentEmail = optional.get().getEmail();
+                if ("success".equalsIgnoreCase(statusValue) && null != optional.get().getEmail()) {
+
                     if (optional.isPresent()) {
                         var user = optional.get();
-                        user.setEmail(currentEmail);
+
                         user.setIsActive(true);
                         user.setState(BASIC_STATE);
                         appUserDAO.save(user);
