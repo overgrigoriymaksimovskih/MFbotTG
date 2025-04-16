@@ -48,6 +48,8 @@ public class MainServiceImpl implements MainService {
         var text = update.getMessage().getText();
         var output = "";
 
+        var chatId = update.getMessage().getChatId();
+
         var serviceCommand = ServiceCommand.fromValue(text);
         if(CANCEL.equals(serviceCommand)){
             output = cancelProcess(appUser);
@@ -55,14 +57,15 @@ public class MainServiceImpl implements MainService {
             output = processServiceCommand(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
+            //
         } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
-            output = appUserService.checkPassword(appUser, text);
+            output = appUserService.checkPassword(chatId, appUser, text);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! введите /cancel и попробуйте снова...";
         }
 
-        var chatId = update.getMessage().getChatId();
+
         sendAnswer(output, chatId);
     }
 
