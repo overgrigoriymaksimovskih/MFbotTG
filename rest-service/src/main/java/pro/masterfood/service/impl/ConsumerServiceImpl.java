@@ -22,59 +22,12 @@ import static pro.masterfood.enums.UserState.WAIT_FOR_EMAIL_STATE;
 public class ConsumerServiceImpl implements ConsumerService {
 
     private final UserActivationService userActivationService;
-    private final AppUserDAO appUserDAO;
-    private final ProducerService producerService;
+//    private final AppUserDAO appUserDAO;
+//    private final ProducerService producerService;
 
     @Override
     @RabbitListener(queues = "${spring.rabbitmq.queues.login}")
-    public void consumeLogin(LoginParams loginParams) {
-
-        var optional = appUserDAO.findById(loginParams.getId());
-
-        String email = loginParams.getEmail();
-        String password = loginParams.getPassword();
-        var res = userActivationService.activationFromSite(email, password);
-        // 1. Извлекаем Map "isAuthorized"
-        Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");
-
-
-        // 2. Извлекаем значение "Status" из isAuthorizedMap
-        String message = "Не удалось связаться с сервисом авторизации...";
-        if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
-            Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
-            if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
-                String statusValue = (String) resultMap.get("Status");
-                if ("success".equalsIgnoreCase(statusValue) && null != optional.get().getEmail()) {
-
-                    if (optional.isPresent()) {
-                        var user = optional.get();
-
-                        user.setIsActive(true);
-                        user.setState(BASIC_STATE);
-                        appUserDAO.save(user);
-                        sendAnswer("Успешно", loginParams.getChatId());
-                    }
-
-                }else if(!optional.get().getIsActive()){
-                    if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
-                        message = (String) resultMap.get("Msg");
-                        if (optional.isPresent()) {
-                            var user = optional.get();
-                            user.setEmail(null);
-                            user.setState(WAIT_FOR_EMAIL_STATE);
-                            appUserDAO.save(user);
-                            sendAnswer(message + " введите email", loginParams.getChatId());
-                        }
-                    }
-                }
-            }
-        }
-    }
-    private void sendAnswer(String output, Long chatId) {
-//        var message = update.getMessage();
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(output);
-        producerService.producerAnswer(sendMessage);
+    public void consumeLogin(LoginParams loginParams){
+        userActivationService.consumeLogin(loginParams);
     }
 }
