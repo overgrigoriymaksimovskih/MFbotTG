@@ -65,6 +65,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                 message = (String) resultMap.get("Msg" + " введите email:");
                 if (optional.isPresent()) {
                     var user = optional.get();
+                    user.setEmail(null);
                     user.setState(WAIT_FOR_EMAIL_STATE);
                     appUserDAO.save(user);
                     sendAnswer(message, loginParams.getChatId());
