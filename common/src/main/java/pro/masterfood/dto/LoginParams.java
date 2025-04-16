@@ -8,6 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginParams {
+    private Long id;
+
     private Long chatId;
 
     private String email;

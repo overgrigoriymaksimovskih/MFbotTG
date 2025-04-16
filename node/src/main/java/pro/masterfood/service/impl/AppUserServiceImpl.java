@@ -39,7 +39,7 @@ public class AppUserServiceImpl implements AppUserService {
         if (appUser.getIsActive()){
             return "Вы уже зарегистрированы";
         } else if (appUser.getEmail() != null && !appUser.getIsActive()){
-            appUser.setState(WAIT_FOR_EMAIL_STATE);
+            appUser.setState(WAIT_FOR_PASSWORD_STATE);
             appUserDAO.save(appUser);
             return  "Ваш email " +  appUser.getEmail() +"\n"
                     + " введите пароль";
@@ -83,6 +83,7 @@ public class AppUserServiceImpl implements AppUserService {
 //        String email = appUser.getEmail();
 //        sendLoginPassword(email, password);
         var loginParams = LoginParams.builder()
+                .id(appUser.getId())
                 .chatId(chatId)
                 .email(appUser.getEmail())
                 .password(password)

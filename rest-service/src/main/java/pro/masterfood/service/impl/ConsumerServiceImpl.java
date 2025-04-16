@@ -29,7 +29,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     @RabbitListener(queues = "${spring.rabbitmq.queues.login}")
     public void consumeLogin(LoginParams loginParams) {
 
-        var optional = appUserDAO.findById(1L);
+        var optional = appUserDAO.findById(loginParams.getId());
 
         String email = loginParams.getEmail();
         String password = loginParams.getPassword();
