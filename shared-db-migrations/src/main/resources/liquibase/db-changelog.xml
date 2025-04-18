@@ -96,6 +96,12 @@
             <column name="email" type="VARCHAR(255)">
                 <constraints nullable="true"/>
             </column>
+            <column name="site_user_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
             <column name="is_active" type="BOOLEAN">
                 <constraints nullable="true"/>
             </column>
