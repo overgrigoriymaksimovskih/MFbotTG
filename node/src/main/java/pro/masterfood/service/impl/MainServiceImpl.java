@@ -142,9 +142,9 @@ public class MainServiceImpl implements MainService {
         if (REGISTRATION.equals(serviceCommand)){
             return appUserService.registerUser(appUser);
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
-            return helpIsActive();
-        } else if (HELP.equals(serviceCommand)) {
             return help();
+        } else if (HELP.equals(serviceCommand)) {
+            return helpIsActive();
         } else if (START.equals(serviceCommand)) {
             return "Здравствуйте, чтобы посмотреть список доступных команд введите /help";
         } else {
