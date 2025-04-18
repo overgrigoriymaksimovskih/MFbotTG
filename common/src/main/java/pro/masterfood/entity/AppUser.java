@@ -29,10 +29,6 @@ public class AppUser {
 
     private String email;
 
-    private String phoneNumber;
-
-    private Long siteUserId;
-
     private Boolean isActive;
 
     @Enumerated(EnumType.STRING)
@@ -97,22 +93,6 @@ public class AppUser {
         this.email = email;
     }
 
-    public Long getSiteUserId() {
-        return siteUserId;
-    }
-
-    public void setSiteUserId(Long siteUserId) {
-        this.siteUserId = siteUserId;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
     public Boolean getIsActive() {
         return isActive;
     }
@@ -152,8 +132,6 @@ public class AppUser {
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", siteUserId='" + siteUserId + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
                 ", isActive=" + isActive +
                 ", state=" + state +
                 '}';
@@ -171,8 +149,6 @@ public class AppUser {
         private String lastName;
         private String username;
         private String email;
-        private Long siteUserId;
-        private String phoneNumber;
         private Boolean isActive;
         private UserState state;
 
@@ -209,16 +185,6 @@ public class AppUser {
             return this;
         }
 
-        public Builder siteUserId(Long siteUserId) {
-            this.siteUserId = siteUserId;
-            return this;
-        }
-
-        public Builder phoneNumber(String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-            return this;
-        }
-
         public Builder isActive(Boolean isActive) {
             this.isActive = isActive;
             return this;
@@ -237,8 +203,6 @@ public class AppUser {
             appUser.setLastName(lastName);
             appUser.setUsername(username);
             appUser.setEmail(email);
-            appUser.setSiteUserId(siteUserId);
-            appUser.setPhoneNumber(phoneNumber);
             appUser.setIsActive(isActive);
             appUser.setState(state);
             return appUser;
