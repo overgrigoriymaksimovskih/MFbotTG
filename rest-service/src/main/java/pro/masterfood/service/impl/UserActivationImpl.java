@@ -2,6 +2,12 @@ package pro.masterfood.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -16,8 +22,9 @@ import pro.masterfood.dto.LoginParams;
 import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.UserActivationService;
 import pro.masterfood.utils.Decoder;
-import pro.masterfood.utils.GeneratorRequestMethodPostForCheckUser;
+import pro.masterfood.utils.SiteData;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,13 +34,13 @@ import static pro.masterfood.enums.UserState.WAIT_FOR_EMAIL_STATE;
 @Component
 public class UserActivationImpl implements UserActivationService {
     private static final Logger log = LoggerFactory.getLogger(UserActivationImpl.class);
-    private final GeneratorRequestMethodPostForCheckUser generatorRequestMethodPostForCheckUser;
+    private final SiteData siteData;
     private final AppUserDAO appUserDAO;
     private final Decoder decoder;
     private final ProducerService producerService;
 
-    public UserActivationImpl(GeneratorRequestMethodPostForCheckUser generatorRequestMethodPostForCheckUser, AppUserDAO appUserDAO, Decoder decoder, ProducerService producerService) {
-        this.generatorRequestMethodPostForCheckUser = generatorRequestMethodPostForCheckUser;
+    public UserActivationImpl(SiteData siteData, AppUserDAO appUserDAO, Decoder decoder, ProducerService producerService) {
+        this.siteData = siteData;
         this.appUserDAO = appUserDAO;
         this.decoder = decoder;
         this.producerService = producerService;
@@ -66,6 +73,8 @@ public class UserActivationImpl implements UserActivationService {
         var res = activationFromSite(email, password);
         // 1. Извлекаем Map "isAuthorized"
         Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");
+        Long siteUid = Long.parseLong((String) res.get("siteUid"));
+        String phoneNumber = res.get("phoneNumber").toString();
 
 
         // 2. Извлекаем значение "Status" из isAuthorizedMap
@@ -76,14 +85,18 @@ public class UserActivationImpl implements UserActivationService {
                 String statusValue = (String) resultMap.get("Status");
                 if ("success".equalsIgnoreCase(statusValue) && null != optional.get().getEmail()) {
 
+                    //-----------------------------------------------------------------
                     if (optional.isPresent()) {
                         var user = optional.get();
 
                         user.setIsActive(true);
                         user.setState(BASIC_STATE);
+                        user.setSiteUserId(siteUid);
+                        user.setPhoneNumber(phoneNumber);
                         appUserDAO.save(user);
                         sendAnswer("Успешно", loginParams.getChatId());
                     }
+                    //-----------------------------------------------------------------
 
                 }else if(!optional.get().getIsActive()){
                     if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
@@ -112,17 +125,51 @@ public class UserActivationImpl implements UserActivationService {
     @Override
     public Map<String, Object> activationFromSite(String email,
                                                   String password) {
-        // 1. Создаем POST-запрос
-        HttpEntity<MultiValueMap<String, String>> request = generatorRequestMethodPostForCheckUser.buildPostRequest(email, password);
-        // 2. Отправляем POST-запрос
+        // Создаем драйвер
+        WebDriver driver = siteData.createWebDriver();
+        // Настраиваем драйвер на страницу
+        driver = siteData.setWebDriver(driver, "https://master-food.pro/private/");
+
+        // Создаем POST-запрос
+        HttpEntity<MultiValueMap<String, String>> request = siteData.buildPostRequest(driver, email, password);
+        // Отправляем POST-запрос
         Map<String, Object> response = sendPostRequest(request);
 
-        // 3. Создаем Map для возврата
+
+        // Настраиваем драйвер на страницу
+        driver = siteData.setWebDriver(driver, "https://master-food.pro/private/personal/");
+        // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
+        String siteUid = null;
+        String phoneNumber = null;
+        try {
+            WebDriverWait waitUid = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
+            WebElement uidElement = waitUid.until(ExpectedConditions.presenceOfElementLocated(By.name("uid")));
+            siteUid = uidElement.getAttribute("value");
+            WebDriverWait waitPhone = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
+            WebElement phoneElement = waitPhone.until(ExpectedConditions.presenceOfElementLocated(By.name("mobilephone")));
+            phoneNumber = phoneElement.getAttribute("value");
+
+        } catch (NoSuchElementException e) {
+            //TODO обработать исключение
+            return null;
+        } catch (Exception e) {
+            //TODO обработать исключение
+            return null;
+        }
+
+
+
+
+        // Создаем Map для возврата
         Map<String, Object> result = new HashMap<>();
         result.put("isAuthorized", response);
         result.put("action", "login");
         result.put("email", email);
         result.put("password", password);
+
+        result.put("siteUid", siteUid);
+        result.put("phoneNumber", phoneNumber);
+
 
         return result;
     }
