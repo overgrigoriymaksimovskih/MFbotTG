@@ -7,5 +7,5 @@ public interface AppUserService {
     String setEmail (AppUser appUser, String email);
     String checkPassword (Long chatId, AppUser appUser, String password);
 
-    String checkBalance (Long chatId, AppUser appUser, String password);
+    String checkBalance (Long chatId, AppUser appUser);
 }

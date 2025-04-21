@@ -94,7 +94,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public String checkBalance(Long chatId, AppUser appUser, String phone) {
+    public String checkBalance(Long chatId, AppUser appUser) {
         var getBalanceParams = RequestParams.builder()
                 .requestType(RequestsToREST.PRESENTS_REQUEST)
                 .id(appUser.getId())

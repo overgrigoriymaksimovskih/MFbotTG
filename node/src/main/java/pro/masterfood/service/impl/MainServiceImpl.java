@@ -51,23 +51,28 @@ public class MainServiceImpl implements MainService {
         var chatId = update.getMessage().getChatId();
 
         var serviceCommand = ServiceCommand.fromValue(text);
+        //Сюда сначала попадают все команды
         if(CANCEL.equals(serviceCommand)){
             output = cancelProcess(appUser);
+
+            //----------------------------------------------------------------------------------------------------------
+            //Все команды имеющие БАСИК_СТЕЙТ обрабатываются в процессСервисеКомманд
+            //это основная обрабатывающая комманда которая обрабатывает все текстовые сообщения в том числе сервисные
+            //по сути вообще все, которые не касаются активации пользователя
         } else if (BASIC_STATE.equals(userState)) {
-            output = processServiceCommand(appUser, text);
+            output = processServiceCommand(chatId, appUser, text);
+
+            //----------------------------------------------------------------------------------------------------------
+            //Все команды с состоянием ОЖИДАЕМ ЕМАЙЛ обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
-            //
+            //Все команды с состоянием ОЖИДАЕМ ПАРОЛЬ обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
             output = appUserService.checkPassword(chatId, appUser, text);
-        } else if (BASIC_STATE.equals(userState) && GET_USER_INFO.equals((serviceCommand))) {
-            output = appUserService.checkBalance(chatId, appUser, text);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! введите /cancel и попробуйте снова...";
         }
-
-
         sendAnswer(output, chatId);
     }
 
@@ -139,14 +144,21 @@ public class MainServiceImpl implements MainService {
         producerService.producerAnswer(sendMessage);
     }
 
-    private String processServiceCommand(AppUser appUser, String cmd) {
+
+
+//----------------------------------------------------------------------------------------------------------------------
+    private String processServiceCommand(Long chatId, AppUser appUser, String cmd) {
         var serviceCommand = ServiceCommand.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)){
             return appUserService.registerUser(appUser);
+        } else if (GET_USER_INFO.equals(serviceCommand) && !appUser.getIsActive()) {
+            return appUserService.checkBalance(chatId, appUser);
+        //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();
         } else if (HELP.equals(serviceCommand)) {
             return helpIsActive();
+        //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
             return "Здравствуйте, чтобы посмотреть список доступных команд введите /help";
         } else {
