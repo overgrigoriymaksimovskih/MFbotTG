@@ -151,7 +151,7 @@ public class MainServiceImpl implements MainService {
         var serviceCommand = ServiceCommand.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)){
             return appUserService.registerUser(appUser);
-        } else if (GET_USER_INFO.equals(serviceCommand) && !appUser.getIsActive()) {
+        } else if (GET_USER_INFO.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.checkBalance(chatId, appUser);
         //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
