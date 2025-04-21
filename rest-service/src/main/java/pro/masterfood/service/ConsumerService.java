@@ -1,8 +1,8 @@
 package pro.masterfood.service;
 
-import pro.masterfood.dto.LoginParams;
+import pro.masterfood.dto.RequestParams;
 
 public interface ConsumerService {
 
-    void consumeRequestToREST(LoginParams loginParams);
+    void consumeRequestToREST(RequestParams requestParams);
 }

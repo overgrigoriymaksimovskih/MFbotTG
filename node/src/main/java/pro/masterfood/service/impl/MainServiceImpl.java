@@ -60,6 +60,8 @@ public class MainServiceImpl implements MainService {
             //
         } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
             output = appUserService.checkPassword(chatId, appUser, text);
+        } else if (BASIC_STATE.equals(userState) && GET_USER_INFO.equals((serviceCommand))) {
+            output = appUserService.checkBalance(chatId, appUser, text);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! введите /cancel и попробуйте снова...";

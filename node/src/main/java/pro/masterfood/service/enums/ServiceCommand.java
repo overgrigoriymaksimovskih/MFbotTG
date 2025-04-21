@@ -3,6 +3,7 @@ package pro.masterfood.service.enums;
 public enum ServiceCommand {
     HELP("/help"),
     REGISTRATION("/registration"),
+    GET_USER_INFO("/present"),
     CANCEL("/cancel"),
     START("/start");
     private final String value;

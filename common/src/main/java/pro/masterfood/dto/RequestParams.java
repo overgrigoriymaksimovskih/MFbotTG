@@ -8,7 +8,7 @@ import pro.masterfood.enums.RequestsToREST;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginParams {
+public class RequestParams {
 
     private RequestsToREST requestType;
 
@@ -19,4 +19,6 @@ public class LoginParams {
     private String email;
 
     private String password;
+
+    private String phoneNumber;
 }

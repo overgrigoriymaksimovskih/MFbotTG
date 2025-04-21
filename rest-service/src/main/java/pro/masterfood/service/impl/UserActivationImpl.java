@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.dao.AppUserDAO;
-import pro.masterfood.dto.LoginParams;
+import pro.masterfood.dto.RequestParams;
 import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.UserActivationService;
 import pro.masterfood.utils.Decoder;
@@ -64,12 +64,12 @@ public class UserActivationImpl implements UserActivationService {
 //        return false;
 //    }
     @Override
-    public void consumeLogin(LoginParams loginParams) {
+    public void consumeLogin(RequestParams requestParams) {
 
-        var optional = appUserDAO.findById(loginParams.getId());
+        var optional = appUserDAO.findById(requestParams.getId());
 
-        String email = loginParams.getEmail();
-        String password = loginParams.getPassword();
+        String email = requestParams.getEmail();
+        String password = requestParams.getPassword();
         var res = activationFromSite(email, password);
         // 1. Извлекаем Map "isAuthorized"
         Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");
@@ -94,7 +94,7 @@ public class UserActivationImpl implements UserActivationService {
                         user.setSiteUserId(siteUid);
                         user.setPhoneNumber(phoneNumber);
                         appUserDAO.save(user);
-                        sendAnswer("Успешно", loginParams.getChatId());
+                        sendAnswer("Успешно", requestParams.getChatId());
                     }
                     //-----------------------------------------------------------------
 
@@ -106,13 +106,16 @@ public class UserActivationImpl implements UserActivationService {
                             user.setEmail(null);
                             user.setState(WAIT_FOR_EMAIL_STATE);
                             appUserDAO.save(user);
-                            sendAnswer(message + " введите email", loginParams.getChatId());
+                            sendAnswer(message + " введите email", requestParams.getChatId());
                         }
                     }
                 }
             }
         }
     }
+
+
+
     @Override
     public void sendAnswer(String output, Long chatId) {
 //        var message = update.getMessage();
@@ -122,7 +125,7 @@ public class UserActivationImpl implements UserActivationService {
         producerService.producerAnswer(sendMessage);
     }
 
-    @Override
+//    @Override
     public Map<String, Object> activationFromSite(String email,
                                                   String password) {
         Map<String, Object> result;

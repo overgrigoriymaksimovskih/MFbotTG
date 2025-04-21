@@ -28,34 +28,34 @@ public class ActivationController {
 //        return ResponseEntity.internalServerError().build();
 //    }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
-    public ResponseEntity<Map<String, Object>> activationMf(@RequestParam("email") String email,
-                                                            @RequestParam("password") String password)
-    {
-        var res = userActivatonService.activationFromSite(email, password);
-        // 1. Извлекаем Map "isAuthorized"
-        Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");
-
-        // 2. Извлекаем значение "Status" из isAuthorizedMap
-        String status = "failure"; // Значение по умолчанию
-        String message = "Не удалось связаться с сервисом авторизации...";
-        if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
-            Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
-            if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
-                String statusValue = (String) resultMap.get("Status");
-                if ("success".equalsIgnoreCase(statusValue)) {
-                    status = "success";
-                }
-            }
-            if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
-                message = (String) resultMap.get("Msg");
-            }
-        }
-
-        // 3. Заменяем isAuthorized на статус
-        res.put("isAuthorized", status);
-        res.put("Message", message);
-
-        return ResponseEntity.ok(res);
-    }
+//    @RequestMapping(method = RequestMethod.GET, value = "/hellooo")
+//    public ResponseEntity<Map<String, Object>> activationMf(@RequestParam("email") String email,
+//                                                            @RequestParam("password") String password)
+//    {
+//        var res = userActivatonService.activationFromSite(email, password);
+//        // 1. Извлекаем Map "isAuthorized"
+//        Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");
+//
+//        // 2. Извлекаем значение "Status" из isAuthorizedMap
+//        String status = "failure"; // Значение по умолчанию
+//        String message = "Не удалось связаться с сервисом авторизации...";
+//        if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
+//            Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
+//            if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
+//                String statusValue = (String) resultMap.get("Status");
+//                if ("success".equalsIgnoreCase(statusValue)) {
+//                    status = "success";
+//                }
+//            }
+//            if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
+//                message = (String) resultMap.get("Msg");
+//            }
+//        }
+//
+//        // 3. Заменяем isAuthorized на статус
+//        res.put("isAuthorized", status);
+//        res.put("Message", message);
+//
+//        return ResponseEntity.ok(res);
+//    }
 }

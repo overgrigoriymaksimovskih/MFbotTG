@@ -7,8 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pro.masterfood.dao.AppUserDAO;
-import pro.masterfood.dto.LoginParams;
-import pro.masterfood.dto.MailParams;
+import pro.masterfood.dto.RequestParams;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.enums.RequestsToREST;
 import pro.masterfood.service.AppUserService;
@@ -83,7 +82,7 @@ public class AppUserServiceImpl implements AppUserService {
     public String checkPassword(Long chatId, AppUser appUser, String password) {
 //        String email = appUser.getEmail();
 //        sendLoginPassword(email, password);
-        var loginParams = LoginParams.builder()
+        var loginParams = RequestParams.builder()
                 .requestType(RequestsToREST.LOGIN_REQUEST)
                 .id(appUser.getId())
                 .chatId(chatId)
@@ -92,6 +91,17 @@ public class AppUserServiceImpl implements AppUserService {
                 .build();
         rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
         return "Отправлено на проверку...";
+    }
+
+    @Override
+    public String checkBalance(Long chatId, AppUser appUser, String phone) {
+        var getBalanceParams = RequestParams.builder()
+                .requestType(RequestsToREST.PRESENTS_REQUEST)
+                .id(appUser.getId())
+                .chatId(chatId)
+                .build();
+        rabbitTemplate.convertAndSend(registrationLoginQueue, getBalanceParams);
+        return "Уточняем...";
     }
 
 //    private void sendLoginPassword(String email, String password) {
