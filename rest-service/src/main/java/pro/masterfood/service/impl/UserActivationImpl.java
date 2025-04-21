@@ -125,51 +125,54 @@ public class UserActivationImpl implements UserActivationService {
     @Override
     public Map<String, Object> activationFromSite(String email,
                                                   String password) {
+        Map<String, Object> result;
         // Создаем драйвер
         WebDriver driver = siteData.createWebDriver();
-        // Настраиваем драйвер на страницу
-        driver = siteData.setWebDriver(driver, "https://master-food.pro/private/");
 
-        // Создаем POST-запрос
-        HttpEntity<MultiValueMap<String, String>> request = siteData.buildPostRequest(driver, email, password);
-        // Отправляем POST-запрос
-        Map<String, Object> response = sendPostRequest(request);
-
-
-        // Настраиваем драйвер на страницу
-        driver = siteData.setWebDriver(driver, "https://master-food.pro/private/personal/");
-        // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
-        String siteUid = null;
-        String phoneNumber = null;
         try {
-            WebDriverWait waitUid = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-            WebElement uidElement = waitUid.until(ExpectedConditions.presenceOfElementLocated(By.name("uid")));
-            siteUid = uidElement.getAttribute("value");
-            WebDriverWait waitPhone = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-            WebElement phoneElement = waitPhone.until(ExpectedConditions.presenceOfElementLocated(By.name("mobilephone")));
-            phoneNumber = phoneElement.getAttribute("value");
+            // Настраиваем драйвер на страницу
+            driver = siteData.setWebDriver(driver, "https://master-food.pro/private/");
 
-        } catch (NoSuchElementException e) {
-            //TODO обработать исключение
-            return null;
-        } catch (Exception e) {
-            //TODO обработать исключение
-            return null;
+            // Создаем POST-запрос
+            HttpEntity<MultiValueMap<String, String>> request = siteData.buildPostRequest(driver, email, password);
+            // Отправляем POST-запрос
+            Map<String, Object> response = sendPostRequest(request);
+
+
+            // Настраиваем драйвер на страницу
+            driver = siteData.setWebDriver(driver, "https://master-food.pro/private/personal/");
+            // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
+            String siteUid = null;
+            String phoneNumber = null;
+            try {
+                WebDriverWait waitUid = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
+                WebElement uidElement = waitUid.until(ExpectedConditions.presenceOfElementLocated(By.name("uid")));
+                siteUid = uidElement.getAttribute("value");
+                WebDriverWait waitPhone = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
+                WebElement phoneElement = waitPhone.until(ExpectedConditions.presenceOfElementLocated(By.name("mobilephone")));
+                phoneNumber = phoneElement.getAttribute("value");
+
+            } catch (NoSuchElementException e) {
+                //TODO обработать исключение
+                return null;
+            } catch (Exception e) {
+                //TODO обработать исключение
+                return null;
+            }
+
+
+            // Создаем Map для возврата
+            result = new HashMap<>();
+            result.put("isAuthorized", response);
+            result.put("action", "login");
+            result.put("email", email);
+            result.put("password", password);
+
+            result.put("siteUid", siteUid);
+            result.put("phoneNumber", phoneNumber);
+        } finally {
+            driver.quit();
         }
-
-
-
-
-        // Создаем Map для возврата
-        Map<String, Object> result = new HashMap<>();
-        result.put("isAuthorized", response);
-        result.put("action", "login");
-        result.put("email", email);
-        result.put("password", password);
-
-        result.put("siteUid", siteUid);
-        result.put("phoneNumber", phoneNumber);
-
 
         return result;
     }
