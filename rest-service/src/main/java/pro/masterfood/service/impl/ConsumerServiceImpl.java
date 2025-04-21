@@ -24,6 +24,8 @@ public class ConsumerServiceImpl implements ConsumerService {
             userActivationService.consumeLogin(requestParams);
         } else if (RequestsToREST.PRESENTS_REQUEST.equals(requestParams.getRequestType())) {
             userInformationProvider.consumeGetBalance(requestParams);
+        } else if (RequestsToREST.ORDER_STATUS_REQUEST.equals(requestParams.getRequestType())) {
+            userInformationProvider.consumeGetOrderStatus(requestParams);
         }
     }
 }

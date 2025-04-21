@@ -35,6 +35,19 @@ public class UserInformationProviderImpl implements UserInformationProvider {
     }
 
     @Override
+    public void consumeGetOrderStatus(RequestParams requestParams) {
+        var optional = appUserDAO.findById(requestParams.getId());
+        if (optional.isPresent()) {
+            String phoneNumber = optional.get().getPhoneNumber();
+            String answer = simpleHttpClient.getOrderStatus(phoneNumber);
+            sendAnswer(answer, requestParams.getChatId());
+        }else{
+            sendAnswer("Пользователь с таким siteId не найден", requestParams.getChatId());
+        }
+
+    }
+
+    @Override
     public void sendAnswer(String output, Long chatId) {
 //        var message = update.getMessage();
         SendMessage sendMessage = new SendMessage();

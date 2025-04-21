@@ -153,6 +153,8 @@ public class MainServiceImpl implements MainService {
             return appUserService.registerUser(appUser);
         } else if (GET_USER_INFO.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.checkBalance(chatId, appUser);
+        } else if (STATUS.equals(serviceCommand) && appUser.getIsActive()) {
+            return appUserService.checkStatus(chatId, appUser);
         //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();
@@ -168,8 +170,10 @@ public class MainServiceImpl implements MainService {
 
     private String helpIsActive() {
         return "Список доступных команд: \n"
-                + "/cancel - отмена выполнения текущей команды\n"
                 + "/present - накоплено на подарок\n"
+                + "/status - статус текущего заказа\n"
+                + "/cancel - отмена выполнения текущей команды\n"
+                + "\n"
                 + "/quit - выйти\n";
     }
 

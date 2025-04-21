@@ -104,6 +104,17 @@ public class AppUserServiceImpl implements AppUserService {
         return "Уточняем...";
     }
 
+    @Override
+    public String checkStatus(Long chatId, AppUser appUser) {
+        var getOrderStatus = RequestParams.builder()
+                .requestType(RequestsToREST.ORDER_STATUS_REQUEST)
+                .id(appUser.getId())
+                .chatId(chatId)
+                .build();
+        rabbitTemplate.convertAndSend(registrationLoginQueue, getOrderStatus);
+        return "Уточняем...";
+    }
+
 //    private void sendLoginPassword(String email, String password) {
 //        var loginParams = LoginParams.builder()
 //                .email(email)

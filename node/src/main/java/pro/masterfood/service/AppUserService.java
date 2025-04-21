@@ -8,4 +8,5 @@ public interface AppUserService {
     String checkPassword (Long chatId, AppUser appUser, String password);
 
     String checkBalance (Long chatId, AppUser appUser);
+    String checkStatus (Long chatId, AppUser appUser);
 }

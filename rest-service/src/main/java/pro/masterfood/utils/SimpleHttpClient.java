@@ -52,7 +52,7 @@ public class SimpleHttpClient {
                     Map<String, Object> responseMap = gson.fromJson(in, new TypeToken<Map<String, Object>>() {}.getType());
 
                     int balance = Math.abs((int)Double.parseDouble(responseMap.get("balance").toString()));
-                    int presents = Math.abs((int)Double.parseDouble(responseMap.get("giftSum").toString()) / 3000);
+                    int presents = Math.abs((int)Double.parseDouble(responseMap.get("giftSum").toString()) / 4000);
                     int reachToPresent = 4000 - Math.abs((int)Double.parseDouble(responseMap.get("giftSum").toString()) % 4000);
                     int bonusPoints = 0;
 
@@ -92,7 +92,8 @@ public class SimpleHttpClient {
 
         HttpURLConnection con = null;
 
-        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetStatus/" + phone + "/";
+//        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetStatus/" + phone + "/";
+        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
 
         try {
             URL obj = new URL(url);
