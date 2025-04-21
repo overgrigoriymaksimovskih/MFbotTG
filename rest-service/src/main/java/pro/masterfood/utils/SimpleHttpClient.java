@@ -93,7 +93,7 @@ public class SimpleHttpClient {
         HttpURLConnection con = null;
 
 //        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetStatus/" + phone + "/";
-        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
+        String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
 
         try {
             URL obj = new URL(url);
