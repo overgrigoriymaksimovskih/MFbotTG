@@ -56,7 +56,7 @@ public class SiteData {
                     driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
                     // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
                     Map<String, String> resultOfParse = parsePage(driver);
-                    result.put("Message", resultOfParse.toString());
+                    result.put("Message", response.toString());//
                     result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
                     result.put("SiteUid", resultOfParse.get("SiteUid"));
                 }else if (response.containsKey("Msg")){
