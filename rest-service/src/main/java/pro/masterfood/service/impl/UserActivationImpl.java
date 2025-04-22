@@ -71,7 +71,7 @@ public class UserActivationImpl implements UserActivationService {
         String email = requestParams.getEmail();
         String password = requestParams.getPassword();
 
-        var res = siteData.activationFromSite(email, password);
+        var res = activationFromSite(email, password);
 
         sendAnswer(res.get("Message") + " " + res.get("PhoneNumber") + " " + res.get("SiteUid"), requestParams.getChatId());
 
@@ -134,5 +134,66 @@ public class UserActivationImpl implements UserActivationService {
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
+    }
+
+    public Map<String, String> activationFromSite(String email,
+                                                  String password) {
+
+        Map<String, String> result = new HashMap<>();
+
+        WebDriver driver = null;
+        try {
+            // Создаем драйвер
+            driver = siteData.createWebDriver();
+            // Настраиваем драйвер на страницу
+            driver = siteData.setWebDriver(driver, "https://master-food.pro/private/");
+
+            // Создаем POST-запрос
+            HttpEntity<MultiValueMap<String, String>> request = siteData.buildPostRequest(driver, email, password);
+            // Отправляем POST-запрос
+            Map<String, Object> response = siteData.sendPostRequest(request);
+
+            // Обрабатываем ответ от сайта на пост запрос
+            if(response.containsKey("Result")){
+                String respResult = response.get("Result").toString();
+                if(!"success".equalsIgnoreCase(respResult)){
+                    result.put("Message", "Post - success");
+
+                    //Настраиваем наш драйвер на страницу
+                    driver = siteData.setWebDriver(driver, "https://master-food.pro/private/personal/");
+                    // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
+                    Map<String, String> resultOfParse = siteData.parsePage(driver);
+
+                    result.put("Message", resultOfParse.get("Message"));
+                    result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
+                    result.put("SiteUid", resultOfParse.get("SiteUid"));
+                }else if (response.containsKey("Msg")){
+                    result.put("Message", response.get("Msg").toString());
+                }else{
+                    result.put("Message", "Что то пошло не так, ответ на пост запрос: " + response.get("Result").toString());
+                }
+            }else{
+                result.put("Message", "В ответе на пост запрос отсутствует key: Result");
+//                result.put("isAuthorized", response);
+//                result.put("action", "login");
+//                result.put("email", email);
+//                result.put("password", password);
+//
+//                result.put("siteUid", siteUid);
+//                result.put("phoneNumber", phoneNumber);
+            }
+
+
+
+
+
+
+
+
+        } finally {
+            driver.quit();
+        }
+
+        return result;
     }
 }

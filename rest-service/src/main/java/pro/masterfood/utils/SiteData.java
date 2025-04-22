@@ -52,10 +52,12 @@ public class SiteData {
                 String respResult = response.get("Result").toString();
                 if(!"success".equalsIgnoreCase(respResult)){
                     result.put("Message", "Post - success");
+
                     //Настраиваем наш драйвер на страницу
                     driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
                     // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
                     Map<String, String> resultOfParse = parsePage(driver);
+
                     result.put("Message", resultOfParse.get("Message"));
                     result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
                     result.put("SiteUid", resultOfParse.get("SiteUid"));
@@ -117,7 +119,6 @@ public class SiteData {
     // Метод для настройки web-драйвера страницей
     public WebDriver setWebDriver (WebDriver driver, String pageUrl){
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
-//        String loginPageUrl = "https://master-food.pro/private/";
         driver.manage().window().setSize(new Dimension(1920, 1080));
         driver.get(pageUrl);
 
@@ -184,7 +185,7 @@ public class SiteData {
         return new HttpEntity<>(map, headers);
     }
     // Метод для отправки POST-запроса
-    private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
+    public Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
         RestTemplate restTemplate = new RestTemplate();
 
         try {
@@ -213,7 +214,7 @@ public class SiteData {
     }
 
     // Метод для парсинга страницы
-    private Map<String, String> parsePage(WebDriver driver){
+    public Map<String, String> parsePage(WebDriver driver){
 
         Map<String, String> result = new HashMap<>();
 
