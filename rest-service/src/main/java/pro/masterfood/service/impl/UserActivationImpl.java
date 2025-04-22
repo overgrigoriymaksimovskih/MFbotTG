@@ -170,15 +170,28 @@ public class UserActivationImpl implements UserActivationService {
             }
 
 
-            // Создаем Map для возврата
-            result = new HashMap<>();
-            result.put("isAuthorized", response);
-            result.put("action", "login");
-            result.put("email", email);
-            result.put("password", password);
+            if(response.containsKey("Result")){
+                String respResult = response.get("Result").toString();
+                if(!"success".equalsIgnoreCase(respResult)){
+                    result = new HashMap<>();
+                    result.put("Msg", response.get("Result").toString());
+                }else{
+                    result = new HashMap<>();
+                    result.put("Msg", "Ошибка на этапе проверки логина/пароля");
+                }
+            }else{
+                // Создаем Map для возврата
+                result = new HashMap<>();
+                result.put("isAuthorized", response);
+                result.put("action", "login");
+                result.put("email", email);
+                result.put("password", password);
 
-            result.put("siteUid", siteUid);
-            result.put("phoneNumber", phoneNumber);
+                result.put("siteUid", siteUid);
+                result.put("phoneNumber", phoneNumber);
+            }
+
+
         } finally {
             driver.quit();
         }
