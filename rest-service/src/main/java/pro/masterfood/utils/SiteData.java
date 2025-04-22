@@ -1,14 +1,9 @@
 package pro.masterfood.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.LinkedMultiValueMap;
 
@@ -17,83 +12,20 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @RequiredArgsConstructor
 @Component
 public class SiteData {
 
-
-//    public Map<String, String> activationFromSite(String email,
-//                                                  String password) {
-//
-//        Map<String, String> result = new HashMap<>();
-//
-//        WebDriver driver = null;
-//        try {
-//            // Создаем драйвер
-//            driver = createWebDriver();
-//            // Настраиваем драйвер на страницу
-//            driver = setWebDriver(driver, "https://master-food.pro/private/");
-//
-//            // Создаем POST-запрос
-//            HttpEntity<MultiValueMap<String, String>> request = buildPostRequest(driver, email, password);
-//            // Отправляем POST-запрос
-//            Map<String, Object> response = sendPostRequest(request);
-//
-//            // Обрабатываем ответ от сайта на пост запрос
-//            if(response.containsKey("Result")){
-//                String respResult = response.get("Result").toString();
-//                if(!"success".equalsIgnoreCase(respResult)){
-//                    result.put("Message", "Post - success");
-//
-//                    //Настраиваем наш драйвер на страницу
-//                    driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
-//                    // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
-//                    Map<String, String> resultOfParse = parsePage(driver);
-//
-//                    result.put("Message", resultOfParse.get("Message"));
-//                    result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
-//                    result.put("SiteUid", resultOfParse.get("SiteUid"));
-//                }else if (response.containsKey("Msg")){
-//                    result.put("Message", response.get("Msg").toString());
-//                }else{
-//                    result.put("Message", "Что то пошло не так, ответ на пост запрос: " + response.get("Result").toString());
-//                }
-//            }else{
-//                result.put("Message", "В ответе на пост запрос отсутствует key: Result");
-////                result.put("isAuthorized", response);
-////                result.put("action", "login");
-////                result.put("email", email);
-////                result.put("password", password);
-////
-////                result.put("siteUid", siteUid);
-////                result.put("phoneNumber", phoneNumber);
-//            }
-//
-//
-//
-//
-//
-//
-//
-//
-//        } finally {
-//            driver.quit();
-//        }
-//
-//        return result;
-//    }
-
     // Метод для создания web-драйвера
     public WebDriver createWebDriver(){
         WebDriver driver = null;
+
+
+
         String chromeDriverPath = System.getenv("CHROMEDRIVER_PATH");
         if (chromeDriverPath == null) {
             chromeDriverPath = "/usr/local/bin/chromedriver"; // Значение по умолчанию (если переменная окружения не установлена)
@@ -119,6 +51,7 @@ public class SiteData {
     // Метод для настройки web-драйвера страницей
     public WebDriver setWebDriver (WebDriver driver, String pageUrl){
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+//        String loginPageUrl = "https://master-food.pro/private/";
         driver.manage().window().setSize(new Dimension(1920, 1080));
         driver.get(pageUrl);
 
@@ -129,12 +62,38 @@ public class SiteData {
     public HttpEntity<MultiValueMap<String, String>> buildPostRequest(WebDriver driver,
                                                                       String email,
                                                                       String password) {
+//        WebDriver driver = null;
         HttpHeaders headers = null;
 
         String parsedCheckNum = null;
         String parsedToken = null;
 
         try {
+//            // 1. Настройка Selenium и ChromeDriver
+//            String chromeDriverPath = System.getenv("CHROMEDRIVER_PATH");
+//            if (chromeDriverPath == null) {
+//                chromeDriverPath = "/usr/local/bin/chromedriver"; // Значение по умолчанию (если переменная окружения не установлена)
+//            }
+//            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+
+
+//            ChromeOptions options = new ChromeOptions();
+//            options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36");
+//            options.addArguments("--ignore-certificate-errors"); // Игнорируем ошибки сертификатов SSL/TLS
+//            options.addArguments("--headless"); // Запуск Chrome в headless режиме (без GUI)
+//            options.addArguments("--enable-javascript");
+//            options.addArguments("--no-sandbox"); // Обязательно для Docker
+//            options.addArguments("--disable-dev-shm-usage");  // Рекомендуется для Docker
+//            options.setBinary("/usr/local/bin/chrome-headless-shell"); // Укажите ПРАВИЛЬНЫЙ путь!
+//            options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+//            options.setCapability("strictFileInteractability", false);
+//
+//            driver = new ChromeDriver(options); // Инициализация driver ЗДЕСЬ
+//            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+//            String loginPageUrl = "https://master-food.pro/private/";
+//            driver.manage().window().setSize(new Dimension(1920, 1080));
+//            driver.get(loginPageUrl);
+
             // Find the CSRF token (adjust the selector if needed)
             WebElement tokenElement = driver.findElement(By.cssSelector("meta[name='csrf-token']"));  // Example: <meta name="csrf-token" content="YOUR_TOKEN">
             String csrfToken = tokenElement.getAttribute("content");
@@ -174,6 +133,13 @@ public class SiteData {
             map.add("action", "Error: " + e.getMessage());
             return new HttpEntity<>(map, headers);
         }
+//        } finally {
+//            if (driver != null) {
+//                driver.quit(); // Закрываем браузер
+//            }
+//
+//        }
+
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("action", "login");
@@ -183,59 +149,5 @@ public class SiteData {
         map.add("token", parsedToken);
 
         return new HttpEntity<>(map, headers);
-    }
-    // Метод для отправки POST-запроса
-//    public Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
-//        RestTemplate restTemplate = new RestTemplate();
-//
-//        try {
-//            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class); // Get response as String
-//            String html = response.getBody();
-//            Map<String, Object> result = new HashMap<>();
-//
-//            // Parse JSON from the HTML string
-//            ObjectMapper mapper = new ObjectMapper();
-//            Map<String, Object> answer = null;
-//            try {
-//                answer = mapper.readValue(html, Map.class);
-//            } catch (JsonProcessingException e) {
-//                result.put("Result", "Cannot read value with mapper from answer (selenium not worked....)");
-//                return result;
-//            }
-//
-//            result.put("Result", answer);
-//            return result;
-//
-//        } catch (RestClientException e) {
-//            Map<String, Object> result = new HashMap<>();
-//            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
-//            return result;
-//        }
-//    }
-
-    // Метод для парсинга страницы
-    public Map<String, String> parsePage(WebDriver driver){
-
-        Map<String, String> result = new HashMap<>();
-
-        String siteUid = null;
-        String phoneNumber = null;
-        try {
-            WebDriverWait waitUid = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-            WebElement uidElement = waitUid.until(ExpectedConditions.presenceOfElementLocated(By.name("uid")));
-            siteUid = uidElement.getAttribute("value");
-            WebDriverWait waitPhone = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-            WebElement phoneElement = waitPhone.until(ExpectedConditions.presenceOfElementLocated(By.name("mobilephone")));
-            phoneNumber = phoneElement.getAttribute("value");
-
-        } catch (NoSuchElementException e) {
-            result.put("Message", "Get - error " + e.getMessage());
-        } catch (Exception e) {
-            result.put("Message", "Get - error " + e.getMessage());
-        }
-        result.put("Message", "Post and Get - success");
-        result.put("PhoneNumber", phoneNumber);
-        result.put("SiteUid", siteUid);
-        return result;
     }
 }
