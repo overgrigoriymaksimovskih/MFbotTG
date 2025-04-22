@@ -8,10 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import org.springframework.amqp.core.AcknowledgeMode;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,21 +31,6 @@ public class RabbitConfiguration {
         Map<String, Object> args = new HashMap<>();
         args.put("x-message-ttl", 6000);
         return new Queue(loginQueue, true, false, false, args);
-    }
-
-
-
-    // Этот бин (ниже) нужен для создания бина rabbitListenerContainerFactory, который будет использоваться
-    // для создания слушателей сообщений, аннотированных @RabbitListener. И в этих слушателях станет доступно использование
-    // chanel, что в свою очередь позволит отклонять сообщения которые не могут быть обработаны в листенере и они
-    // соответственно не будут висеть в очереди в попытке быть обработанными
-    @Bean
-    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-        // factory.setChannelTransacted(true); // Опционально, если нужна транзакционность
-        return factory;
     }
 
 }

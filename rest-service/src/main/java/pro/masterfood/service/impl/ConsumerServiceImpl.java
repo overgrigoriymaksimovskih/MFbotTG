@@ -10,10 +10,6 @@ import pro.masterfood.service.UserActivationService;
 import pro.masterfood.service.UserInformationProvider;
 
 import com.rabbitmq.client.Channel;
-import org.springframework.messaging.handler.annotation.Headers;
-import org.springframework.amqp.support.AmqpHeaders;
-import java.util.Map;
-import java.io.IOException;
 
 
 
@@ -28,10 +24,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     @Override
     @RabbitListener(queues = "${spring.rabbitmq.queues.login}")
-    public void consumeRequestToREST(RequestParams requestParams, Channel channel, @Headers Map<String, Object> headers){
-
-        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
-
+    public void consumeRequestToREST(RequestParams requestParams){
         try {
             if(RequestsToREST.LOGIN_REQUEST.equals(requestParams.getRequestType())){
                 userActivationService.consumeLogin(requestParams);
@@ -40,15 +33,8 @@ public class ConsumerServiceImpl implements ConsumerService {
             } else if (RequestsToREST.ORDER_STATUS_REQUEST.equals(requestParams.getRequestType())) {
                 userInformationProvider.consumeGetOrderStatus(requestParams);
             }
-//            channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
-            System.err.println("Error processing message: " + e.getMessage());
-            try {
-                channel.basicNack(deliveryTag, false, false); // Отклоняем сообщение, requeue=false - СООБЩЕНИЕ БУДЕТ УДАЛЕНО
-            } catch (IOException ex) {
-                System.err.println("Error sending Nack: " + ex.getMessage());
-                // В этом месте ничего не можем сделать, ошибка отправки Nack маловероятна
-            }
+            throw new RuntimeException(e);
         }
     }
 }
