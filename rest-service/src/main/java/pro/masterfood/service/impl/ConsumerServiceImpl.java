@@ -44,7 +44,8 @@ public class ConsumerServiceImpl implements ConsumerService {
         } catch (Exception e) {
             System.err.println("Error processing message: " + e.getMessage());
             try {
-                channel.basicNack(deliveryTag, false, false); // Отклоняем сообщение, requeue=false - СООБЩЕНИЕ БУДЕТ УДАЛЕНО
+//                channel.basicNack(deliveryTag, false, false); // Отклоняем сообщение, requeue=false - СООБЩЕНИЕ БУДЕТ УДАЛЕНО
+                channel.basicAck(deliveryTag, false);
             } catch (IOException ex) {
                 System.err.println("Error sending Nack: " + ex.getMessage());
                 // В этом месте ничего не можем сделать, ошибка отправки Nack маловероятна
