@@ -151,7 +151,7 @@ public class UserActivationImpl implements UserActivationService {
             // Создаем POST-запрос
             HttpEntity<MultiValueMap<String, String>> request = siteData.buildPostRequest(driver, email, password);
             // Отправляем POST-запрос
-            Map<String, Object> response = siteData.sendPostRequest(request);
+            Map<String, Object> response = sendPostRequest(request);
 
             // Обрабатываем ответ от сайта на пост запрос
             if(response.containsKey("Result")){
@@ -195,5 +195,33 @@ public class UserActivationImpl implements UserActivationService {
         }
 
         return result;
+    }
+
+    public Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class); // Get response as String
+            String html = response.getBody();
+            Map<String, Object> result = new HashMap<>();
+
+            // Parse JSON from the HTML string
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> answer = null;
+            try {
+                answer = mapper.readValue(html, Map.class);
+            } catch (JsonProcessingException e) {
+                result.put("Result", "Cannot read value with mapper from answer (selenium not worked....)");
+                return result;
+            }
+
+            result.put("Result", answer);
+            return result;
+
+        } catch (RestClientException e) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
+            return result;
+        }
     }
 }

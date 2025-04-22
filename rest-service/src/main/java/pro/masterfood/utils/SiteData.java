@@ -30,66 +30,66 @@ import java.util.Set;
 public class SiteData {
 
 
-    public Map<String, String> activationFromSite(String email,
-                                                  String password) {
-
-        Map<String, String> result = new HashMap<>();
-
-        WebDriver driver = null;
-        try {
-            // Создаем драйвер
-            driver = createWebDriver();
-            // Настраиваем драйвер на страницу
-            driver = setWebDriver(driver, "https://master-food.pro/private/");
-
-            // Создаем POST-запрос
-            HttpEntity<MultiValueMap<String, String>> request = buildPostRequest(driver, email, password);
-            // Отправляем POST-запрос
-            Map<String, Object> response = sendPostRequest(request);
-
-            // Обрабатываем ответ от сайта на пост запрос
-            if(response.containsKey("Result")){
-                String respResult = response.get("Result").toString();
-                if(!"success".equalsIgnoreCase(respResult)){
-                    result.put("Message", "Post - success");
-
-                    //Настраиваем наш драйвер на страницу
-                    driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
-                    // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
-                    Map<String, String> resultOfParse = parsePage(driver);
-
-                    result.put("Message", resultOfParse.get("Message"));
-                    result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
-                    result.put("SiteUid", resultOfParse.get("SiteUid"));
-                }else if (response.containsKey("Msg")){
-                    result.put("Message", response.get("Msg").toString());
-                }else{
-                    result.put("Message", "Что то пошло не так, ответ на пост запрос: " + response.get("Result").toString());
-                }
-            }else{
-                result.put("Message", "В ответе на пост запрос отсутствует key: Result");
-//                result.put("isAuthorized", response);
-//                result.put("action", "login");
-//                result.put("email", email);
-//                result.put("password", password);
+//    public Map<String, String> activationFromSite(String email,
+//                                                  String password) {
 //
-//                result.put("siteUid", siteUid);
-//                result.put("phoneNumber", phoneNumber);
-            }
-
-
-
-
-
-
-
-
-        } finally {
-            driver.quit();
-        }
-
-        return result;
-    }
+//        Map<String, String> result = new HashMap<>();
+//
+//        WebDriver driver = null;
+//        try {
+//            // Создаем драйвер
+//            driver = createWebDriver();
+//            // Настраиваем драйвер на страницу
+//            driver = setWebDriver(driver, "https://master-food.pro/private/");
+//
+//            // Создаем POST-запрос
+//            HttpEntity<MultiValueMap<String, String>> request = buildPostRequest(driver, email, password);
+//            // Отправляем POST-запрос
+//            Map<String, Object> response = sendPostRequest(request);
+//
+//            // Обрабатываем ответ от сайта на пост запрос
+//            if(response.containsKey("Result")){
+//                String respResult = response.get("Result").toString();
+//                if(!"success".equalsIgnoreCase(respResult)){
+//                    result.put("Message", "Post - success");
+//
+//                    //Настраиваем наш драйвер на страницу
+//                    driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
+//                    // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
+//                    Map<String, String> resultOfParse = parsePage(driver);
+//
+//                    result.put("Message", resultOfParse.get("Message"));
+//                    result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
+//                    result.put("SiteUid", resultOfParse.get("SiteUid"));
+//                }else if (response.containsKey("Msg")){
+//                    result.put("Message", response.get("Msg").toString());
+//                }else{
+//                    result.put("Message", "Что то пошло не так, ответ на пост запрос: " + response.get("Result").toString());
+//                }
+//            }else{
+//                result.put("Message", "В ответе на пост запрос отсутствует key: Result");
+////                result.put("isAuthorized", response);
+////                result.put("action", "login");
+////                result.put("email", email);
+////                result.put("password", password);
+////
+////                result.put("siteUid", siteUid);
+////                result.put("phoneNumber", phoneNumber);
+//            }
+//
+//
+//
+//
+//
+//
+//
+//
+//        } finally {
+//            driver.quit();
+//        }
+//
+//        return result;
+//    }
 
     // Метод для создания web-драйвера
     public WebDriver createWebDriver(){
@@ -185,33 +185,33 @@ public class SiteData {
         return new HttpEntity<>(map, headers);
     }
     // Метод для отправки POST-запроса
-    public Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        try {
-            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class); // Get response as String
-            String html = response.getBody();
-            Map<String, Object> result = new HashMap<>();
-
-            // Parse JSON from the HTML string
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> answer = null;
-            try {
-                answer = mapper.readValue(html, Map.class);
-            } catch (JsonProcessingException e) {
-                result.put("Result", "Cannot read value with mapper from answer (selenium not worked....)");
-                return result;
-            }
-
-            result.put("Result", answer);
-            return result;
-
-        } catch (RestClientException e) {
-            Map<String, Object> result = new HashMap<>();
-            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
-            return result;
-        }
-    }
+//    public Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        try {
+//            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class); // Get response as String
+//            String html = response.getBody();
+//            Map<String, Object> result = new HashMap<>();
+//
+//            // Parse JSON from the HTML string
+//            ObjectMapper mapper = new ObjectMapper();
+//            Map<String, Object> answer = null;
+//            try {
+//                answer = mapper.readValue(html, Map.class);
+//            } catch (JsonProcessingException e) {
+//                result.put("Result", "Cannot read value with mapper from answer (selenium not worked....)");
+//                return result;
+//            }
+//
+//            result.put("Result", answer);
+//            return result;
+//
+//        } catch (RestClientException e) {
+//            Map<String, Object> result = new HashMap<>();
+//            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
+//            return result;
+//        }
+//    }
 
     // Метод для парсинга страницы
     public Map<String, String> parsePage(WebDriver driver){
