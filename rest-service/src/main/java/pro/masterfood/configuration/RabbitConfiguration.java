@@ -25,7 +25,7 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public Queue textMessageQueue() {
+    public Queue loginMessageQueue() {
         Map<String, Object> args = new HashMap<>();
         args.put("x-message-ttl", 6000);
         return new Queue(loginQueue, true, false, false, args);
