@@ -32,9 +32,11 @@ public class ConsumerServiceImpl implements ConsumerService {
                 userInformationProvider.consumeGetBalance(requestParams);
             } else if (RequestsToREST.ORDER_STATUS_REQUEST.equals(requestParams.getRequestType())) {
                 userInformationProvider.consumeGetOrderStatus(requestParams);
+            }else{
+                userActivationService.sendAnswer("Сервис не может обработать сообщение " + requestParams.getRequestType(), requestParams.getChatId());
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            userActivationService.sendAnswer("Ошибка при обработке запроса " + e.getMessage(), requestParams.getChatId());
         }
     }
 }

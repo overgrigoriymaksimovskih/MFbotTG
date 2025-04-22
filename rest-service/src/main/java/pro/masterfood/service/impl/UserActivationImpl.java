@@ -78,7 +78,7 @@ public class UserActivationImpl implements UserActivationService {
 
 
         // 2. Извлекаем значение "Status" из isAuthorizedMap
-        String message = "Не удалось связаться с сервисом авторизации...";
+        String message = "Ошибка авторизации, попробуйте еще раз...";
         if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
             Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
             if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
@@ -108,6 +108,12 @@ public class UserActivationImpl implements UserActivationService {
                             appUserDAO.save(user);
                             sendAnswer(message + " введите email", requestParams.getChatId());
                         }
+                    }else{
+                        var user = optional.get();
+                        user.setEmail(null);
+                        user.setState(WAIT_FOR_EMAIL_STATE);
+                        appUserDAO.save(user);
+                        sendAnswer(message + " введите email", requestParams.getChatId());
                     }
                 }
             }
