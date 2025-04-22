@@ -52,12 +52,10 @@ public class SiteData {
                 String respResult = response.get("Result").toString();
                 if(!"success".equalsIgnoreCase(respResult)){
                     result.put("Message", "Post - success");
+                    //Настраиваем наш драйвер на страницу
                     driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
-                    WebDriverWait waitUid = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-                    WebElement uidElement = waitUid.until(ExpectedConditions.presenceOfElementLocated(By.name("uid")));
-                    WebDriverWait waitPhone = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-                    WebElement phoneElement = waitPhone.until(ExpectedConditions.presenceOfElementLocated(By.name("mobilephone")));
-                    Map<String, String> resultOfParse = parsePage(driver, uidElement,phoneElement);
+                    // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
+                    Map<String, String> resultOfParse = parsePage(driver);
                     result.put("Message", resultOfParse.get("Message"));
                     result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
                     result.put("SiteUid", resultOfParse.get("SiteUid"));
@@ -215,19 +213,18 @@ public class SiteData {
     }
 
     // Метод для парсинга страницы
-    private Map<String, String> parsePage(WebDriver driver, WebElement uidElement, WebElement phoneElement ){
-        // Настраиваем драйвер на страницу
+    private Map<String, String> parsePage(WebDriver driver){
+
         Map<String, String> result = new HashMap<>();
-//        setWebDriver(driver, pageUrl);
-        // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
+
         String siteUid = null;
         String phoneNumber = null;
         try {
-//            WebDriverWait waitUid = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-//            WebElement uidElement = waitUid.until(ExpectedConditions.presenceOfElementLocated(By.name("uid")));
+            WebDriverWait waitUid = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
+            WebElement uidElement = waitUid.until(ExpectedConditions.presenceOfElementLocated(By.name("uid")));
             siteUid = uidElement.getAttribute("value");
-//            WebDriverWait waitPhone = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-//            WebElement phoneElement = waitPhone.until(ExpectedConditions.presenceOfElementLocated(By.name("mobilephone")));
+            WebDriverWait waitPhone = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
+            WebElement phoneElement = waitPhone.until(ExpectedConditions.presenceOfElementLocated(By.name("mobilephone")));
             phoneNumber = phoneElement.getAttribute("value");
 
         } catch (NoSuchElementException e) {
