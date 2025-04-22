@@ -70,54 +70,59 @@ public class UserActivationImpl implements UserActivationService {
 
         String email = requestParams.getEmail();
         String password = requestParams.getPassword();
-        var res = activationFromSite(email, password);
-        // 1. Извлекаем Map "isAuthorized"
-        Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");
-        Long siteUid = Long.parseLong((String) res.get("siteUid"));
-        String phoneNumber = res.get("phoneNumber").toString();
+
+        var res = siteData.activationFromSite(email, password);
+
+        sendAnswer(res.get("Message") + " " + res.get("PhoneNumber") + " " + res.get("SiteUid"), requestParams.getChatId());
 
 
-        // 2. Извлекаем значение "Status" из isAuthorizedMap
-        String message = "Ошибка авторизации, попробуйте еще раз...";
-        if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
-            Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
-            if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
-                String statusValue = (String) resultMap.get("Status");
-                if ("success".equalsIgnoreCase(statusValue) && null != optional.get().getEmail()) {
-
-                    //-----------------------------------------------------------------
-                    if (optional.isPresent()) {
-                        var user = optional.get();
-
-                        user.setIsActive(true);
-                        user.setState(BASIC_STATE);
-                        user.setSiteUserId(siteUid);
-                        user.setPhoneNumber(phoneNumber);
-                        appUserDAO.save(user);
-                        sendAnswer("Успешно", requestParams.getChatId());
-                    }
-                    //-----------------------------------------------------------------
-
-                }else if(!optional.get().getIsActive()){
-                    if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
-                        message = (String) resultMap.get("Msg");
-                        if (optional.isPresent()) {
-                            var user = optional.get();
-                            user.setEmail(null);
-                            user.setState(WAIT_FOR_EMAIL_STATE);
-                            appUserDAO.save(user);
-                            sendAnswer(message + " введите email", requestParams.getChatId());
-                        }
-                    }else{
-                        var user = optional.get();
-                        user.setEmail(null);
-                        user.setState(WAIT_FOR_EMAIL_STATE);
-                        appUserDAO.save(user);
-                        sendAnswer(message + " введите email", requestParams.getChatId());
-                    }
-                }
-            }
-        }
+//        // 1. Извлекаем Map "isAuthorized"
+//        Map<String, Object> isAuthorizedMap = (Map<String, Object>) res.get("isAuthorized");
+//        Long siteUid = Long.parseLong((String) res.get("siteUid"));
+//        String phoneNumber = res.get("phoneNumber").toString();
+//
+//
+//        // 2. Извлекаем значение "Status" из isAuthorizedMap
+//        String message = "Ошибка авторизации, попробуйте еще раз...";
+//        if (isAuthorizedMap != null && isAuthorizedMap.containsKey("Result") && isAuthorizedMap.get("Result") instanceof Map) {
+//            Map<?, ?> resultMap = (Map<?, ?>) isAuthorizedMap.get("Result");
+//            if (resultMap.containsKey("Status") && resultMap.get("Status") instanceof String) {
+//                String statusValue = (String) resultMap.get("Status");
+//                if ("success".equalsIgnoreCase(statusValue) && null != optional.get().getEmail()) {
+//
+//                    //-----------------------------------------------------------------
+//                    if (optional.isPresent()) {
+//                        var user = optional.get();
+//
+//                        user.setIsActive(true);
+//                        user.setState(BASIC_STATE);
+//                        user.setSiteUserId(siteUid);
+//                        user.setPhoneNumber(phoneNumber);
+//                        appUserDAO.save(user);
+//                        sendAnswer("Успешно", requestParams.getChatId());
+//                    }
+//                    //-----------------------------------------------------------------
+//
+//                }else if(!optional.get().getIsActive()){
+//                    if (resultMap.containsKey("Msg") && resultMap.get("Msg") instanceof String) {
+//                        message = (String) resultMap.get("Msg");
+//                        if (optional.isPresent()) {
+//                            var user = optional.get();
+//                            user.setEmail(null);
+//                            user.setState(WAIT_FOR_EMAIL_STATE);
+//                            appUserDAO.save(user);
+//                            sendAnswer(message + " введите email", requestParams.getChatId());
+//                        }
+//                    }else{
+//                        var user = optional.get();
+//                        user.setEmail(null);
+//                        user.setState(WAIT_FOR_EMAIL_STATE);
+//                        appUserDAO.save(user);
+//                        sendAnswer(message + " введите email", requestParams.getChatId());
+//                    }
+//                }
+//            }
+//        }
     }
 
 
@@ -129,88 +134,5 @@ public class UserActivationImpl implements UserActivationService {
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
-    }
-
-    //    @Override
-    public Map<String, Object> activationFromSite(String email,
-                                                  String password) {
-        Map<String, Object> result;
-        // Создаем драйвер
-        WebDriver driver = siteData.createWebDriver();
-
-        try {
-            // Настраиваем драйвер на страницу
-            driver = siteData.setWebDriver(driver, "https://master-food.pro/private/");
-
-            // Создаем POST-запрос
-            HttpEntity<MultiValueMap<String, String>> request = siteData.buildPostRequest(driver, email, password);
-            // Отправляем POST-запрос
-            Map<String, Object> response = sendPostRequest(request);
-
-
-            // Настраиваем драйвер на страницу
-            driver = siteData.setWebDriver(driver, "https://master-food.pro/private/personal/");
-            // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
-            String siteUid = null;
-            String phoneNumber = null;
-            try {
-                WebDriverWait waitUid = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-                WebElement uidElement = waitUid.until(ExpectedConditions.presenceOfElementLocated(By.name("uid")));
-                siteUid = uidElement.getAttribute("value");
-                WebDriverWait waitPhone = new WebDriverWait(driver, Duration.ofSeconds(10)); // Ожидание до 10 секунд
-                WebElement phoneElement = waitPhone.until(ExpectedConditions.presenceOfElementLocated(By.name("mobilephone")));
-                phoneNumber = phoneElement.getAttribute("value");
-
-            } catch (NoSuchElementException e) {
-                //TODO обработать исключение
-                return null;
-            } catch (Exception e) {
-                //TODO обработать исключение
-                return null;
-            }
-
-
-            // Создаем Map для возврата
-            result = new HashMap<>();
-            result.put("isAuthorized", response);
-            result.put("action", "login");
-            result.put("email", email);
-            result.put("password", password);
-
-            result.put("siteUid", siteUid);
-            result.put("phoneNumber", phoneNumber);
-        } finally {
-            driver.quit();
-        }
-
-        return result;
-    }
-
-    private Map<String, Object> sendPostRequest(HttpEntity<MultiValueMap<String, String>> request) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        try {
-            ResponseEntity<String> response = restTemplate.postForEntity("https://master-food.pro/", request, String.class); // Get response as String
-            String html = response.getBody();
-            Map<String, Object> result = new HashMap<>();
-
-            // Parse JSON from the HTML string
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> answer = null;
-            try {
-                answer = mapper.readValue(html, Map.class);
-            } catch (JsonProcessingException e) {
-                result.put("Result", "Cannot read value with mapper from answer (selenium not worked....)");
-                return result;
-            }
-
-            result.put("Result", answer);
-            return result;
-
-        } catch (RestClientException e) {
-            Map<String, Object> result = new HashMap<>();
-            result.put("Error", "Ошибка при отправке POST-запроса: " + e.getMessage());
-            return result;
-        }
     }
 }
