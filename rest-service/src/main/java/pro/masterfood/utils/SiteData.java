@@ -49,15 +49,14 @@ public class SiteData {
 
             // Обрабатываем ответ от сайта на пост запрос
             if(response.containsKey("Result")){
-                String respResult = response.get("Msg").toString();
-//                if(!"success".equalsIgnoreCase(respResult)){
-                if(!respResult.contains("Добро")){
+                String respResult = response.get("Result").toString();
+                if(!"success".equalsIgnoreCase(respResult)){
                     result.put("Message", "Post - success");
                     //Настраиваем наш драйвер на страницу
                     driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
                     // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
                     Map<String, String> resultOfParse = parsePage(driver);
-                    result.put("Message", resultOfParse.get("Message"));
+                    result.put("Message", resultOfParse.toString());
                     result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
                     result.put("SiteUid", resultOfParse.get("SiteUid"));
                 }else if (response.containsKey("Msg")){
