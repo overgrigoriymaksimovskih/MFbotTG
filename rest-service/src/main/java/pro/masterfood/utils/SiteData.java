@@ -53,6 +53,7 @@ public class SiteData {
                 if(!"success".equalsIgnoreCase(respResult)){
                     result.put("Message", "Post - success");
                     Map<String, String> resultOfParse = parsePage(driver, "https://master-food.pro/private/personal/");
+                    result.put("Message", resultOfParse.get("Message"));
                     result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
                     result.put("SiteUid", resultOfParse.get("SiteUid"));
                 }else if (response.containsKey("Msg")){
@@ -212,7 +213,7 @@ public class SiteData {
     private Map<String, String> parsePage(WebDriver driver, String pageUrl){
         // Настраиваем драйвер на страницу
         Map<String, String> result = new HashMap<>();
-        driver = setWebDriver(driver, pageUrl);
+        setWebDriver(driver, pageUrl);
         // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
         String siteUid = null;
         String phoneNumber = null;
