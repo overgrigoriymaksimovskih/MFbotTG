@@ -32,8 +32,8 @@ public class SiteData {
 
     public Map<String, String> activationFromSite(String email,
                                                   String password) {
-        Map<String, String> result = null;
 
+        Map<String, String> result = new HashMap<>();
 
         WebDriver driver = null;
         try {
