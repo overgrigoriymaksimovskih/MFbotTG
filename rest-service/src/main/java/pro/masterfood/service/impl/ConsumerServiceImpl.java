@@ -40,7 +40,7 @@ public class ConsumerServiceImpl implements ConsumerService {
             } else if (RequestsToREST.ORDER_STATUS_REQUEST.equals(requestParams.getRequestType())) {
                 userInformationProvider.consumeGetOrderStatus(requestParams);
             }
-            channel.basicAck(deliveryTag, false);
+//            channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             System.err.println("Error processing message: " + e.getMessage());
             try {
