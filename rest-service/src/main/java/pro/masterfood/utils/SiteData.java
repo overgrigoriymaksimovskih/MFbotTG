@@ -49,8 +49,9 @@ public class SiteData {
 
             // Обрабатываем ответ от сайта на пост запрос
             if(response.containsKey("Result")){
-                String respResult = response.get("Result").toString();
-                if(!"success".equalsIgnoreCase(respResult)){
+                String respResult = response.get("Msg").toString();
+//                if(!"success".equalsIgnoreCase(respResult)){
+                if(!respResult.contains("Добро")){
                     result.put("Message", "Post - success");
                     //Настраиваем наш драйвер на страницу
                     driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
