@@ -46,11 +46,12 @@ public class SiteData {
             HttpEntity<MultiValueMap<String, String>> request = buildPostRequest(driver, email, password);
             // Отправляем POST-запрос
             Map<String, Object> response = sendPostRequest(request);
+            Map<String, Object> responseData = (Map<String, Object>) response.get("Result");
 
             // Обрабатываем ответ от сайта на пост запрос
-            if(response.containsKey("Result")){
-                String respResult = response.get("Result").toString();
-                if(!"success".equalsIgnoreCase(respResult)){
+            if(responseData.containsKey("Result")){
+                String respResult = response.get("Status").toString();
+                if("success".equalsIgnoreCase(respResult)){
                     result.put("Message", "Post - success");
                     //Настраиваем наш драйвер на страницу
                     driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
@@ -60,9 +61,9 @@ public class SiteData {
                     result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
                     result.put("SiteUid", resultOfParse.get("SiteUid"));
                 }else if (response.containsKey("Msg")){
-                    result.put("Message", response.get("Msg").toString());
+                    result.put("Message", response.get("Msg").toString().replace("uid::",""));
                 }else{
-                    result.put("Message", "Что то пошло не так, ответ на пост запрос: " + response.get("Result").toString());
+                    result.put("Message", "Что то пошло не так, ответ на пост запрос: " + response.get("Status").toString());
                 }
             }else{
                 result.put("Message", "В ответе на пост запрос отсутствует key: Result");
