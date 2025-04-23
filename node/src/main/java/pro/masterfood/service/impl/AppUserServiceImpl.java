@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pro.masterfood.dao.AppUserDAO;
+import pro.masterfood.dto.MailParams;
 import pro.masterfood.dto.RequestParams;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.enums.RequestsToREST;
@@ -32,6 +33,9 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Value("${spring.rabbitmq.queues.login}")
     private String registrationLoginQueue;
+
+    @Value("${spring.rabbitmq.queues.registration-mail}")
+    private String registrationMailQueue;
 
 
     @Override
@@ -130,4 +134,13 @@ public class AppUserServiceImpl implements AppUserService {
 //                .build();
 //        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
 //    }
+
+    @Override
+    public void sendReportMail(String cryptoUserId, String email) {
+        var mailParams = MailParams.builder()
+                .id(cryptoUserId)
+                .emailTo(email)
+                .build();
+        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+    }
 }

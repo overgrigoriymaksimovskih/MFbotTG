@@ -21,9 +21,11 @@ public class MailSenderServiceImpl implements MailSenderService {
 
     @Override
     public void send(MailParams mailParams) {
-        var subject = "Активация учетной записи";
-        var messageBody = getActivationMailBody(mailParams.getId());
-        var emailTo = mailParams.getEmailTo();
+        var subject = "Тестовое письмо из бота";
+//        var messageBody = getActivationMailBody(mailParams.getId());
+//        var emailTo = mailParams.getEmailTo();
+        var messageBody = "Текст тестового письма из бота";
+        var emailTo = "master-2m@yandex.ru";
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(emailFrom);

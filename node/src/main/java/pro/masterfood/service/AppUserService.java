@@ -9,4 +9,6 @@ public interface AppUserService {
 
     String checkBalance (Long chatId, AppUser appUser);
     String checkStatus (Long chatId, AppUser appUser);
+
+    void sendReportMail(String cryptoUserId, String email);
 }
