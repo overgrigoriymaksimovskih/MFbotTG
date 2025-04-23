@@ -28,8 +28,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static pro.masterfood.enums.UserState.BASIC_STATE;
-import static pro.masterfood.enums.UserState.WAIT_FOR_EMAIL_STATE;
+import static pro.masterfood.enums.UserState.*;
 
 @Component
 public class UserActivationImpl implements UserActivationService {
@@ -73,28 +72,35 @@ public class UserActivationImpl implements UserActivationService {
 
         var res = siteData.activationFromSite(email, password);
 
+        var user = optional.get();
+        if(user.getState().equals(WAIT_FOR_ANSWER)){
+            sendAnswer("Дождитесь выполнения команды..", requestParams.getChatId());
+        }else{
+            user.setState(WAIT_FOR_ANSWER);
+            appUserDAO.save(user);
+
 //        sendAnswer(res.get("Message") , requestParams.getChatId());
 
-        if(res.containsKey("PhoneNumber") && res.containsKey("SiteUid")){
-            if(!res.get("PhoneNumber").equalsIgnoreCase("null") && !res.get("SiteUid").equalsIgnoreCase("0")){
-                var user = optional.get();
-                user.setIsActive(true);
-                        user.setState(BASIC_STATE);
-                        user.setPhoneNumber(res.get("PhoneNumber").toString());
-                        user.setSiteUserId(Long.valueOf(res.get("SiteUid").toString()));
-                        appUserDAO.save(user);
-                sendAnswer(res.get("Message"), requestParams.getChatId());
-            }else{
-                sendAnswer("Ошибка в интерпритации ответа при авторизации \n" + "Введите email..." , requestParams.getChatId());
-            }
+            if(res.containsKey("PhoneNumber") && res.containsKey("SiteUid")){
+                if(!res.get("PhoneNumber").equalsIgnoreCase("null") && !res.get("SiteUid").equalsIgnoreCase("0")){
+//                var user = optional.get();
+                    user.setIsActive(true);
+                    user.setState(BASIC_STATE);
+                    user.setPhoneNumber(res.get("PhoneNumber").toString());
+                    user.setSiteUserId(Long.valueOf(res.get("SiteUid").toString()));
+                    appUserDAO.save(user);
+                    sendAnswer(res.get("Message").replace("uid::", "" + "\n" + "Введите email..."), requestParams.getChatId());
+                }else{
+                    sendAnswer("Ошибка в интерпритации ответа при авторизации \n" + "Введите email..." , requestParams.getChatId());
+                }
 
-        }else{
-            var user = optional.get();
-                        user.setEmail(null);
-                        user.setState(WAIT_FOR_EMAIL_STATE);
-                        appUserDAO.save(user);
-            sendAnswer(res.get("Message"), requestParams.getChatId());
-        }
+            }else{
+//            var user = optional.get();
+                user.setEmail(null);
+                user.setState(WAIT_FOR_EMAIL_STATE);
+                appUserDAO.save(user);
+                sendAnswer(res.get("Message"), requestParams.getChatId());
+            }
 
 
 
@@ -145,7 +151,9 @@ public class UserActivationImpl implements UserActivationService {
 //                }
 //            }
 //        }
+        }
     }
+
 
 
 
