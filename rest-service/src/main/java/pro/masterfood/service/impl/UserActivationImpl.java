@@ -83,14 +83,17 @@ public class UserActivationImpl implements UserActivationService {
                         user.setPhoneNumber(res.get("PhoneNumber").toString());
                         user.setSiteUserId(Long.valueOf(res.get("SiteUid").toString()));
                         appUserDAO.save(user);
+                sendAnswer(res.get("Message"), requestParams.getChatId());
+            }else{
+                sendAnswer("Ошибка в интерпритации ответа при авторизации \n" + "Введите email..." , requestParams.getChatId());
             }
-            sendAnswer(res.get("Message"), requestParams.getChatId());
+
         }else{
             var user = optional.get();
                         user.setEmail(null);
                         user.setState(WAIT_FOR_EMAIL_STATE);
                         appUserDAO.save(user);
-            sendAnswer("Ошибка в интерпритации ответа при авторизации \n" + "Введите email..." , requestParams.getChatId());
+            sendAnswer(res.get("Message"), requestParams.getChatId());
         }
 
 
