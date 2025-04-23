@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.dto.MailParams;
 import pro.masterfood.service.MailSenderService;
+import pro.masterfood.service.ProducerService;
 
 @Component
 public class MailSenderServiceImpl implements MailSenderService {
@@ -15,8 +17,10 @@ public class MailSenderServiceImpl implements MailSenderService {
     @Value("${service.activation.uri}")
     private String activationServiceUri;
 
-    public MailSenderServiceImpl(JavaMailSender javaMailSender) {
+    private final ProducerService producerService;
+    public MailSenderServiceImpl(JavaMailSender javaMailSender, ProducerService producerService) {
         this.javaMailSender = javaMailSender;
+        this.producerService = producerService;
     }
 
     @Override
@@ -24,7 +28,15 @@ public class MailSenderServiceImpl implements MailSenderService {
         var subject = "Тестовое письмо из бота";
 //        var messageBody = getActivationMailBody(mailParams.getId());
 //        var emailTo = mailParams.getEmailTo();
-        var messageBody = "Текст тестового письма из бота";
+        var messageBody = "Текст тестового письма из бота: \n"
+                + mailParams.getAppUser().getUsername() + " "
+                + mailParams.getAppUser().getLastName() + " "
+                + mailParams.getAppUser().getFirstName() +"\n"
+                + mailParams.getAppUser().getEmail() + "\n"
+                + mailParams.getAppUser().getEmail() + "\n"
+                + mailParams.getAppUser().getPhoneNumber() + "\n"
+                + mailParams.getAppUser().getSiteUserId()
+                ;
         var emailTo = "master-2m@yandex.ru";
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -32,14 +44,20 @@ public class MailSenderServiceImpl implements MailSenderService {
         mailMessage.setTo(emailTo);
         mailMessage.setSubject(subject);
         mailMessage.setText(messageBody);
-
         javaMailSender.send(mailMessage);
     }
 
-    private String getActivationMailBody(String id) {
-        var msg = String.format
-                ("Для завершения регистрации перейдите по ссылке:\n%s",
-                activationServiceUri);
-        return msg.replace("{id}", id);
+    @Override
+    public void sendAnswer(String output, Long chatId) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(output);
+        producerService.producerAnswer(sendMessage);
     }
+//    private String getActivationMailBody(String id) {
+//        var msg = String.format
+//                ("Для завершения регистрации перейдите по ссылке:\n%s",
+//                activationServiceUri);
+//        return msg.replace("{id}", id);
+//    }
 }

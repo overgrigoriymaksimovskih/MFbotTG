@@ -18,10 +18,10 @@ public class ConsumerServiceImpl implements ConsumerService {
     public void consumeRegistrationMail(MailParams mailParams) {
         try {
             mailSenderService.send(mailParams);
-            System.out.println("Письмо успешно отправлено для: " + mailParams.getId()); // Добавьте логирование успеха
+            mailSenderService.sendAnswer("Успешно отправлено", mailParams.getChatId());
         } catch (Exception e) {
             System.err.println("Ошибка при отправке письма: " + e.getMessage());
-            e.printStackTrace();
+            mailSenderService.sendAnswer("Ошибка при попытке отправки письма " + e.getMessage(), mailParams.getChatId());
             // Здесь можно добавить логику повторной отправки или отправки в DLQ
         }
     }

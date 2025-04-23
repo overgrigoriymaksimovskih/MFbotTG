@@ -136,10 +136,10 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Override
-    public void sendReportMail(String cryptoUserId, String email) {
+    public void sendReportMail(Long chatId, AppUser appUser) {
         var mailParams = MailParams.builder()
-                .id(cryptoUserId)
-                .emailTo(email)
+                .chatId(chatId)
+                .appUser(appUser)
                 .build();
         rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }
