@@ -49,7 +49,7 @@ public class SiteData {
             Map<String, Object> responseData = (Map<String, Object>) response.get("Result");
 
             // Обрабатываем ответ от сайта на пост запрос
-            if(responseData.containsKey("Result")){
+            if(response.containsKey("Result")){
                 String respResult = response.get("Status").toString();
                 if("success".equalsIgnoreCase(respResult)){
 //                    result.put("Message", "Post - success");
