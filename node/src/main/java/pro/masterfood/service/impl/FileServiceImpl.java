@@ -52,6 +52,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public String processReport(String reportMessage) {
+
+            return "Сообщение отправляется...";
+
+    }
+
+    @Override
     public AppDocument processDoc(Message telegramMessage){
         Document telegramDoc = telegramMessage.getDocument();
         String fileId = telegramDoc.getFileId();

@@ -159,6 +159,9 @@ public class MainServiceImpl implements MainService {
             return appUserService.checkBalance(chatId, appUser);
         } else if (STATUS.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.checkStatus(chatId, appUser);
+
+        } else if (REPORT.equals(serviceCommand) && appUser.getIsActive()) {
+            return fileService.processReport("popka");
         //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();
@@ -176,6 +179,7 @@ public class MainServiceImpl implements MainService {
         return "Список доступных команд: \n"
                 + "/present - накоплено на подарок\n"
                 + "/status - статус текущего заказа\n"
+                + "/report - отправить жалобу\n"
                 + "/cancel - отмена выполнения текущей команды\n"
                 + "\n"
                 + "/quit - выйти\n";
@@ -188,7 +192,8 @@ public class MainServiceImpl implements MainService {
     }
 
     private String cancelProcess(AppUser appUser) {
-        if(WAIT_FOR_PASSWORD_STATE.equals(appUser.getState())){
+        if(WAIT_FOR_PASSWORD_STATE.equals(appUser.getState())
+        || WAIT_FOR_ANSWER.equals(appUser.getState())){
             appUser.setEmail(null);
         }
         appUser.setState(BASIC_STATE);

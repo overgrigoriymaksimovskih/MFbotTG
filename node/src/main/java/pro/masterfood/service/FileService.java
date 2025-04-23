@@ -6,6 +6,7 @@ import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.service.enums.LinkType;
 
 public interface FileService {
+    String processReport(String reportMessage);
     AppDocument processDoc(Message telegramMessage);
     AppPhoto processPhoto(Message telegramMessage);
     String generateLink(Long docId, LinkType linkType);
