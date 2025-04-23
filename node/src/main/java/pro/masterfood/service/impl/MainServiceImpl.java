@@ -69,8 +69,8 @@ public class MainServiceImpl implements MainService {
             //Все команды с состоянием ОЖИДАЕМ ПАРОЛЬ обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
             output = appUserService.checkPassword(chatId, appUser, text);
-            //Все команды с состоянием ОЖИДАЕМ ОТВЕТ возвращают ответ ОБОЖДИТЕ
-        } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
+            //Все команды с состоянием ОЖИДАЕМ ОТВЕТ возвращают ответ ОБОЖДИТЕ...
+        } else if (WAIT_FOR_ANSWER.equals(userState)) {
             output = "Дождитесь выполнения команды... Если команда выполняется слишком долго - отмените ее...";
         } else {
             log.error("Unknown user state: " + userState);
