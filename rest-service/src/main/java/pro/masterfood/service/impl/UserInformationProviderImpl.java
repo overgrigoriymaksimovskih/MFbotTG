@@ -8,6 +8,9 @@ import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.UserInformationProvider;
 import pro.masterfood.utils.SimpleHttpClient;
 
+import static pro.masterfood.enums.UserState.BASIC_STATE;
+import static pro.masterfood.enums.UserState.WAIT_FOR_ANSWER;
+
 @Component
 public class UserInformationProviderImpl implements UserInformationProvider {
 
@@ -24,25 +27,42 @@ public class UserInformationProviderImpl implements UserInformationProvider {
     @Override
     public void consumeGetBalance(RequestParams requestParams) {
         var optional = appUserDAO.findById(requestParams.getId());
-        if (optional.isPresent()) {
-            Long siteId = optional.get().getSiteUserId();
-            String answer = simpleHttpClient.getBalance(siteId.toString());
-            sendAnswer(answer, requestParams.getChatId());
-        }else{
-            sendAnswer("Пользователь с таким siteId не найден", requestParams.getChatId());
-        }
+        var user = optional.get();
+        try {
+            user.setState(WAIT_FOR_ANSWER);
+            appUserDAO.save(user);
 
+            if (optional.isPresent()) {
+                Long siteId = optional.get().getSiteUserId();
+                String answer = simpleHttpClient.getBalance(siteId.toString());
+                sendAnswer(answer, requestParams.getChatId());
+            }else{
+                sendAnswer("Пользователь с таким siteId не найден", requestParams.getChatId());
+            }
+        } finally {
+            user.setState(BASIC_STATE);
+            appUserDAO.save(user);
+        }
     }
 
     @Override
     public void consumeGetOrderStatus(RequestParams requestParams) {
         var optional = appUserDAO.findById(requestParams.getId());
-        if (optional.isPresent()) {
-            String phoneNumber = optional.get().getPhoneNumber();
-            String answer = simpleHttpClient.getOrderStatus(phoneNumber);
-            sendAnswer(answer, requestParams.getChatId());
-        }else{
-            sendAnswer("Пользователь с таким siteId не найден", requestParams.getChatId());
+        var user = optional.get();
+        try {
+            user.setState(WAIT_FOR_ANSWER);
+            appUserDAO.save(user);
+
+            if (optional.isPresent()) {
+                String phoneNumber = optional.get().getPhoneNumber();
+                String answer = simpleHttpClient.getOrderStatus(phoneNumber);
+                sendAnswer(answer, requestParams.getChatId());
+            }else{
+                sendAnswer("Пользователь с таким siteId не найден", requestParams.getChatId());
+            }
+        } finally {
+            user.setState(BASIC_STATE);
+            appUserDAO.save(user);
         }
 
     }
