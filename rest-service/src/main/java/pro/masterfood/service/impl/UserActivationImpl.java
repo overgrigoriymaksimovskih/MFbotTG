@@ -74,6 +74,7 @@ public class UserActivationImpl implements UserActivationService {
 
         var user = optional.get();
         user.setState(WAIT_FOR_ANSWER);
+        appUserDAO.save(user);
         var res = siteData.activationFromSite(email, password);
         if(res.containsKey("PhoneNumber") && res.containsKey("SiteUid")){
             if(!res.get("PhoneNumber").equalsIgnoreCase("null") && !res.get("SiteUid").equalsIgnoreCase("0")){
