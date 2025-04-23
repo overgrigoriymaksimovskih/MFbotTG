@@ -59,14 +59,13 @@ public class SiteData {
                         if ("success".equalsIgnoreCase(status)) {
                             // Обработка успешного ответа
 
-                            //Настраиваем наш драйвер на страницу (возможно, стоит использовать Href, как мы обсуждали)
+                            //Настраиваем наш драйвер на страницу
                             driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
 
                             // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
                             Map<String, String> resultOfParse = parsePage(driver);
 
-                            result.put("Message", responseData.toString()); // Временное решение - показывает содержимое responseData
-                            //  result.put("Message", "Post and Get - success"); // Лучше, если парсинг успешен
+                            result.put("Message", responseData.get("Msg").toString());
                             result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
                             result.put("SiteUid", resultOfParse.get("SiteUid"));
                         } else if (responseData.containsKey("Msg")) {
