@@ -44,42 +44,42 @@ public class SiteData {
 
             // Создаем POST-запрос
             HttpEntity<MultiValueMap<String, String>> request = buildPostRequest(driver, email, password);
+
             // Отправляем POST-запрос
             Map<String, Object> response = sendPostRequest(request);
-            Map<String, Object> responseData = (Map<String, Object>) response.get("Result");
+            if (response.containsKey("Result")) {
+                Object resultObject = response.get("Result");
 
-            // Обрабатываем ответ от сайта на пост запрос
-            if(response.containsKey("Result")){
-                String respResult = response.get("Status").toString();
-                if("success".equalsIgnoreCase(respResult)){
-//                    result.put("Message", "Post - success");
-                    //Настраиваем наш драйвер на страницу
-                    driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
-                    // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
-                    Map<String, String> resultOfParse = parsePage(driver);
+                if (resultObject instanceof Map) {
+                    Map<String, Object> responseData = (Map<String, Object>) resultObject;
 
-                    result.put("Message", responseData.toString());
-//                    if(responseData.containsKey("Msg")){
-//                        result.put("Message", responseData.get("Msg").toString());//
-//                    }else{
-//                        result.put("Message", responseData.get("Status").toString());
-//                    }
-                    result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
-                    result.put("SiteUid", resultOfParse.get("SiteUid"));
-                }else if (response.containsKey("Msg")){
-                    result.put("Message", response.get("Msg").toString().replace("uid::",""));
-                }else{
-                    result.put("Message", "Что то пошло не так, ответ на пост запрос: " + response.get("Status").toString());
+                    if (responseData.containsKey("Status")) {
+                        String status = responseData.get("Status").toString();
+
+                        if ("success".equalsIgnoreCase(status)) {
+                            // Обработка успешного ответа
+
+                            //Настраиваем наш драйвер на страницу (возможно, стоит использовать Href, как мы обсуждали)
+                            driver = setWebDriver(driver, "https://master-food.pro/private/personal/");
+
+                            // Теперь страница загружена в наш драйвер, просто спарсим итересующие нас данные из нее
+                            Map<String, String> resultOfParse = parsePage(driver);
+
+                            result.put("Message", responseData.toString()); // Временное решение - показывает содержимое responseData
+                            //  result.put("Message", "Post and Get - success"); // Лучше, если парсинг успешен
+                            result.put("PhoneNumber", resultOfParse.get("PhoneNumber"));
+                            result.put("SiteUid", resultOfParse.get("SiteUid"));
+                        } else if (responseData.containsKey("Msg")) {
+                            result.put("Message", responseData.get("Msg").toString());
+                        } else {
+                            result.put("Message", "Что то пошло не так, ответ на пост запрос: " + responseData.get("Status").toString());
+                        }
+                    } else {
+                        result.put("Message", "Status not found in response");
+                    }
+                } else {
+                    result.put("Message", "Result is not a Map");
                 }
-            }else{
-                result.put("Message", "В ответе на пост запрос отсутствует key: Result");
-//                result.put("isAuthorized", response);
-//                result.put("action", "login");
-//                result.put("email", email);
-//                result.put("password", password);
-//
-//                result.put("siteUid", siteUid);
-//                result.put("phoneNumber", phoneNumber);
             }
 
 
