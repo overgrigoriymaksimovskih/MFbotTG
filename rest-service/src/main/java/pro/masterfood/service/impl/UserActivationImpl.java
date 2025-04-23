@@ -73,7 +73,20 @@ public class UserActivationImpl implements UserActivationService {
 
         var res = siteData.activationFromSite(email, password);
 
-        sendAnswer(res.get("Message") + " " + res.get("PhoneNumber") + " " + res.get("SiteUid"), requestParams.getChatId());
+        if(res.containsKey("PhoneNumber") && res.containsKey("SiteUid")){
+            if(!res.get("PhoneNumber").equalsIgnoreCase("null") && !res.get("SiteUid").equalsIgnoreCase("0")){
+                var user = optional.get();
+                user.setIsActive(true);
+                        user.setState(BASIC_STATE);
+                        user.setPhoneNumber(res.get("PhoneNumber").toString());
+                        user.setSiteUserId(Long.valueOf(res.get("SiteUid").toString()));
+                        appUserDAO.save(user);
+            }
+            sendAnswer(res.get("Message"), requestParams.getChatId());
+        }else{
+            sendAnswer("Ошибка в интерпритации ответа при авторизации" , requestParams.getChatId());
+        }
+
 
 
 //        // 1. Извлекаем Map "isAuthorized"
