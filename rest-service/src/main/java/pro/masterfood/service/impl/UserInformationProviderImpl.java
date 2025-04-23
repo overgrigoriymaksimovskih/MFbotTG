@@ -32,6 +32,11 @@ public class UserInformationProviderImpl implements UserInformationProvider {
             user.setState(WAIT_FOR_ANSWER);
             appUserDAO.save(user);
 
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                sendAnswer("ошибка сна", requestParams.getChatId());
+            }
             if (optional.isPresent()) {
                 Long siteId = optional.get().getSiteUserId();
                 String answer = simpleHttpClient.getBalance(siteId.toString());
@@ -53,6 +58,11 @@ public class UserInformationProviderImpl implements UserInformationProvider {
             user.setState(WAIT_FOR_ANSWER);
             appUserDAO.save(user);
 
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                sendAnswer("ошибка сна", requestParams.getChatId());
+            }
             if (optional.isPresent()) {
                 String phoneNumber = optional.get().getPhoneNumber();
                 String answer = simpleHttpClient.getOrderStatus(phoneNumber);
