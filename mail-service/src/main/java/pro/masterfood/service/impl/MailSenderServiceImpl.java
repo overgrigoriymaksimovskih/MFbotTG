@@ -1,6 +1,7 @@
 package pro.masterfood.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -29,18 +30,18 @@ public class MailSenderServiceImpl implements MailSenderService {
     @Override
     public void send(MailParams mailParams) {
         var optional = appUserDAO.findById(mailParams.getId());
-        var user = optional.get();
+//        var user = optional.get();
         var subject = "Тестовое письмо из бота";
 //        var messageBody = getActivationMailBody(mailParams.getId());
 //        var emailTo = mailParams.getEmailTo();
         var messageBody = "Текст тестового письма из бота: \n"
-                + user.getUsername() + " "
-                + user.getLastName() + " "
-                + user.getFirstName() +"\n"
-                + user.getEmail() + "\n"
-                + user.getEmail() + "\n"
-                + user.getPhoneNumber() + "\n"
-                + user.getSiteUserId()
+//                + user.getUsername() + " "
+//                + user.getLastName() + " "
+//                + user.getFirstName() +"\n"
+//                + user.getEmail() + "\n"
+//                + user.getEmail() + "\n"
+//                + user.getPhoneNumber() + "\n"
+//                + user.getSiteUserId()
                 ;
         var emailTo = "master-2m@yandex.ru";
 
@@ -49,7 +50,12 @@ public class MailSenderServiceImpl implements MailSenderService {
         mailMessage.setTo(emailTo);
         mailMessage.setSubject(subject);
         mailMessage.setText(messageBody);
-        javaMailSender.send(mailMessage);
+        try {
+            javaMailSender.send(mailMessage);
+            sendAnswer("успех", mailParams.getChatId());
+        } catch (MailException e) {
+            sendAnswer(e.getMessage(), mailParams.getChatId());
+        }
     }
 
     @Override
