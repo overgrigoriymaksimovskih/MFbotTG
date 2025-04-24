@@ -12,6 +12,9 @@ public class AppPhoto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne // Одна фотография принадлежит одному пользователю
+    @JoinColumn(name = "owner_id") // Указываем имя колонки, связывающей таблицы
+    private AppUser owner; // Ссылка на сущность User
     private String telegramField;
 
     @OneToOne
@@ -22,8 +25,9 @@ public class AppPhoto {
     public AppPhoto() {
     }
 
-    public AppPhoto(Long id, String telegramField, BinaryContent binaryContent, Integer fileSize) {
+    public AppPhoto(Long id, AppUser owner, String telegramField, BinaryContent binaryContent, Integer fileSize) {
         this.id = id;
+        this.owner = owner;
         this.telegramField = telegramField;
         this.binaryContent = binaryContent;
         this.fileSize = fileSize;
@@ -35,6 +39,14 @@ public class AppPhoto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public AppUser getOwner() {
+        return owner;
+    }
+
+    public void setOwner(AppUser owner) {
+        this.owner = owner;
     }
 
     public String getTelegramField() {
@@ -78,6 +90,7 @@ public class AppPhoto {
     public String toString() {
         return "AppDocument{" +
                 "id=" + id +
+                "owner=" + owner.getId() +
                 ", telegramField='" + telegramField + '\'' +
                 ", binaryContent=" + binaryContent +
                 ", fileSize=" + fileSize +
@@ -90,6 +103,7 @@ public class AppPhoto {
 
     public static class Builder {
         private Long id;
+        private AppUser owner;
         private String telegramField;
         private BinaryContent binaryContent;
         private Integer fileSize;
@@ -117,9 +131,15 @@ public class AppPhoto {
             return this;
         }
 
+        public Builder owner(AppUser owner) { // Добавляем метод для установки owner
+            this.owner = owner;
+            return this;
+        }
+
         public AppPhoto build() {
             AppPhoto appDocument = new AppPhoto();
             appDocument.setId(id);
+            appDocument.setOwner(owner);
             appDocument.setTelegramField(telegramField);
             appDocument.setBinaryContent(binaryContent);
             appDocument.setFileSize(fileSize);

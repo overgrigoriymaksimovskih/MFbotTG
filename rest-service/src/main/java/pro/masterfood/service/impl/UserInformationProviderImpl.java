@@ -32,8 +32,9 @@ public class UserInformationProviderImpl implements UserInformationProvider {
             user.setState(WAIT_FOR_ANSWER);
             appUserDAO.save(user);
 
+            //TODO слишком уж быстро возвращает.... чтобы не спамили....
             try {
-                Thread.sleep(5000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 sendAnswer("ошибка сна", requestParams.getChatId());
             }
@@ -58,8 +59,9 @@ public class UserInformationProviderImpl implements UserInformationProvider {
             user.setState(WAIT_FOR_ANSWER);
             appUserDAO.save(user);
 
+            //TODO слишком уж быстро возвращает.... чтобы не спамили....
             try {
-                Thread.sleep(5000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 sendAnswer("ошибка сна", requestParams.getChatId());
             }
