@@ -7,6 +7,7 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dao.AppPhotoDAO;
 import pro.masterfood.dto.MailParams;
@@ -143,6 +144,7 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Override
+    @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
         try {
             return appUser.getPhotos().toString();
