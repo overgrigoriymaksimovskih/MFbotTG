@@ -158,7 +158,7 @@ public class AppUserServiceImpl implements AppUserService {
                     .email(appUser.getEmail())
                     .siteUid((appUser.getSiteUserId()))
                     .phoneNumber(appUser.getPhoneNumber())
-                    .message(String.valueOf(listPhotos.get(1)))
+                    .message(String.valueOf(listPhotos.get(0)))
                     .build();
         } catch (Exception e) {
             return "ups..." + e.getMessage();
