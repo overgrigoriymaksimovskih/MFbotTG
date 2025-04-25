@@ -9,8 +9,10 @@ import pro.masterfood.entity.AppUser;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MailParams {
-
-    private Long id;//id пользователя в таблице
-
+    //
+//    private String id;
+//
+//    private String emailTo;
     private Long chatId;
+    private AppUser appUser;
 }

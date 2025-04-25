@@ -18,6 +18,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     public void consumeRegistrationMail(MailParams mailParams) {
         try {
             mailSenderService.send(mailParams);
+            mailSenderService.sendAnswer("Успешно отправлено", mailParams.getChatId());
         } catch (Exception e) {
             System.err.println("Ошибка при отправке письма: " + e.getMessage());
             mailSenderService.sendAnswer("Ошибка при попытке отправки письма " + e.getMessage(), mailParams.getChatId());
