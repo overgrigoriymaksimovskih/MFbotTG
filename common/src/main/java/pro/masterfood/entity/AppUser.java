@@ -58,7 +58,7 @@ public class AppUser {
         return photos;
     }
 
-    // Сеттер для photos (обычно не нужен, но зависит от логики)
+    // Сеттер для photos (обычно нужен, но зависит от логики)
     public void setPhotos(List<AppPhoto> photos) {
         this.photos = photos;
     }

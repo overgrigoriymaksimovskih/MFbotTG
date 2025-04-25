@@ -18,8 +18,6 @@ import pro.masterfood.service.AppUserService;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import java.util.List;
-
 import static pro.masterfood.enums.UserState.*;
 
 @Component
@@ -142,28 +140,16 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Override
-    public String sendReportMail(Long chatId, AppUser appUser) {
-//        var optional = appPhotoDAO.findById(1L);
-        List<AppPhoto> listPhotos = null;
-        try {
-            listPhotos = appUser.getPhotos();
-        } catch (Exception e) {
-            return "not list get..." + e.getMessage();
-        }
-        MailParams mailParams = null;
-        try {
-            mailParams = MailParams.builder()
-                    .id(appUser.getId())
-                    .chatId(chatId)
-                    .email(appUser.getEmail())
-                    .siteUid((appUser.getSiteUserId()))
-                    .phoneNumber(appUser.getPhoneNumber())
-                    .message(String.valueOf(listPhotos.get(0)))
-                    .build();
-        } catch (Exception e) {
-            return "ups..." + e.getMessage();
-        }
+    public void sendReportMail(Long chatId, AppUser appUser) {
+        var optional = appPhotoDAO.findById(1L);
+        var mailParams = MailParams.builder()
+                .id(appUser.getId())
+                .chatId(chatId)
+                .email(appUser.getEmail())
+                .siteUid((appUser.getSiteUserId()))
+                .phoneNumber(appUser.getPhoneNumber())
+                .message(optional.get().getTelegramField())
+                .build();
         rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-        return "oтправлено в очередь registrationMailQueue";
     }
 }
