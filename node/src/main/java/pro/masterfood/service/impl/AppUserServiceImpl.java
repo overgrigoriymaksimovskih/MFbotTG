@@ -146,6 +146,13 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("1");
+        if (appUser == null) {
+            return "Пользователь не найден";
+        }else{
+            sb.append("2");
+        }
         try {
             return appUser.toString();
 //            var optional = appPhotoDAO.findById(1L);
@@ -161,6 +168,7 @@ public class AppUserServiceImpl implements AppUserService {
 //            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
 //            return optional.get().getTelegramField();
         } catch (Exception e) {
+            sb.append("3");
             return "error in sendReportMail" + e.getMessage();
         }
     }
