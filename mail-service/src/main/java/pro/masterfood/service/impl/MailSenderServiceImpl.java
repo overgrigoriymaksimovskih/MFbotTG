@@ -31,10 +31,11 @@ public class MailSenderServiceImpl implements MailSenderService {
 //        var messageBody = getActivationMailBody(mailParams.getId());
 //        var emailTo = mailParams.getEmailTo();
         var messageBody = "Текст тестового письма из бота: \n"
-                + mailParams.getEmail() + " "
-                + mailParams.getPhoneNumber() + " "
+                + mailParams.getEmail() +"\n"
+                + mailParams.getPhoneNumber() +"\n"
                 + mailParams.getSiteUid() +"\n"
                 + mailParams.getMessage() + "\n"
+                + mailParams.getPhotoList().toString()
                 ;
         var emailTo = "master-2m@yandex.ru";
 
