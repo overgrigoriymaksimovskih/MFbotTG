@@ -7,8 +7,10 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pro.masterfood.dao.AppUserDAO;
+import pro.masterfood.dao.AppPhotoDAO;
 import pro.masterfood.dto.MailParams;
 import pro.masterfood.dto.RequestParams;
+import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.enums.RequestsToREST;
 import pro.masterfood.service.AppUserService;
@@ -23,11 +25,13 @@ public class AppUserServiceImpl implements AppUserService {
     private static final Logger log = LoggerFactory.getLogger(AppUserServiceImpl.class);
     private final RabbitTemplate rabbitTemplate;
     private final AppUserDAO appUserDAO;
+    private final AppPhotoDAO appPhotoDAO;
     private final Hashids hashids;
 
-    public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, Hashids hashids) {
+    public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, AppPhotoDAO appPhotoDAO, Hashids hashids) {
         this.appUserDAO = appUserDAO;
         this.rabbitTemplate = rabbitTemplate;
+        this.appPhotoDAO = appPhotoDAO;
         this.hashids = hashids;
     }
 
@@ -137,13 +141,14 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public void sendReportMail(Long chatId, AppUser appUser) {
+        var optional = appPhotoDAO.findById(1L);
         var mailParams = MailParams.builder()
                 .id(appUser.getId())
                 .chatId(chatId)
                 .email(appUser.getEmail())
                 .siteUid((appUser.getSiteUserId()))
                 .phoneNumber(appUser.getPhoneNumber())
-                .message(("TEST"))
+                .message(optional.get().getTelegramField())
                 .build();
         rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }
