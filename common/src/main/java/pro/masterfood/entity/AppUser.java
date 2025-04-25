@@ -6,7 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import pro.masterfood.enums.UserState;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -18,9 +17,6 @@ public class AppUser {
     private Long id;
 
     private Long telegramUserId;
-
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AppPhoto> photos; // Список фотографий, принадлежащих пользователю
 
     @CreationTimestamp
     private LocalDateTime firstLoginDate;
@@ -52,14 +48,6 @@ public class AppUser {
     public void setId(Long id) {
         this.id = id;
     }
-
-    public List<AppPhoto> getPhotos() {
-        return photos;
-    }
-
-//    public void setPhotos(List<AppPhoto> photos) {
-//        this.photos = photos;
-//    }
 
     public Long getTelegramUserId() {
         return telegramUserId;
@@ -178,7 +166,6 @@ public class AppUser {
     public static class Builder {
 
         private Long telegramUserId;
-//        private List<AppPhoto> photos;
         private LocalDateTime firstLoginDate;
         private String firstName;
         private String lastName;
@@ -196,11 +183,6 @@ public class AppUser {
             this.telegramUserId = telegramUserId;
             return this;
         }
-
-//        public Builder photos(List<AppPhoto> photos) {
-//            this.photos = photos;
-//            return this;
-//        }
 
         public Builder firstLoginDate(LocalDateTime firstLoginDate) {
             this.firstLoginDate = firstLoginDate;
@@ -250,7 +232,6 @@ public class AppUser {
         public AppUser build() {
             AppUser appUser = new AppUser();
             appUser.setTelegramUserId(telegramUserId);
-//            appUser.setPhotos(photos);
             appUser.setFirstLoginDate(firstLoginDate);
             appUser.setFirstName(firstName);
             appUser.setLastName(lastName);

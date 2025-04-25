@@ -111,7 +111,7 @@ public class MainServiceImpl implements MainService {
         }
 
         try{
-            AppPhoto photo = fileService.processPhoto(update.getMessage(), appUser);
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
             String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
             var answer = "Фото успешно загружено. Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
@@ -161,7 +161,8 @@ public class MainServiceImpl implements MainService {
             return appUserService.checkStatus(chatId, appUser);
 
         } else if (REPORT.equals(serviceCommand) && appUser.getIsActive()) {
-            return appUserService.sendReportMail(chatId, appUser);
+            appUserService.sendReportMail(chatId, appUser);
+            return "Отправляем письмо";
         //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();

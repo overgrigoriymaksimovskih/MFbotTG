@@ -17,7 +17,6 @@ import pro.masterfood.dao.AppPhotoDAO;
 import pro.masterfood.dao.BinaryContentDAO;
 import pro.masterfood.entity.AppDocument;
 import pro.masterfood.entity.AppPhoto;
-import pro.masterfood.entity.AppUser;
 import pro.masterfood.entity.BinaryContent;
 import pro.masterfood.exceptions.UploadFileException;
 import pro.masterfood.service.FileService;
@@ -66,7 +65,7 @@ public class FileServiceImpl implements FileService {
         }
     }
     @Override
-    public AppPhoto processPhoto(Message telegramMessage, AppUser owner) {
+    public AppPhoto processPhoto(Message telegramMessage) {
         var photoSizeCount = telegramMessage.getPhoto().size();
         var photoIndex = photoSizeCount > 1 ? telegramMessage.getPhoto().size() - 1 : 0;
 
@@ -75,7 +74,7 @@ public class FileServiceImpl implements FileService {
         ResponseEntity<String> response = getFilePath(fileId);
         if (response.getStatusCode() == HttpStatus.OK){
             BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
-            AppPhoto transientAppDoc = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent, owner);
+            AppPhoto transientAppDoc = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent);
             return appPhotoDAO.save(transientAppDoc);
         } else {
             throw new UploadFileException("Bad response from telegram service " + response);
@@ -107,9 +106,8 @@ public class FileServiceImpl implements FileService {
                 .fileSize(telegramDoc.getFileSize())
                 .build();
     }
-    private AppPhoto buildTransientAppPhoto(PhotoSize telegramPhoto, BinaryContent persistentBinaryContent, AppUser owner) {
+    private AppPhoto buildTransientAppPhoto(PhotoSize telegramPhoto, BinaryContent persistentBinaryContent) {
         return AppPhoto.builder()
-                .owner(owner)
                 .telegramField(telegramPhoto.getFileId())
                 .binaryContent(persistentBinaryContent)
                 .fileSize(telegramPhoto.getFileSize())

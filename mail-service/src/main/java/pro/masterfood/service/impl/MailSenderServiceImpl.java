@@ -1,12 +1,10 @@
 package pro.masterfood.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dto.MailParams;
 import pro.masterfood.service.MailSenderService;
 import pro.masterfood.service.ProducerService;
@@ -19,43 +17,34 @@ public class MailSenderServiceImpl implements MailSenderService {
     @Value("${service.activation.uri}")
     private String activationServiceUri;
 
-    private final AppUserDAO appUserDAO;
     private final ProducerService producerService;
-    public MailSenderServiceImpl(JavaMailSender javaMailSender, AppUserDAO appUserDAO, ProducerService producerService) {
+    public MailSenderServiceImpl(JavaMailSender javaMailSender, ProducerService producerService) {
         this.javaMailSender = javaMailSender;
-        this.appUserDAO = appUserDAO;
         this.producerService = producerService;
     }
 
     @Override
     public void send(MailParams mailParams) {
-        var optional = appUserDAO.findById(mailParams.getId());
-//        var user = optional.get();
         var subject = "Тестовое письмо из бота";
 //        var messageBody = getActivationMailBody(mailParams.getId());
 //        var emailTo = mailParams.getEmailTo();
         var messageBody = "Текст тестового письма из бота: \n"
-//                + user.getUsername() + " "
-//                + user.getLastName() + " "
-//                + user.getFirstName() +"\n"
-//                + user.getEmail() + "\n"
-//                + user.getEmail() + "\n"
-//                + user.getPhoneNumber() + "\n"
-//                + user.getSiteUserId()
+                + mailParams.getAppUser().getUsername() + " "
+                + mailParams.getAppUser().getLastName() + " "
+                + mailParams.getAppUser().getFirstName() +"\n"
+                + mailParams.getAppUser().getEmail() + "\n"
+                + mailParams.getAppUser().getEmail() + "\n"
+                + mailParams.getAppUser().getPhoneNumber() + "\n"
+                + mailParams.getAppUser().getSiteUserId()
                 ;
-        var emailTo = "master-2m@yandex.ru";//
+        var emailTo = "master-2m@yandex.ru";
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(emailFrom);
         mailMessage.setTo(emailTo);
         mailMessage.setSubject(subject);
         mailMessage.setText(messageBody);
-        try {
-            javaMailSender.send(mailMessage);
-            sendAnswer("успех", mailParams.getChatId());
-        } catch (MailException e) {
-            sendAnswer(e.getMessage(), mailParams.getChatId());
-        }
+        javaMailSender.send(mailMessage);
     }
 
     @Override

@@ -74,18 +74,6 @@
             </exclusions>
         </dependency>
 
-        <!--Для РАБОТЫ С БД ПО ORM-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!--Для того чтобы наше приложение запущенное из dispatcher знало что есть еще модуль common-->
         <dependency>
             <groupId>pro.masterfood</groupId>

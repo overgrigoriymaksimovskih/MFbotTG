@@ -59,11 +59,6 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="owner_id" type="BIGINT"> <!-- Добавлено поле owner_id -->
-                <constraints nullable="false"></constraints>  <!-- Обязательный владелец -->
-                foreignKeyName="fk_app_photo_app_user"
-                references="app_user(id)"/>
-            </column>
             <column name="telegram_field" type="VARCHAR(255)">
                 <constraints nullable="true"/>
             </column>
