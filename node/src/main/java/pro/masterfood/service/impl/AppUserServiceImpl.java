@@ -141,7 +141,6 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public void sendReportMail(Long chatId, AppUser appUser) {
-//        var optional = appPhotoDAO.findByOwnerId(appUser);
         var optional = appPhotoDAO.findById(1L);
         var mailParams = MailParams.builder()
                 .id(appUser.getId())
