@@ -13,13 +13,14 @@ import pro.masterfood.service.ProducerService;
 
 @Component
 public class MailSenderServiceImpl implements MailSenderService {
-    private final AppUserDAO appUserDAO;
+
     private final JavaMailSender javaMailSender;
     @Value("${spring.mail.username}")
     private String emailFrom;
     @Value("${service.activation.uri}")
     private String activationServiceUri;
 
+    private final AppUserDAO appUserDAO;
     private final ProducerService producerService;
     public MailSenderServiceImpl(AppUserDAO appUserDAO, JavaMailSender javaMailSender, ProducerService producerService) {
         this.appUserDAO = appUserDAO;

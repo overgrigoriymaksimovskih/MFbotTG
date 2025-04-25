@@ -13,7 +13,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories("pro.masterfood.*")
 @EntityScan("pro.masterfood.*")
 @ComponentScan("pro.masterfood.*")
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, LiquibaseAutoConfiguration.class})
+//@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, LiquibaseAutoConfiguration.class}) пока не работали с базой было так
+@SpringBootApplication
 public class MailApplication {
     public static void main(String[] args) {
 
