@@ -53,6 +53,16 @@ public class AppUser {
         this.id = id;
     }
 
+    // Геттер для photos
+    public List<AppPhoto> getPhotos() {
+        return photos;
+    }
+
+    // Сеттер для photos (обычно не нужен, но зависит от логики)
+    public void setPhotos(List<AppPhoto> photos) {
+        this.photos = photos;
+    }
+
     public Long getTelegramUserId() {
         return telegramUserId;
     }
