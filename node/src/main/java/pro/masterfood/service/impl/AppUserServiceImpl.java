@@ -158,7 +158,7 @@ public class AppUserServiceImpl implements AppUserService {
 //                    .build();
 //            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
 //            return optional.get().getTelegramField();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return "error in sendReportMail" + e.getMessage();
         }
     }
