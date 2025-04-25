@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import pro.masterfood.enums.UserState;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -15,6 +16,9 @@ public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AppPhoto> photos; // Список фотографий, принадлежащих пользователю
 
     private Long telegramUserId;
 
