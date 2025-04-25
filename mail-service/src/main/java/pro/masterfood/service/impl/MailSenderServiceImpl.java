@@ -43,7 +43,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 //                + user.getPhoneNumber() + "\n"
 //                + user.getSiteUserId()
                 ;
-        var emailTo = "master-2m@yandex.ru";
+        var emailTo = "master-2m@yandex.ru";//
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(emailFrom);
