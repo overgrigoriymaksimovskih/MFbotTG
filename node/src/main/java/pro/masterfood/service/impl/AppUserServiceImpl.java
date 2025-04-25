@@ -145,32 +145,31 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String sendReportMail(Long chatId, AppUser appUser) {
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("1");
-//        if (appUser == null) {
-//            return "Пользователь не найден";
-//        }else{
-//            sb.append("2");
-//        }
-//        try {
-//            sb.append(appUser.toString());
-//            var optional = appPhotoDAO.findById(1L);
-////            List<AppPhoto> appPhotos = appUser.getPhotos();
-//            var mailParams = MailParams.builder()
-//                    .id(appUser.getId())
-//                    .chatId(chatId)
-//                    .email(appUser.getEmail())
-//                    .siteUid((appUser.getSiteUserId()))
-//                    .phoneNumber(appUser.getPhoneNumber())
-//                    .message(optional.get().getTelegramField())
-//                    .build();
-////            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-////            return optional.get().getTelegramField();
-//        } catch (Exception e) {
-//            sb.append("3");
-//            return "error in sendReportMail" + e.getMessage();
-//        }
-//        return sb.toString();
-    return "wehrldhfjdshfg";
+        StringBuilder sb = new StringBuilder();
+        sb.append("1");
+        if (appUser == null) {
+            return "Пользователь не найден";
+        }else{
+            sb.append("2");
+        }
+        try {
+            sb.append(appUser.toString());
+            var optional = appPhotoDAO.findById(1L);
+//            List<AppPhoto> appPhotos = appUser.getPhotos();
+            var mailParams = MailParams.builder()
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .email(appUser.getEmail())
+                    .siteUid((appUser.getSiteUserId()))
+                    .phoneNumber(appUser.getPhoneNumber())
+                    .message(optional.get().getTelegramField())
+                    .build();
+//            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+//            return optional.get().getTelegramField();
+        } catch (Exception e) {
+            sb.append("3");
+            return "error in sendReportMail" + e.getMessage();
+        }
+        return sb.toString();
     }
 }
