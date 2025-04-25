@@ -147,7 +147,7 @@ public class AppUserServiceImpl implements AppUserService {
     @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
         try {
-            return appUser.getPhotos().toString();
+            return appUser.toString();
 //            var optional = appPhotoDAO.findById(1L);
 //            List<AppPhoto> appPhotos = appUser.getPhotos();
 //            var mailParams = MailParams.builder()
