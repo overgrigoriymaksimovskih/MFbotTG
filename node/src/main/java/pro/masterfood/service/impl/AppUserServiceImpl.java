@@ -3,6 +3,7 @@ package pro.masterfood.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.hashids.Hashids;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -140,16 +141,21 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Override
-    public void sendReportMail(Long chatId, AppUser appUser) {
-        var optional = appPhotoDAO.findById(1L);
-        var mailParams = MailParams.builder()
-                .id(appUser.getId())
-                .chatId(chatId)
-                .email(appUser.getEmail())
-                .siteUid((appUser.getSiteUserId()))
-                .phoneNumber(appUser.getPhoneNumber())
-                .message(optional.get().getTelegramField())
-                .build();
-        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+    public String sendReportMail(Long chatId, AppUser appUser) {
+        try {
+            var optional = appPhotoDAO.findById(1L);
+            var mailParams = MailParams.builder()
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .email(appUser.getEmail())
+                    .siteUid((appUser.getSiteUserId()))
+                    .phoneNumber(appUser.getPhoneNumber())
+                    .message(optional.get().getTelegramField())
+                    .build();
+            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+            return optional.get().getTelegramField();
+        } catch (AmqpException e) {
+            return "error in sendReportMail" + e.getMessage();
+        }
     }
 }

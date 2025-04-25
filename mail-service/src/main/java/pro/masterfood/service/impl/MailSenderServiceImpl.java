@@ -27,6 +27,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 
     @Override
     public void send(MailParams mailParams) {
+        sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
         var subject = "Тестовое письмо из бота";
 //        var messageBody = getActivationMailBody(mailParams.getId());
 //        var emailTo = mailParams.getEmailTo();
@@ -45,7 +46,7 @@ public class MailSenderServiceImpl implements MailSenderService {
         mailMessage.setText(messageBody);
         try {
             javaMailSender.send(mailMessage);
-            sendAnswer("Успешно отправлено", mailParams.getChatId());
+            sendAnswer("Успешно отправлено MailSenderServiceImpl", mailParams.getChatId());
         } catch (MailException e) {
             sendAnswer("Ошибка отправки " + e.getMessage(), mailParams.getChatId());
         }
