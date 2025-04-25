@@ -151,21 +151,21 @@ public class AppUserServiceImpl implements AppUserService {
 //            var optional = appPhotoDAO.findById(1L);
             AppUser appUsero = appUserDAO.getById(1L);
             List<AppPhoto> appPhotos = appUsero.getPhotos();
-//            var mailParams = MailParams.builder()
-//                    .id(appUser.getId())
-//                    .chatId(chatId)
-//                    .email(appUser.getEmail())
-//                    .siteUid((appUser.getSiteUserId()))
-//                    .phoneNumber(appUser.getPhoneNumber())
-//                    .message(optional.get().getTelegramField())
-//                    .build();
-//            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-//            return optional.get().getTelegramField();
+            var mailParams = MailParams.builder()
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .email(appUser.getEmail())
+                    .siteUid((appUser.getSiteUserId()))
+                    .phoneNumber(appUser.getPhoneNumber())
+                    .message(appPhotos.get(0).toString())
+                    .build();
+            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+            return "Отправляем в очередь registrationMailQueue, mailParams";
 
         } catch (RuntimeException e) {
 
             return "error in sendReportMail" + e.getMessage();
         }
-        return "sb.toString();";
+
     }
 }
