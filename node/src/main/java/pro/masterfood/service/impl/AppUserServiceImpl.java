@@ -12,7 +12,6 @@ import pro.masterfood.dto.RequestParams;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.enums.RequestsToREST;
 import pro.masterfood.service.AppUserService;
-import pro.masterfood.service.utils.PhotoDbHarvester;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -24,13 +23,11 @@ public class AppUserServiceImpl implements AppUserService {
     private static final Logger log = LoggerFactory.getLogger(AppUserServiceImpl.class);
     private final RabbitTemplate rabbitTemplate;
     private final AppUserDAO appUserDAO;
-    private final PhotoDbHarvester photoDbHarvester;
     private final Hashids hashids;
 
-    public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, PhotoDbHarvester photoDbHarvester, Hashids hashids) {
+    public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, Hashids hashids) {
         this.appUserDAO = appUserDAO;
         this.rabbitTemplate = rabbitTemplate;
-        this.photoDbHarvester = photoDbHarvester;
         this.hashids = hashids;
     }
 
@@ -147,7 +144,6 @@ public class AppUserServiceImpl implements AppUserService {
                 .siteUid((appUser.getSiteUserId()))
                 .phoneNumber(appUser.getPhoneNumber())
                 .message(("TEST"))
-                .photoList(photoDbHarvester.getAllPhotosByUserId(1L))
                 .build();
         rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }

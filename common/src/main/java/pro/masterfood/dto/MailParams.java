@@ -1,10 +1,7 @@
 package pro.masterfood.dto;
 
 import lombok.*;
-import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.AppUser;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -23,7 +20,4 @@ public class MailParams {
     private String phoneNumber;
 
     private String message;
-
-    private List<AppPhoto> photoList;
-
 }
