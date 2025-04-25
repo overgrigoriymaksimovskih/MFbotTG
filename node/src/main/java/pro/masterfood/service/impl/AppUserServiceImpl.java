@@ -154,7 +154,7 @@ public class AppUserServiceImpl implements AppUserService {
             sb.append("2");
         }
         try {
-            return appUser.toString();
+            sb.append(appUser.toString());
 //            var optional = appPhotoDAO.findById(1L);
 //            List<AppPhoto> appPhotos = appUser.getPhotos();
 //            var mailParams = MailParams.builder()
@@ -171,5 +171,6 @@ public class AppUserServiceImpl implements AppUserService {
             sb.append("3");
             return "error in sendReportMail" + e.getMessage();
         }
+        return sb.toString();
     }
 }
