@@ -162,7 +162,7 @@ public class MainServiceImpl implements MainService {
 
         } else if (REPORT.equals(serviceCommand) && appUser.getIsActive()) {
             appUserService.sendReportMail(chatId, appUser);
-            return "Отправляем письмо";
+            return "Отправляем письмоf";
         //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();
