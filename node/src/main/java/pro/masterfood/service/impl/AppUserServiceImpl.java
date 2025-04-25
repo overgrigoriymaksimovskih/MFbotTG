@@ -19,6 +19,8 @@ import pro.masterfood.service.AppUserService;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import java.util.List;
+
 import static pro.masterfood.enums.UserState.*;
 
 @Component
@@ -143,17 +145,19 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public String sendReportMail(Long chatId, AppUser appUser) {
         try {
-            var optional = appPhotoDAO.findById(1L);
-            var mailParams = MailParams.builder()
-                    .id(appUser.getId())
-                    .chatId(chatId)
-                    .email(appUser.getEmail())
-                    .siteUid((appUser.getSiteUserId()))
-                    .phoneNumber(appUser.getPhoneNumber())
-                    .message(optional.get().getTelegramField())
-                    .build();
-            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-            return optional.get().getTelegramField();
+            return appUser.getPhotos().toString();
+//            var optional = appPhotoDAO.findById(1L);
+//            List<AppPhoto> appPhotos = appUser.getPhotos();
+//            var mailParams = MailParams.builder()
+//                    .id(appUser.getId())
+//                    .chatId(chatId)
+//                    .email(appUser.getEmail())
+//                    .siteUid((appUser.getSiteUserId()))
+//                    .phoneNumber(appUser.getPhoneNumber())
+//                    .message(optional.get().getTelegramField())
+//                    .build();
+//            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+//            return optional.get().getTelegramField();
         } catch (AmqpException e) {
             return "error in sendReportMail" + e.getMessage();
         }
