@@ -144,7 +144,12 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public String sendReportMail(Long chatId, AppUser appUser) {
 //        var optional = appPhotoDAO.findById(1L);
-        List<AppPhoto> listPhotos = appUser.getPhotos();
+        List<AppPhoto> listPhotos = null;
+        try {
+            listPhotos = appUser.getPhotos();
+        } catch (Exception e) {
+            return "not list get..." + e.getMessage();
+        }
         MailParams mailParams = null;
         try {
             mailParams = MailParams.builder()
