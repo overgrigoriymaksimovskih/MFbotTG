@@ -9,7 +9,15 @@ import pro.masterfood.entity.AppUser;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MailParams {
-    private Long id;//id пользователя в БД
+    private Long id;//id пользователя в таблице
 
     private Long chatId;
+
+    private String email;
+
+    private Long siteUid;
+
+    private String phoneNumber;
+
+    private String message;
 }

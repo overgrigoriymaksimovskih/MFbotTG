@@ -138,8 +138,12 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public void sendReportMail(Long chatId, AppUser appUser) {
         var mailParams = MailParams.builder()
+                .id(appUser.getId())
                 .chatId(chatId)
-                .appUser(appUser)
+                .email(appUser.getEmail())
+                .siteUid((appUser.getSiteUserId()))
+                .phoneNumber(appUser.getPhoneNumber())
+                .message(("TEST"))
                 .build();
         rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }
