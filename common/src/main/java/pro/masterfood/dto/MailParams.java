@@ -13,6 +13,7 @@ public class MailParams {
 //    private String id;
 //
 //    private String emailTo;
+
+    private Long id;
     private Long chatId;
-    private AppUser appUser;
 }
