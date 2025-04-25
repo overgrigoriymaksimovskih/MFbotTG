@@ -144,6 +144,7 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Override
+    @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
         StringBuilder sb = new StringBuilder();
         sb.append("1");
