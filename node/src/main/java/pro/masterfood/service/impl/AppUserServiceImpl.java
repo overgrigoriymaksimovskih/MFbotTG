@@ -154,16 +154,16 @@ public class AppUserServiceImpl implements AppUserService {
         }
         try {
             sb.append(appUser.toString());
-//            var optional = appPhotoDAO.findById(1L);
+            var optional = appPhotoDAO.findById(1L);
 //            List<AppPhoto> appPhotos = appUser.getPhotos();
-//            var mailParams = MailParams.builder()
-//                    .id(appUser.getId())
-//                    .chatId(chatId)
-//                    .email(appUser.getEmail())
-//                    .siteUid((appUser.getSiteUserId()))
-//                    .phoneNumber(appUser.getPhoneNumber())
-//                    .message(optional.get().getTelegramField())
-//                    .build();
+            var mailParams = MailParams.builder()
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .email(appUser.getEmail())
+                    .siteUid((appUser.getSiteUserId()))
+                    .phoneNumber(appUser.getPhoneNumber())
+                    .message(optional.get().getTelegramField())
+                    .build();
 //            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
 //            return optional.get().getTelegramField();
         } catch (Exception e) {
