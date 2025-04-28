@@ -55,12 +55,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Jakarta Mail API -->
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
-            <version>2.0.1</version> <!-- Или более новая версия -->
-        </dependency>
+
 
         <!--Для ТГ-->
         <dependency>
