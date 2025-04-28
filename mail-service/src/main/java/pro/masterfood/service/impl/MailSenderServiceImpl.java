@@ -18,8 +18,9 @@ import org.springframework.core.io.ByteArrayResource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
-import pro.masterfood.dto.MailParams;
+import pro.masterfood.utils.FileTypeDetector;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -31,9 +32,12 @@ public class MailSenderServiceImpl  implements MailSenderService {
     private final JavaMailSender javaMailSender;
     private final ProducerService producerService;
 
-    public MailSenderServiceImpl(JavaMailSender javaMailSender, ProducerService producerService) {
+    private final FileTypeDetector fileTypeDetector;
+
+    public MailSenderServiceImpl(JavaMailSender javaMailSender, ProducerService producerService, FileTypeDetector fileTypeDetector) {
         this.javaMailSender = javaMailSender;
         this.producerService = producerService;
+        this.fileTypeDetector = fileTypeDetector;
     }
 
 //    public void sendSimpleEmail(String to, String subject, String text, MailParams mailParams) {
@@ -81,11 +85,21 @@ public class MailSenderServiceImpl  implements MailSenderService {
             helper.setText(messageBody, false); // false - plain text
 
             // Добавляем вложения, если они есть
+//            if (photos != null && !photos.isEmpty()) {
+//                int i = 1;
+//                for (byte[] photo : photos) {
+//                    ByteArrayResource resource = new ByteArrayResource(photo);
+//                    helper.addAttachment("photo_" + i + ".jpg", resource); // Укажи правильное имя и расширение
+//                    i++;
+//                }
+//            }
             if (photos != null && !photos.isEmpty()) {
                 int i = 1;
                 for (byte[] photo : photos) {
                     ByteArrayResource resource = new ByteArrayResource(photo);
-                    helper.addAttachment("photo_" + i + ".jpg", resource); // Укажи правильное имя и расширение
+                    String fileExtension = FileTypeDetector.detectFileType(photo);
+                    String fileName = "photo_" + i + "." + fileExtension;
+                    helper.addAttachment(fileName, resource);
                     i++;
                 }
             }
@@ -96,6 +110,8 @@ public class MailSenderServiceImpl  implements MailSenderService {
             sendAnswer("Ошибка отправки (MessagingException): " + e.getMessage(), mailParams.getChatId());
         } catch (MailException e) {
             sendAnswer("Ошибка отправки (MailException): " + e.getMessage(), mailParams.getChatId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
