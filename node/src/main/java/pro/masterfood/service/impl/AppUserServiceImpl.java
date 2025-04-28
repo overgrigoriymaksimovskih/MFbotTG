@@ -173,6 +173,9 @@ public class AppUserServiceImpl implements AppUserService {
                     .photos(attachments)
                     .build();
             rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+            for (AppPhoto appPhoto : appPhotos) {
+                appPhotoDAO.delete(appPhoto);
+            }
             return "Отправляем в очередь registrationMailQueue, mailParams";
 
         } catch (RuntimeException e) {
