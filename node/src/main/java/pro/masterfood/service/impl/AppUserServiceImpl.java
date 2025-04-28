@@ -160,6 +160,7 @@ public class AppUserServiceImpl implements AppUserService {
             for (AppPhoto appPhoto : appPhotos) {
                 byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
                 attachments.add(binaryContent);
+                appPhotoDAO.delete(appPhoto);
             }
 
             var mailParams = MailParams.builder()
@@ -172,9 +173,9 @@ public class AppUserServiceImpl implements AppUserService {
                     .photos(attachments)
                     .build();
             rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-            for (AppPhoto appPhoto : appPhotos) {
-                appPhotoDAO.delete(appPhoto);
-            }
+//            for (AppPhoto appPhoto : appPhotos) {
+//                appPhotoDAO.delete(appPhoto);
+//            }
             return "Отправляем в очередь registrationMailQueue, mailParams";
 
         } catch (RuntimeException e) {

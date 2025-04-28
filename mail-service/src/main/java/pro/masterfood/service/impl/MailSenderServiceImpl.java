@@ -69,8 +69,8 @@ public class MailSenderServiceImpl  implements MailSenderService {
                 + mailParams.getPhoneNumber() + "\n"
                 + "ИД сайта:  "
                 + mailParams.getSiteUid() + "\n"
-                + "Текст сообщения:  "
-                + mailParams.getMessage() + "\n";
+                + "Текст сообщения:  " + "\n"
+                + mailParams.getMessage();
         var emailTo = "master-2m@yandex.ru";
         List<byte[]> photos = mailParams.getPhotos();
 
