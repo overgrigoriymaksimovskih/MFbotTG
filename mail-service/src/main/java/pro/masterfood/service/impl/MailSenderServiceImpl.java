@@ -1,9 +1,12 @@
 package pro.masterfood.service.impl;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.dto.MailParams;
@@ -38,17 +41,36 @@ public class MailSenderServiceImpl implements MailSenderService {
                 + mailParams.getMessage() + "\n"
                 ;
         var emailTo = "master-2m@yandex.ru";
+        var photos = mailParams.getPhotos();
 
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setFrom(emailFrom);
-        mailMessage.setTo(emailTo);
-        mailMessage.setSubject(subject);
-        mailMessage.setText(messageBody);
+//        SimpleMailMessage mailMessage = new SimpleMailMessage();
+//        mailMessage.setFrom(emailFrom);
+//        mailMessage.setTo(emailTo);
+//        mailMessage.setSubject(subject);
+//        mailMessage.setText(messageBody);
         try {
-            javaMailSender.send(mailMessage);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true); // true - multipart
+
+            helper.setFrom(emailFrom); // Используй emailFrom из настроек
+            helper.setTo(emailTo);
+            helper.setSubject(subject);
+            helper.setText(messageBody, false); // false - plain text
+
+            // Добавляем вложения, если они есть
+            if (photos != null && !photos.isEmpty()) {
+                int i = 1;
+                for (byte[] photo : photos) {
+                    ByteArrayResource resource = new ByteArrayResource(photo);
+                    helper.addAttachment("photo_" + i + ".jpg", resource); // Укажи правильное имя и расширение
+                    i++;
+                }
+            }
             sendAnswer("Успешно отправлено MailSenderServiceImpl", mailParams.getChatId());
+        } catch (MessagingException e) {
+            sendAnswer("Ошибка отправки (MessagingException): " + e.getMessage(), mailParams.getChatId());
         } catch (MailException e) {
-            sendAnswer("Ошибка отправки " + e.getMessage(), mailParams.getChatId());
+            sendAnswer("Ошибка отправки (MailException): " + e.getMessage(), mailParams.getChatId());
         }
     }
 

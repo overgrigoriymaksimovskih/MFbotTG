@@ -20,6 +20,7 @@ import pro.masterfood.service.AppUserService;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static pro.masterfood.enums.UserState.*;
@@ -144,7 +145,7 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Override
-    @Transactional
+//    @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
             Long userId = appUser.getId();
         //Начинаем цирк с конями... Сейчас сохраним сюда ИД юзера, чтобы ниже получить его же из БД
@@ -154,8 +155,13 @@ public class AppUserServiceImpl implements AppUserService {
 //            var optional = appPhotoDAO.findById(1L);
             AppUser appUsero = appUserDAO.getById(1L);
             List<AppPhoto> appPhotos = appUsero.getPhotos();
-            AppPhoto appPhoto = appPhotos.get(0);
-            byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes(); // Получаем fileAsArrayOfBytes
+
+            // Создаем List<byte[]> для всех вложений
+            List<byte[]> attachments = new ArrayList<>();
+            for (AppPhoto appPhoto : appPhotos) {
+                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                attachments.add(binaryContent);
+            }
 
             var mailParams = MailParams.builder()
                     .id(appUser.getId())
@@ -163,7 +169,8 @@ public class AppUserServiceImpl implements AppUserService {
                     .email(appUser.getEmail())
                     .siteUid((appUser.getSiteUserId()))
                     .phoneNumber(appUser.getPhoneNumber())
-                    .message(binaryContent.toString())
+                    .message("qwerty")
+                    .photos(attachments)
                     .build();
             rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
             return "Отправляем в очередь registrationMailQueue, mailParams";
