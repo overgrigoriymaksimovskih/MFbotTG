@@ -2,6 +2,7 @@ package pro.masterfood.service.impl;
 
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
@@ -25,6 +26,8 @@ import java.util.List;
 @Component
 public class MailSenderServiceImpl  implements MailSenderService {
 
+    @Value("${spring.mail.username}")
+    private String emailFrom;
     private final JavaMailSender javaMailSender;
     private final ProducerService producerService;
 
@@ -33,23 +36,23 @@ public class MailSenderServiceImpl  implements MailSenderService {
         this.producerService = producerService;
     }
 
-    public void sendSimpleEmail(String to, String subject, String text, MailParams mailParams) {
-        try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8"); // Укажем кодировку UTF-8
-
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(text, false); // false означает, что это plain text
-
-            javaMailSender.send(message);
-            sendAnswer("Успешно отправлено MailSenderServiceImpl", mailParams.getChatId());
-        } catch (MessagingException e) {
-            sendAnswer("Ошибка при отправке письма (MessagingException): " + e.getMessage(), mailParams.getChatId());
-        } catch (MailException e) {
-            sendAnswer("Ошибка при отправке письма (MailException): " + e.getMessage(), mailParams.getChatId());
-        }
-    }
+//    public void sendSimpleEmail(String to, String subject, String text, MailParams mailParams) {
+//        try {
+//            MimeMessage message = javaMailSender.createMimeMessage();
+//            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8"); // Укажем кодировку UTF-8
+//
+//            helper.setTo(to);
+//            helper.setSubject(subject);
+//            helper.setText(text, false); // false означает, что это plain text
+//
+//            javaMailSender.send(message);
+//            sendAnswer("Успешно отправлено MailSenderServiceImpl", mailParams.getChatId());
+//        } catch (MessagingException e) {
+//            sendAnswer("Ошибка при отправке письма (MessagingException): " + e.getMessage(), mailParams.getChatId());
+//        } catch (MailException e) {
+//            sendAnswer("Ошибка при отправке письма (MailException): " + e.getMessage(), mailParams.getChatId());
+//        }
+//    }
 
 
     @Override
@@ -57,9 +60,13 @@ public class MailSenderServiceImpl  implements MailSenderService {
         sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
         var subject = "Тестовое письмо из бота (с вложениями)";
         var messageBody = "Текст тестового письма из бота: \n"
-                + mailParams.getEmail() + " "
-                + mailParams.getPhoneNumber() + " "
+                + "От: "
+                + mailParams.getEmail() + "\n"
+                + "Телефон: "
+                + mailParams.getPhoneNumber() + "\n"
+                + "ИД сайта: "
                 + mailParams.getSiteUid() + "\n"
+                + "Текст сообщения: "
                 + mailParams.getMessage() + "\n";
         var emailTo = "master-2m@yandex.ru";
         List<byte[]> photos = mailParams.getPhotos();
@@ -68,7 +75,7 @@ public class MailSenderServiceImpl  implements MailSenderService {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8"); // true - multipart, кодировка UTF-8
 
-            helper.setFrom("masterfood174@gmail.com"); // Используй emailFrom из настроек
+            helper.setFrom(emailFrom); // Используй emailFrom из настроек
             helper.setTo(emailTo);
             helper.setSubject(subject);
             helper.setText(messageBody, false); // false - plain text
