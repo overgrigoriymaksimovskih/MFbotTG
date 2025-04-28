@@ -31,7 +31,6 @@ public class MailSenderServiceImpl  implements MailSenderService {
     private String emailFrom;
     private final JavaMailSender javaMailSender;
     private final ProducerService producerService;
-
     private final FileTypeDetector fileTypeDetector;
 
     public MailSenderServiceImpl(JavaMailSender javaMailSender, ProducerService producerService, FileTypeDetector fileTypeDetector) {
@@ -93,9 +92,11 @@ public class MailSenderServiceImpl  implements MailSenderService {
 //                    i++;
 //                }
 //            }
+            int attachments = 0;
             if (photos != null && !photos.isEmpty()) {
                 int i = 1;
                 for (byte[] photo : photos) {
+                    attachments++;
                     ByteArrayResource resource = new ByteArrayResource(photo);
                     String fileExtension = FileTypeDetector.detectFileType(photo);
                     String fileName = "photo_" + i + "." + fileExtension;
@@ -103,9 +104,15 @@ public class MailSenderServiceImpl  implements MailSenderService {
                     i++;
                 }
             }
-
             javaMailSender.send(message);
-            sendAnswer("Успешно отправлено MailSenderServiceImpl (с вложениями)", mailParams.getChatId());
+            if(attachments == 0){
+                sendAnswer("Успешно отправлено MailSenderServiceImpl (без фото)", mailParams.getChatId());
+            }else{
+                sendAnswer("Успешно отправлено MailSenderServiceImpl (с " + attachments +" фото)", mailParams.getChatId());
+            }
+
+
+
         } catch (MessagingException e) {
             sendAnswer("Ошибка отправки (MessagingException): " + e.getMessage(), mailParams.getChatId());
         } catch (MailException e) {

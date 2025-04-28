@@ -1,8 +1,11 @@
 package pro.masterfood.utils;
 
+import org.springframework.stereotype.Component;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+@Component
 public class FileTypeDetector {
 
     public static String detectFileType(byte[] data) throws IOException {
