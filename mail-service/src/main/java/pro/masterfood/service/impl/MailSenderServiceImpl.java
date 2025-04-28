@@ -12,11 +12,14 @@ import pro.masterfood.service.ProducerService;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.core.io.ByteArrayResource;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 import pro.masterfood.dto.MailParams;
+
+import java.util.List;
 
 
 @Component
@@ -51,7 +54,42 @@ public class MailSenderServiceImpl  implements MailSenderService {
 
     @Override
     public void send(MailParams mailParams) {
-        sendSimpleEmail("master-2m@yandex.ru", "Тестовое письмо", "Это простое тестовое письмо.", mailParams);
+        sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
+        var subject = "Тестовое письмо из бота (с вложениями)";
+        var messageBody = "Текст тестового письма из бота: \n"
+                + mailParams.getEmail() + " "
+                + mailParams.getPhoneNumber() + " "
+                + mailParams.getSiteUid() + "\n"
+                + mailParams.getMessage() + "\n";
+        var emailTo = "master-2m@yandex.ru";
+        List<byte[]> photos = mailParams.getPhotos();
+
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8"); // true - multipart, кодировка UTF-8
+
+            helper.setFrom("masterfood174@gmail.com"); // Используй emailFrom из настроек
+            helper.setTo(emailTo);
+            helper.setSubject(subject);
+            helper.setText(messageBody, false); // false - plain text
+
+            // Добавляем вложения, если они есть
+            if (photos != null && !photos.isEmpty()) {
+                int i = 1;
+                for (byte[] photo : photos) {
+                    ByteArrayResource resource = new ByteArrayResource(photo);
+                    helper.addAttachment("photo_" + i + ".jpg", resource); // Укажи правильное имя и расширение
+                    i++;
+                }
+            }
+
+            javaMailSender.send(message);
+            sendAnswer("Успешно отправлено MailSenderServiceImpl (с вложениями)", mailParams.getChatId());
+        } catch (MessagingException e) {
+            sendAnswer("Ошибка отправки (MessagingException): " + e.getMessage(), mailParams.getChatId());
+        } catch (MailException e) {
+            sendAnswer("Ошибка отправки (MailException): " + e.getMessage(), mailParams.getChatId());
+        }
     }
 
     @Override
