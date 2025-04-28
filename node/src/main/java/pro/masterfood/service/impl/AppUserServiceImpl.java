@@ -173,12 +173,6 @@ public class AppUserServiceImpl implements AppUserService {
                     .photos(attachments)
                     .build();
             rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-
-            // Удаляем фотографии и бинарные данные зачем нам их хранить после отправки
-            // а если отправка не удастся вылетит исключение и удаление не произойдет
-//            for (AppPhoto appPhoto : appPhotos) {
-//                appPhotoDAO.delete(appPhoto);
-//            }
             return "Отправляем в очередь registrationMailQueue, mailParams";
 
         } catch (RuntimeException e) {
