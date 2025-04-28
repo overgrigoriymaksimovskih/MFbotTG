@@ -146,18 +146,24 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
-
+            Long userId = appUser.getId();
+        //Начинаем цирк с конями... Сейчас сохраним сюда ИД юзера, чтобы ниже получить его же из БД
+        // а все это потому что хибернейт не может связать две сущности вызванные в рамках разных сессий
+        // поэтому надо получать из БД пользователя и лист его фоток в одной сессии
         try {
 //            var optional = appPhotoDAO.findById(1L);
             AppUser appUsero = appUserDAO.getById(1L);
             List<AppPhoto> appPhotos = appUsero.getPhotos();
+            AppPhoto appPhoto = appPhotos.get(0);
+            byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes(); // Получаем fileAsArrayOfBytes
+
             var mailParams = MailParams.builder()
                     .id(appUser.getId())
                     .chatId(chatId)
                     .email(appUser.getEmail())
                     .siteUid((appUser.getSiteUserId()))
                     .phoneNumber(appUser.getPhoneNumber())
-                    .message(appPhotos.get(0).toString())
+                    .message(binaryContent.toString())
                     .build();
             rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
             return "Отправляем в очередь registrationMailQueue, mailParams";
