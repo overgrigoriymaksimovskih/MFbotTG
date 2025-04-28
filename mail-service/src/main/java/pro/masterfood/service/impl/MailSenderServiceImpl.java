@@ -62,11 +62,11 @@ public class MailSenderServiceImpl  implements MailSenderService {
         var messageBody = "Текст тестового письма из бота: \n"
                 + "От: "
                 + mailParams.getEmail() + "\n"
-                + "Телефон: "
+                + "Телефон:  "
                 + mailParams.getPhoneNumber() + "\n"
-                + "ИД сайта: "
+                + "ИД сайта:  "
                 + mailParams.getSiteUid() + "\n"
-                + "Текст сообщения: "
+                + "Текст сообщения:  "
                 + mailParams.getMessage() + "\n";
         var emailTo = "master-2m@yandex.ru";
         List<byte[]> photos = mailParams.getPhotos();
