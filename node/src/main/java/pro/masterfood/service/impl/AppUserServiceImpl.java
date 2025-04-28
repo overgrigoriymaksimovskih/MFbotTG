@@ -145,7 +145,7 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Override
-//    @Transactional
+    @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
             Long userId = appUser.getId();
         //Начинаем цирк с конями... Сейчас сохраним сюда ИД юзера, чтобы ниже получить его же из БД
