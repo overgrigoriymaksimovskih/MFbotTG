@@ -1,7 +1,6 @@
 package pro.masterfood.service.impl;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.MailException;
@@ -12,6 +11,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.dto.MailParams;
 import pro.masterfood.service.MailSenderService;
 import pro.masterfood.service.ProducerService;
+
+import jakarta.mail.MessagingException; // Правильный импорт!
+import jakarta.mail.internet.MimeMessage; // Правильный импорт!
+
 
 @Component
 public class MailSenderServiceImpl implements MailSenderService {
@@ -32,8 +35,6 @@ public class MailSenderServiceImpl implements MailSenderService {
     public void send(MailParams mailParams) {
         sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
         var subject = "Тестовое письмо из бота";
-//        var messageBody = getActivationMailBody(mailParams.getId());
-//        var emailTo = mailParams.getEmailTo();
         var messageBody = "Текст тестового письма из бота: \n"
                 + mailParams.getEmail() + " "
                 + mailParams.getPhoneNumber() + " "
@@ -43,16 +44,11 @@ public class MailSenderServiceImpl implements MailSenderService {
         var emailTo = "master-2m@yandex.ru";
         var photos = mailParams.getPhotos();
 
-//        SimpleMailMessage mailMessage = new SimpleMailMessage();
-//        mailMessage.setFrom(emailFrom);
-//        mailMessage.setTo(emailTo);
-//        mailMessage.setSubject(subject);
-//        mailMessage.setText(messageBody);
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true); // true - multipart
 
-            helper.setFrom(emailFrom); // Используй emailFrom из настроек
+            helper.setFrom("masterfood174@gmail.com"); // Используй emailFrom из настроек
             helper.setTo(emailTo);
             helper.setSubject(subject);
             helper.setText(messageBody, false); // false - plain text
