@@ -18,8 +18,9 @@ import org.springframework.core.io.ByteArrayResource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
-import pro.masterfood.dto.MailParams;
+import pro.masterfood.utils.FileTypeDetector;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -30,10 +31,12 @@ public class MailSenderServiceImpl  implements MailSenderService {
     private String emailFrom;
     private final JavaMailSender javaMailSender;
     private final ProducerService producerService;
+    private final FileTypeDetector fileTypeDetector;
 
-    public MailSenderServiceImpl(JavaMailSender javaMailSender, ProducerService producerService) {
+    public MailSenderServiceImpl(JavaMailSender javaMailSender, ProducerService producerService, FileTypeDetector fileTypeDetector) {
         this.javaMailSender = javaMailSender;
         this.producerService = producerService;
+        this.fileTypeDetector = fileTypeDetector;
     }
 
 //    public void sendSimpleEmail(String to, String subject, String text, MailParams mailParams) {
@@ -59,15 +62,15 @@ public class MailSenderServiceImpl  implements MailSenderService {
     public void send(MailParams mailParams) {
         sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
         var subject = "Тестовое письмо из бота (с вложениями)";
-        var messageBody = "Текст тестового письма из бота: \n"
+        var messageBody = "Новое сообщение из бота: \n"
                 + "От: "
                 + mailParams.getEmail() + "\n"
                 + "Телефон:  "
                 + mailParams.getPhoneNumber() + "\n"
                 + "ИД сайта:  "
                 + mailParams.getSiteUid() + "\n"
-                + "Текст сообщения:  "
-                + mailParams.getMessage() + "\n";
+                + "Текст сообщения:  " + "\n"
+                + mailParams.getMessage();
         var emailTo = "master-2m@yandex.ru";
         List<byte[]> photos = mailParams.getPhotos();
 
@@ -85,7 +88,9 @@ public class MailSenderServiceImpl  implements MailSenderService {
                 int i = 1;
                 for (byte[] photo : photos) {
                     ByteArrayResource resource = new ByteArrayResource(photo);
-                    helper.addAttachment("photo_" + i + ".jpg", resource); // Укажи правильное имя и расширение
+                    String fileExtension = FileTypeDetector.detectFileType(photo);
+                    String fileName = "photo_" + i + "." + fileExtension;
+                    helper.addAttachment(fileName, resource);
                     i++;
                 }
             }
@@ -96,6 +101,8 @@ public class MailSenderServiceImpl  implements MailSenderService {
             sendAnswer("Ошибка отправки (MessagingException): " + e.getMessage(), mailParams.getChatId());
         } catch (MailException e) {
             sendAnswer("Ошибка отправки (MailException): " + e.getMessage(), mailParams.getChatId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
