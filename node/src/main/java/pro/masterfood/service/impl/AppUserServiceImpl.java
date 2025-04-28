@@ -152,7 +152,6 @@ public class AppUserServiceImpl implements AppUserService {
         // а все это потому что хибернейт не может связать две сущности вызванные в рамках разных сессий
         // поэтому надо получать из БД пользователя и лист его фоток в одной сессии
         try {
-//            var optional = appPhotoDAO.findById(1L);
             AppUser appUsero = appUserDAO.getById(1L);
             List<AppPhoto> appPhotos = appUsero.getPhotos();
 
