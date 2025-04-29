@@ -188,9 +188,14 @@ public class AppUserServiceImpl implements AppUserService {
     }
     @Override
     public String sendReportMail(Long chatId, AppUser appUser) {
-        List<byte[]> attachments = getAttachments(chatId, appUser);
+        try {
+            List<byte[]> attachments = getAttachments(chatId, appUser);
 //        String res = sendMailtoQueue(chatId, appUser, attachments);
-        String res2 = deletePhotoOfUser(appUser.getId());
+            String res2 = deletePhotoOfUser(appUser.getId());
+            return res2;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
 //        try {
 //            Long userId = appUser.getId();
 //            AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя для сессии
