@@ -23,6 +23,9 @@ import pro.masterfood.service.AppUserService;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -180,36 +183,97 @@ public class AppUserServiceImpl implements AppUserService {
 
 
 
+    public void mailGo (Long chatId, AppUser appUser, List<byte[]> attachments){
+//            3. Отправляем письмо
+        var mailParams = MailParams.builder()
+                .id(appUser.getId())
+                .chatId(chatId)
+                .email(appUser.getEmail())
+                .siteUid(appUser.getSiteUserId())
+                .phoneNumber(appUser.getPhoneNumber())
+                .message("qwerty")
+                .photos(attachments)
+                .build();
+        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+    }
+
         @Override
         @Transactional // Важно!
         public String sendReportMail(Long chatId, AppUser appUser) {
             Long userId = appUser.getId();
+            List<byte[]> attachments = new ArrayList<>();
 
             try {
                 AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null);
                 if (appUsero != null) {
                     List<AppPhoto> appPhotos = appUsero.getPhotos();
 
-                    List<byte[]> attachments = new ArrayList<>();
-                    for (AppPhoto appPhoto : appPhotos) {
-                        if (appPhoto.getBinaryContent() != null) {
-                            byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-                            attachments.add(binaryContent);
-                        }
-                    }
-                    //тут можно использовать attachments, до удаления
+                    // Создаем независимый список байтовых массивов
+                    List<byte[]> independentAttachments = appPhotos.stream()
+                            .filter(appPhoto -> appPhoto.getBinaryContent() != null)
+                            .map(appPhoto -> appPhoto.getBinaryContent().getFileAsArrayOfBytes())
+                            .map(byteArr -> Arrays.copyOf(byteArr, byteArr.length)) // Создаем копии байтовых массивов
+                            .collect(Collectors.toList());
 
+                    mailGo(chatId, appUser, independentAttachments); // Отправляем письмо
 
                 } else {
                     return "Пользователь не найден в методе sendReportMail";
                 }
-                appPhotoDAO.deleteByOwnerId(userId);
+
+                appPhotoDAO.deleteByOwnerId(userId); // Удаляем фотографии после отправки письма
                 return "Все фотографии пользователя с ID " + userId + " удалены.";
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return "Ошибка при удалении фотографий: " + e.getMessage();
             }
-        }
+
+
+
+
+
+
+
+
+
+//            Long userId = appUser.getId();
+//
+//            try {
+//                AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null);
+//                if (appUsero != null) {
+//                    List<AppPhoto> appPhotos = appUsero.getPhotos();
+//
+//                    List<byte[]> attachments = new ArrayList<>();
+//                    for (AppPhoto appPhoto : appPhotos) {
+//                        if (appPhoto.getBinaryContent() != null) {
+//                            byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+//                            attachments.add(binaryContent);
+//                        }
+//                    }
+//                    //тут можно использовать attachments, до удаления
+////                    3. Отправляем письмо
+////                var mailParams = MailParams.builder()
+////                        .id(appUser.getId())
+////                        .chatId(chatId)
+////                        .email(appUser.getEmail())
+////                        .siteUid(appUser.getSiteUserId())
+////                        .phoneNumber(appUser.getPhoneNumber())
+////                        .message("qwerty")
+////                        .photos(attachments)
+////                        .build();
+////                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+//
+//                } else {
+//                    return "Пользователь не найден в методе sendReportMail";
+//                }
+//                appPhotoDAO.deleteByOwnerId(userId);
+//                return "Все фотографии пользователя с ID " + userId + " удалены.";
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return "Ошибка при удалении фотографий: " + e.getMessage();
+//            }
+
 
 
 
