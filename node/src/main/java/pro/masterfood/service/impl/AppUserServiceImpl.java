@@ -8,6 +8,7 @@ import org.hashids.Hashids;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class AppUserServiceImpl implements AppUserService {
     private static final Logger log = LoggerFactory.getLogger(AppUserServiceImpl.class);
     private final RabbitTemplate rabbitTemplate;
     private final AppUserDAO appUserDAO;
+    @Autowired
     private final AppPhotoDAO appPhotoDAO;
     private final Hashids hashids;
 
@@ -163,7 +165,7 @@ public class AppUserServiceImpl implements AppUserService {
             for (AppPhoto appPhoto : appPhotos) {
                 byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
                 attachments.add(binaryContent);
-                appPhotoDAO.delete(appPhoto);
+//                appPhotoDAO.delete(appPhoto);
             }
 
             var mailParams = MailParams.builder()
@@ -179,6 +181,8 @@ public class AppUserServiceImpl implements AppUserService {
 //            for (AppPhoto appPhoto : appPhotos) {
 //                appPhotoDAO.delete(appPhoto);
 //            }
+            // Удаляем фотографии с помощью нового метода в AppPhotoDAO
+            appPhotoDAO.deleteAllByAppUserId(userId);
             return "Отправляем в очередь registrationMailQueue, mailParams";
 
         } catch (RuntimeException e) {
