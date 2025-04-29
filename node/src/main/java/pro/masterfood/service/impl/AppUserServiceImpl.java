@@ -194,7 +194,7 @@ public class AppUserServiceImpl implements AppUserService {
                 .message("qwerty")
                 .photos(attachments)
                 .build();
-        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+//        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }
 
         @Override
