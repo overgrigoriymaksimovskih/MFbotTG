@@ -17,7 +17,7 @@ public class AppPhoto {
     private AppUser owner; // Ссылка на сущность AppUser
     private String telegramField;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private BinaryContent binaryContent;
 
     private Integer fileSize;
