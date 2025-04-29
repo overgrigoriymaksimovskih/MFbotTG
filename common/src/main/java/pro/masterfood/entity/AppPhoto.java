@@ -17,7 +17,8 @@ public class AppPhoto {
     private AppUser owner; // Ссылка на сущность AppUser
     private String telegramField;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)  // Или можно @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+    @JoinColumn(name = "file_as_array_of_bytes") // Имя столбца внешнего ключа
     private BinaryContent binaryContent;
 
     private Integer fileSize;
