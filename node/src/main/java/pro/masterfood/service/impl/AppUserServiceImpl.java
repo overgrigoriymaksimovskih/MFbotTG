@@ -151,9 +151,28 @@ public class AppUserServiceImpl implements AppUserService {
     @Transactional // Важно!
     public String sendReportMail(Long chatId, AppUser appUser) {
         Long userId = appUser.getId();
+        List<byte[]> attachments;
+
         try {
+            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
+            if (appUsero != null) {
+                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
+                List<AppPhoto> appPhotos = appUsero.getPhotos();
+
+                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
+                attachments = new ArrayList<>();
+                for (AppPhoto appPhoto : appPhotos) {
+                    if (appPhoto.getBinaryContent() != null) {
+                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                        attachments.add(binaryContent);
+                    }
+                }
+            }else {
+                return "Пользователь не найден в методе sendReportMail";
+            }
+
             appPhotoDAO.deleteByOwnerId(userId);
-            return "Все фотографии пользователя с ID " + userId + " удалены.";
+            return "Все фотографии пользователя с ID " + userId + " удалены." + attachments.get(0).toString();
         } catch (Exception e) {
             e.printStackTrace();
             return "Ошибка при удалении фотографий: " + e.getMessage();
