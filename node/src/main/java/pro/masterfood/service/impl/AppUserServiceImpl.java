@@ -148,8 +148,8 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Transactional
-    public List<byte[]> getAttachments(Long chatId, AppUser appUser) {
-        AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя для сессии
+    public List<byte[]> getAttachments(AppUser appUser) {
+        AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя // Получаем пользователя для сессии
         if (userForSession != null) {
             // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
             List<AppPhoto> appPhotos = userForSession.getPhotos();
@@ -169,28 +169,43 @@ public class AppUserServiceImpl implements AppUserService {
     }
     @Transactional
     public String deletePhotoOfUser(Long userId){
-        appPhotoDAO.deleteByOwnerId(userId);//
-        return "Все фотографии пользователя с ID " + userId + " удалены.";
+        try {
+            appPhotoDAO.deleteByOwnerId(userId);//
+            return "Все фотографии пользователя с ID " + userId + " удалены.";
+        } catch (Exception e) {
+            return "Ошибка при удалении фото пользователя ID " + userId + " " + e.getMessage();
+        }
+
     }
 
-    public String sendMailtoQueue(Long chatId, AppUser appUser, List<byte[]> attachments){
-        var mailParams = MailParams.builder()
-                        .id(appUser.getId())
-                        .chatId(chatId)
-                        .email(appUser.getEmail())
-                        .siteUid(appUser.getSiteUserId())
-                        .phoneNumber(appUser.getPhoneNumber())
-                        .message("qwerty")
-                        .photos(attachments)
-                        .build();
-                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-        return "Отправляем в очередь registrationMailQueue, mailParams";
+    public boolean sendMailtoQueue(Long chatId, AppUser appUser, List<byte[]> attachments){
+        try {
+            var mailParams = MailParams.builder()
+                            .id(appUser.getId())
+                            .chatId(chatId)
+                            .email(appUser.getEmail())
+                            .siteUid(appUser.getSiteUserId())
+                            .phoneNumber(appUser.getPhoneNumber())
+                            .message("qwerty")
+                            .photos(attachments)
+                            .build();
+            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+            return true;
+        } catch (AmqpException e) {
+            return false;
+        }
+//        return "Отправляем в очередь registrationMailQueue, mailParams";
     }
     @Override
     public String sendReportMail(Long chatId, AppUser appUser) {
         try {
-            List<byte[]> attachments = getAttachments(chatId, appUser);
-//        String res = sendMailtoQueue(chatId, appUser, attachments);
+            List<byte[]> attachments = getAttachments(appUser);
+//            if(sendMailtoQueue(chatId, appUser, attachments)){
+//                String res2 = deletePhotoOfUser(appUser.getId());
+//                return "Отправляем в очередь registrationMailQueue, mailParams " + res2;
+//            }else{
+//                return "Какая то ошибка при отправке майлпарамс в очередь";
+//            }
             String res2 = deletePhotoOfUser(appUser.getId());
             return res2;
         } catch (Exception e) {
