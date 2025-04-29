@@ -185,16 +185,16 @@ public class AppUserServiceImpl implements AppUserService {
 
     public void mailGo (Long chatId, AppUser appUser, List<byte[]> attachments){
 //            3. Отправляем письмо
-        var mailParams = MailParams.builder()
-                .id(appUser.getId())
-                .chatId(chatId)
-                .email(appUser.getEmail())
-                .siteUid(appUser.getSiteUserId())
-                .phoneNumber(appUser.getPhoneNumber())
-                .message("qwerty")
-                .photos(attachments)
-                .build();
-        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+//        var mailParams = MailParams.builder()
+//                .id(appUser.getId())
+//                .chatId(chatId)
+//                .email(appUser.getEmail())
+//                .siteUid(appUser.getSiteUserId())
+//                .phoneNumber(appUser.getPhoneNumber())
+//                .message("qwerty")
+//                .photos(attachments)
+//                .build();
+//        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }
 
         @Override
