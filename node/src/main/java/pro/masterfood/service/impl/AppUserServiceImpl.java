@@ -23,10 +23,6 @@ import pro.masterfood.service.AppUserService;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,12 +33,8 @@ public class AppUserServiceImpl implements AppUserService {
     private static final Logger log = LoggerFactory.getLogger(AppUserServiceImpl.class);
     private final RabbitTemplate rabbitTemplate;
     private final AppUserDAO appUserDAO;
-    @Autowired
     private final AppPhotoDAO appPhotoDAO;
     private final Hashids hashids;
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, AppPhotoDAO appPhotoDAO, Hashids hashids) {
         this.appUserDAO = appUserDAO;
@@ -184,11 +176,9 @@ public class AppUserServiceImpl implements AppUserService {
                     .photos(attachments)
                     .build();
             rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-            for (AppPhoto appPhoto : appPhotos) {
-                appPhotoDAO.delete(appPhoto);
-            }
-            entityManager.flush(); // Сбрасываем изменения Hibernate
-            entityManager.clear(); // Очищаем кэш Hibernate
+//            for (AppPhoto appPhoto : appPhotos) {
+//                appPhotoDAO.delete(appPhoto);
+//            }
             return "Отправляем в очередь registrationMailQueue, mailParams";
 
         } catch (RuntimeException e) {
