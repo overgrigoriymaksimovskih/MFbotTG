@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.hashids.Hashids;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import javax.mail.internet.InternetAddress;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ public class AppUserServiceImpl implements AppUserService {
     private static final Logger log = LoggerFactory.getLogger(AppUserServiceImpl.class);
     private final RabbitTemplate rabbitTemplate;
     private final AppUserDAO appUserDAO;
+    @Autowired
     private final AppPhotoDAO appPhotoDAO;
     private final Hashids hashids;
 
