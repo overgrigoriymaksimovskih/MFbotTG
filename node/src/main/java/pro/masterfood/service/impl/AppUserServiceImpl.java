@@ -52,12 +52,12 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String registerUser(AppUser appUser) {
-        if (appUser.getIsActive()){
+        if (appUser.getIsActive()) {
             return "Вы уже зарегистрированы";
-        } else if (appUser.getEmail() != null && !appUser.getIsActive()){
+        } else if (appUser.getEmail() != null && !appUser.getIsActive()) {
             appUser.setState(WAIT_FOR_PASSWORD_STATE);
             appUserDAO.save(appUser);
-            return  "Ваш email " +  appUser.getEmail() +"\n"
+            return "Ваш email " + appUser.getEmail() + "\n"
                     + " введите пароль";
         }
         appUser.setState(WAIT_FOR_EMAIL_STATE);
@@ -67,10 +67,10 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String setEmail(AppUser appUser, String email) {
-        try{
+        try {
             InternetAddress emailAddr = new InternetAddress(email);
             emailAddr.validate();
-        } catch (AddressException e){
+        } catch (AddressException e) {
             return "Введите пожалуйста корректный адрес. Для отмены команды введите /cancel";
         }
 //        var appUserOpt = appUserDAO.findByEmail(email);
@@ -179,25 +179,24 @@ public class AppUserServiceImpl implements AppUserService {
 //        }
 
 
+    @Override
+    @Transactional // Важно!
+    public String sendReportMail(Long chatId, AppUser appUser) {
+        Long userId = appUser.getId();
 
-        @Override
-        @Transactional // Важно!
-        public String sendReportMail(Long chatId, AppUser appUser) {
-            Long userId = appUser.getId();
+        try {
+            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null);
+            if (appUsero != null) {
+                List<AppPhoto> appPhotos = appUsero.getPhotos();
 
-            try {
-                AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null);
-                if (appUsero != null) {
-                    List<AppPhoto> appPhotos = appUsero.getPhotos();
-
-                    List<byte[]> attachments = new ArrayList<>();
-                    for (AppPhoto appPhoto : appPhotos) {
-                        if (appPhoto.getBinaryContent() != null) {
-                            byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-                            attachments.add(binaryContent);
-                        }
+                List<byte[]> attachments = new ArrayList<>();
+                for (AppPhoto appPhoto : appPhotos) {
+                    if (appPhoto.getBinaryContent() != null) {
+                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                        attachments.add(binaryContent);
                     }
-                    //тут можно использовать attachments, до удаления
+                }
+                //тут можно использовать attachments, до удаления
 //                    3. Отправляем письмо
                 var mailParams = MailParams.builder()
                         .id(appUser.getId())
@@ -210,16 +209,16 @@ public class AppUserServiceImpl implements AppUserService {
                         .build();
                 rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
 
-                } else {
-                    return "Пользователь не найден в методе sendReportMail";
-                }
-                appPhotoDAO.deleteByOwnerId(userId);
-                return "Все фотографии пользователя с ID " + userId + " удалены."  + "Отправляем в очередь registrationMailQueue, mailParams";
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "Ошибка при удалении фотографий: " + e.getMessage();
+            } else {
+                return "Пользователь не найден в методе sendReportMail";
             }
+            appPhotoDAO.deleteByOwnerId(userId);
+            return "Все фотографии пользователя с ID " + userId + " удалены." + "Отправляем в очередь registrationMailQueue, mailParams";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Ошибка при удалении фотографий: " + e.getMessage();
         }
+
 
 
 
