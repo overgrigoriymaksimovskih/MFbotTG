@@ -187,8 +187,9 @@ public class AppUserServiceImpl implements AppUserService {
 //            }else{
 //                return "Какая то ошибка при отправке майлпарамс в очередь";
 //            }
-            String res2 = deletePhotoOfUser(appUser.getId());
-            return res2;
+//            String res2 = deletePhotoOfUser(appUser.getId());
+//            return res2;
+            return attachments.get(0).toString();
         } catch (Exception e) {
             return e.getMessage();
         }
