@@ -131,40 +131,21 @@ public class AppUserServiceImpl implements AppUserService {
         return "Уточняем...";
     }
 
-//    private void sendLoginPassword(String email, String password) {
-//        var loginParams = LoginParams.builder()
-//                .email(email)
-//                .password(password)
-//                .build();
-//        rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
-//    }
-
-//    private void sendRegistrationMail(String cryptoUserId, String email) {
-//        var mailParams = MailParams.builder()
-//                .id(cryptoUserId)
-//                .emailTo(email)
-//                .build();
-//        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-//    }
-
     @Transactional
     public List<byte[]> getAttachments(AppUser appUser) {
-        AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя // Получаем пользователя для сессии
-        if (userForSession != null) {
-            // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
+        try {
+            AppUser userForSession = appUserDAO.getById(appUser.getId());
             List<AppPhoto> appPhotos = userForSession.getPhotos();
-            // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
+
+            // Создаем List<byte[]> для всех вложений
             List<byte[]> attachments = new ArrayList<>();
             for (AppPhoto appPhoto : appPhotos) {
-                if (appPhoto.getBinaryContent() != null) {
-                    byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-                    attachments.add(binaryContent);
-                }
+                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                attachments.add(binaryContent);
             }
             return attachments;
-
-        } else {
-            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -194,8 +175,8 @@ public class AppUserServiceImpl implements AppUserService {
         } catch (AmqpException e) {
             return false;
         }
-//        return "Отправляем в очередь registrationMailQueue, mailParams";
     }
+
     @Override
     public String sendReportMail(Long chatId, AppUser appUser) {
         try {
@@ -211,70 +192,5 @@ public class AppUserServiceImpl implements AppUserService {
         } catch (Exception e) {
             return e.getMessage();
         }
-//        try {
-//            Long userId = appUser.getId();
-//            AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя для сессии
-//            if (userForSession != null) {
-//                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
-//                List<AppPhoto> appPhotos = userForSession.getPhotos();
-//                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
-//                List<byte[]> attachments = new ArrayList<>();
-//                for (AppPhoto appPhoto : appPhotos) {
-//                    if (appPhoto.getBinaryContent() != null) {
-//                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-//                        attachments.add(binaryContent);
-//                    }
-//                }
-//                appPhotoDAO.deleteByOwnerId(userId);//
-//                return "Все фотографии пользователя с ID " + userId + " удалены.";
-//
-//            } else {
-//                return "Пользователь не найден в методе sendReportMail";
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return "Ошибка при удалении фотографий: " + e.getMessage();
-//        }
-////        try {
-////            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
-////            if (appUsero != null) {
-////                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
-////                List<AppPhoto> appPhotos = appUsero.getPhotos();
-////
-////                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
-////                List<byte[]> attachments = new ArrayList<>();
-////                for (AppPhoto appPhoto : appPhotos) {
-////                    if (appPhoto.getBinaryContent() != null) {
-////                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-////                        attachments.add(binaryContent);
-////                    }
-////                }
-////
-////                // 3. Отправляем письмо
-////                var mailParams = MailParams.builder()
-////                        .id(appUser.getId())
-////                        .chatId(chatId)
-////                        .email(appUser.getEmail())
-////                        .siteUid(appUser.getSiteUserId())
-////                        .phoneNumber(appUser.getPhoneNumber())
-////                        .message("qwerty")
-////                        .photos(attachments)
-////                        .build();
-////                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-////
-////                // 4. Удаляем фотографии (в рамках той же транзакции, что и получение фотографий)
-////                for (AppPhoto appPhotoa : appPhotos) {
-////                    appPhotoDAO.delete(appPhotoa); // Удаляем фотографии в рамках транзакции
-////                }
-////
-////                return "Отправляем в очередь registrationMailQueue, mailParams";
-////            } else {
-////                return "Пользователь не найден в методе sendReportMail";
-////            }
-////        } catch (Exception e) {
-////            // Обрабатываем исключения
-////            e.printStackTrace();
-////            return "Ошибка при отправке отчета: " + e.getMessage();
-////        }
     }
 }
