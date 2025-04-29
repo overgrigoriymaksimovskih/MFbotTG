@@ -2,6 +2,7 @@ package pro.masterfood.service.impl;
 
 
 
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.hashids.Hashids;
@@ -131,23 +132,24 @@ public class AppUserServiceImpl implements AppUserService {
         return "Уточняем...";
     }
 
-//    @Transactional
-//    public List<byte[]> getAttachments(AppUser appUser) {
-//        try {
-//            AppUser userForSession = appUserDAO.getById(appUser.getId());
-//            List<AppPhoto> appPhotos = userForSession.getPhotos();
-//
-//            // Создаем List<byte[]> для всех вложений
-//            List<byte[]> attachments = new ArrayList<>();
-//            for (AppPhoto appPhoto : appPhotos) {
-//                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-//                attachments.add(binaryContent);
-//            }
-//            return attachments;
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @Transactional
+    public List<byte[]> getAttachments(AppUser appUser) {
+        try {
+            AppUser userForSession = appUserDAO.getById(appUser.getId());
+            List<AppPhoto> appPhotos = userForSession.getPhotos();
+            Hibernate.initialize(appPhotos); // Загружаем фотографии
+
+            // Создаем List<byte[]> для всех вложений
+            List<byte[]> attachments = new ArrayList<>();
+            for (AppPhoto appPhoto : appPhotos) {
+                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                attachments.add(binaryContent);
+            }
+            return attachments;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Transactional
     public String deletePhotoOfUser(Long userId){
@@ -179,34 +181,19 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
-//        try {
-//            List<byte[]> attachments = getAttachments(appUser);
-////            if(sendMailtoQueue(chatId, appUser, attachments)){
-////                String res2 = deletePhotoOfUser(appUser.getId());
-////                return "Отправляем в очередь registrationMailQueue, mailParams " + res2;
-////            }else{
-////                return "Какая то ошибка при отправке майлпарамс в очередь";
-////            }
-//            String res2 = deletePhotoOfUser(appUser.getId());
-//            return res2;
-//        } catch (Exception e) {
-//            return e.getMessage();
-//        }
         try {
-            AppUser userForSession = appUserDAO.getById(appUser.getId());
-            List<AppPhoto> appPhotos = userForSession.getPhotos();
-
-            // Создаем List<byte[]> для всех вложений
-            List<byte[]> attachments = new ArrayList<>();
-            for (AppPhoto appPhoto : appPhotos) {
-                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-                attachments.add(binaryContent);
-            }
-            return attachments.get(0).toString();
+            List<byte[]> attachments = getAttachments(appUser);
+//            if(sendMailtoQueue(chatId, appUser, attachments)){
+//                String res2 = deletePhotoOfUser(appUser.getId());
+//                return "Отправляем в очередь registrationMailQueue, mailParams " + res2;
+//            }else{
+//                return "Какая то ошибка при отправке майлпарамс в очередь";
+//            }
+            String res2 = deletePhotoOfUser(appUser.getId());
+            return res2;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return e.getMessage();
         }
     }
 }
