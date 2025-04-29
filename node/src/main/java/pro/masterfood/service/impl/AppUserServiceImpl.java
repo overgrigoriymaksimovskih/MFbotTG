@@ -152,22 +152,8 @@ public class AppUserServiceImpl implements AppUserService {
     public String sendReportMail(Long chatId, AppUser appUser) {
         Long userId = appUser.getId();
         try {
-            // 1. Получаем пользователя (проверка)
-            AppUser appUsera = appUserDAO.findById(userId).orElse(null);
-            if (appUsera == null) {
-                return "Пользователь с ID " + userId + " не найден.";
-            }
-
-            // 2. Получаем список фотографий пользователя (важно, чтобы они были в рамках транзакции)
-            List<AppPhoto> appPhotos = appUsera.getPhotos();
-
-            // 3. Удаляем фотографии по одной
-            for (AppPhoto appPhoto : appPhotos) {
-                appPhotoDAO.delete(appPhoto); //  Удаляем каждую фотографию
-            }
-
+            appPhotoDAO.deleteByOwnerId(userId);
             return "Все фотографии пользователя с ID " + userId + " удалены.";
-
         } catch (Exception e) {
             e.printStackTrace();
             return "Ошибка при удалении фотографий: " + e.getMessage();
