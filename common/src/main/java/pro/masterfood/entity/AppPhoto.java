@@ -17,8 +17,7 @@ public class AppPhoto {
     private AppUser owner; // Ссылка на сущность AppUser
     private String telegramField;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}) // Важно!
-    @JoinColumn(name = "binary_content_id")
+    @OneToOne
     private BinaryContent binaryContent;
 
     private Integer fileSize;

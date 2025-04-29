@@ -150,39 +150,36 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
-
+            Long userId = appUser.getId();
         //Начинаем цирк с конями... Сейчас сохраним сюда ИД юзера, чтобы ниже получить его же из БД
         // а все это потому что хибернейт не может связать две сущности вызванные в рамках разных сессий
         // поэтому надо получать из БД пользователя и лист его фоток в одной сессии
         try {
-            appPhotoDAO.deleteAll();
+            AppUser appUsero = appUserDAO.getById(appUser.getId());
+            List<AppPhoto> appPhotos = appUsero.getPhotos();
 
-            return "Удаление всех фотографий";
-//            AppUser appUsero = appUserDAO.getById(appUser.getId());
-//            List<AppPhoto> appPhotos = appUsero.getPhotos();
-//
-//            // Создаем List<byte[]> для всех вложений
-//            List<byte[]> attachments = new ArrayList<>();
+            // Создаем List<byte[]> для всех вложений
+            List<byte[]> attachments = new ArrayList<>();
+            for (AppPhoto appPhoto : appPhotos) {
+                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                attachments.add(binaryContent);
+                appPhotoDAO.delete(appPhoto);
+            }
+
+            var mailParams = MailParams.builder()
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .email(appUser.getEmail())
+                    .siteUid((appUser.getSiteUserId()))
+                    .phoneNumber(appUser.getPhoneNumber())
+                    .message("qwerty")
+                    .photos(attachments)
+                    .build();
+            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
 //            for (AppPhoto appPhoto : appPhotos) {
-//                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-//                attachments.add(binaryContent);
 //                appPhotoDAO.delete(appPhoto);
 //            }
-//
-//            var mailParams = MailParams.builder()
-//                    .id(appUser.getId())
-//                    .chatId(chatId)
-//                    .email(appUser.getEmail())
-//                    .siteUid((appUser.getSiteUserId()))
-//                    .phoneNumber(appUser.getPhoneNumber())
-//                    .message("qwerty")
-//                    .photos(attachments)
-//                    .build();
-//            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-////            for (AppPhoto appPhoto : appPhotos) {
-////                appPhotoDAO.delete(appPhoto);
-////            }
-//            return "Отправляем в очередь registrationMailQueue, mailParams";
+            return "Отправляем в очередь registrationMailQueue, mailParams";
 
         } catch (RuntimeException e) {
 

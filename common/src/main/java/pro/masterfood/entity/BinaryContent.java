@@ -15,13 +15,10 @@ public class BinaryContent {
     @Column(name = "file_as_array_of_bytes", columnDefinition = "bytea")
     private byte[] fileAsArrayOfBytes;
 
-    @Column(name = "file_path") // Добавляем поле filePath
-    private String filePath;
-
     public BinaryContent() {
     }
 
-    public BinaryContent(Long id, byte[] fileAsArrayOfBytes, String filePath) {  // Добавляем в конструктор
+    public BinaryContent(Long id, byte[] fileAsArrayOfBytes) {
         this.id = id;
         this.fileAsArrayOfBytes = fileAsArrayOfBytes;
     }
@@ -42,28 +39,17 @@ public class BinaryContent {
         this.fileAsArrayOfBytes = fileAsArrayOfBytes;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BinaryContent that = (BinaryContent) o;
-        return Objects.equals(id, that.id) && Arrays.equals(fileAsArrayOfBytes, that.fileAsArrayOfBytes) && Objects.equals(filePath, that.filePath);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, filePath);
-        result = 31 * result + Arrays.hashCode(fileAsArrayOfBytes);
-        return result;
+        return Objects.hash(id);
     }
 
     @Override
@@ -71,7 +57,6 @@ public class BinaryContent {
         return "BinaryContent{" +
                 "id=" + id +
                 ", fileAsArrayOfBytes=" + Arrays.toString(fileAsArrayOfBytes) +
-                ", filePath='" + filePath + '\'' +
                 '}';
     }
 
@@ -82,7 +67,6 @@ public class BinaryContent {
     public static class Builder {
         private Long id;
         private byte[] fileAsArrayOfBytes;
-        private String filePath;  //  Добавляем filePath в Builder
 
         private Builder() {
         }
@@ -97,16 +81,10 @@ public class BinaryContent {
             return this;
         }
 
-        public Builder filePath(String filePath) {  // Добавляем метод для установки filePath
-            this.filePath = filePath;
-            return this;
-        }
-
         public BinaryContent build() {
             BinaryContent binaryContent = new BinaryContent();
             binaryContent.setId(id);
             binaryContent.setFileAsArrayOfBytes(fileAsArrayOfBytes);
-            binaryContent.setFilePath(filePath);  // Устанавливаем filePath
             return binaryContent;
         }
     }
