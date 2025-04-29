@@ -85,10 +85,21 @@ public class FileServiceImpl implements FileService {
     private BinaryContent getPersistentBinaryContent(ResponseEntity<String> response) {
         String filePath = getFilePath(response);
         byte[] fileInByte = downloadFile(filePath);
-        BinaryContent transientBinaryContent = BinaryContent.builder()
-                .fileAsArrayOfBytes(fileInByte)
-                .build();
-        return binaryContentDAO.save(transientBinaryContent);
+
+        //  Попытка найти существующий BinaryContent по filePath
+        BinaryContent existingContent = binaryContentDAO.findByFilePath(filePath);
+
+        if (existingContent != null) {
+            //  Если BinaryContent уже существует, просто возвращаем его
+            return existingContent;
+        } else {
+            //  Если BinaryContent не существует, создаем новый
+            BinaryContent newContent = BinaryContent.builder()
+                    .fileAsArrayOfBytes(fileInByte)
+                    .filePath(filePath) //  Используем builder для установки filePath
+                    .build();
+            return binaryContentDAO.save(newContent);
+        }
     }
 
     private static String getFilePath(ResponseEntity<String> response) {

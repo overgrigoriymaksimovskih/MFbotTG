@@ -25,6 +25,9 @@
             <column name="file_as_array_of_bytes" type="BYTEA">
                 <constraints nullable="true"/>
             </column>
+            <column name="file_path" type="VARCHAR(255)">  <!-- Добавляем file_path -->
+                <constraints nullable="true"/> <!-- Или укажи nullable="false" если нужно -->
+            </column>
         </createTable>
     </changeSet>
 
