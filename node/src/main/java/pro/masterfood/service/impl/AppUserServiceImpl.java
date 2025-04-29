@@ -167,7 +167,7 @@ public class AppUserServiceImpl implements AppUserService {
             return null;
         }
     }
-    @Transactional
+
     public String deletePhotoOfUser(Long userId){
         try {
             appPhotoDAO.deleteByOwnerId(userId);//
