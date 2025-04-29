@@ -1,5 +1,7 @@
 package pro.masterfood.service.impl;
 
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.hashids.Hashids;
@@ -20,6 +22,9 @@ import pro.masterfood.service.AppUserService;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +37,9 @@ public class AppUserServiceImpl implements AppUserService {
     private final AppUserDAO appUserDAO;
     private final AppPhotoDAO appPhotoDAO;
     private final Hashids hashids;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, AppPhotoDAO appPhotoDAO, Hashids hashids) {
         this.appUserDAO = appUserDAO;
@@ -145,82 +153,45 @@ public class AppUserServiceImpl implements AppUserService {
 //    }
 
     @Override
+    @Transactional
     public String sendReportMail(Long chatId, AppUser appUser) {
-//            Long userId = appUser.getId();
+            Long userId = appUser.getId();
         //Начинаем цирк с конями... Сейчас сохраним сюда ИД юзера, чтобы ниже получить его же из БД
         // а все это потому что хибернейт не может связать две сущности вызванные в рамках разных сессий
         // поэтому надо получать из БД пользователя и лист его фоток в одной сессии
-//        try {
-//            AppUser appUsero = appUserDAO.getById(1L);
-//            List<AppPhoto> appPhotos = appUsero.getPhotos();
-//
-//            // Создаем List<byte[]> для всех вложений
-//            List<byte[]> attachments = new ArrayList<>();
-//            for (AppPhoto appPhoto : appPhotos) {
-//                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-//                attachments.add(binaryContent);
-//            }
-//
-//            var mailParams = MailParams.builder()
-//                    .id(appUser.getId())
-//                    .chatId(chatId)
-//                    .email(appUser.getEmail())
-//                    .siteUid((appUser.getSiteUserId()))
-//                    .phoneNumber(appUser.getPhoneNumber())
-//                    .message("qwerty")
-//                    .photos(attachments)
-//                    .build();
-//            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-//            for (AppPhoto appPhoto : appPhotos) {
-//                appPhotoDAO.delete(appPhoto);
+        try {
+            AppUser appUsero = appUserDAO.getById(appUser.getId());
+            List<AppPhoto> appPhotos = appUsero.getPhotos();
 
-//            }
-//            return "Отправляем в очередь registrationMailQueue, mailParams";
+            // Создаем List<byte[]> для всех вложений
+            List<byte[]> attachments = new ArrayList<>();
+            for (AppPhoto appPhoto : appPhotos) {
+                byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                attachments.add(binaryContent);
+                appPhotoDAO.delete(appPhoto);
+            }
 
-//        } catch (RuntimeException e) {
-//
-//            return "error in sendReportMail" + e.getMessage();
-//        }
-        List<byte[]> attachments = createListOfBytes(appUser.getSiteUserId());
-        boolean stepOne = sendListOfPhotosToQueue(chatId, appUser, attachments);
-        boolean stepTwo = deleteSentPhotos(appUser.getId());
-        return "Отправляем в очередь registrationMailQueue, mailParams " + stepOne + " " + stepTwo;
-    }
-    @Transactional
-    public List<byte[]> createListOfBytes (Long userId) {
-        AppUser appUsero = appUserDAO.getById(userId);
-        List<AppPhoto> appPhotos = appUsero.getPhotos();
+            var mailParams = MailParams.builder()
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .email(appUser.getEmail())
+                    .siteUid((appUser.getSiteUserId()))
+                    .phoneNumber(appUser.getPhoneNumber())
+                    .message("qwerty")
+                    .photos(attachments)
+                    .build();
+            rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+            for (AppPhoto appPhoto : appPhotos) {
+                appPhotoDAO.delete(appPhoto);
+            }
+            entityManager.flush(); // Сбрасываем изменения Hibernate
+            entityManager.clear(); // Очищаем кэш Hibernate
+            return "Отправляем в очередь registrationMailQueue, mailParams";
 
-        // Создаем List<byte[]> для всех вложений
-        List<byte[]> attachments = new ArrayList<>();
-        for (AppPhoto appPhoto : appPhotos) {
-            byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-            attachments.add(binaryContent);
+        } catch (RuntimeException e) {
 
+            return "error in sendReportMail" + e.getMessage();
         }
-        return attachments;
-    }
 
-    public boolean sendListOfPhotosToQueue (Long chatId, AppUser appUser, List<byte[]> attachments) {
-        var mailParams = MailParams.builder()
-                .id(appUser.getId())
-                .chatId(chatId)
-                .email(appUser.getEmail())
-                .siteUid((appUser.getSiteUserId()))
-                .phoneNumber(appUser.getPhoneNumber())
-                .message("qwerty")
-                .photos(attachments)
-                .build();
-        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-        return true;
-    }
-    @Transactional
-    public boolean deleteSentPhotos (Long userId){
-        AppUser appUsero = appUserDAO.getById(userId);
-        List<AppPhoto> appPhotos = appUsero.getPhotos();
-        for (AppPhoto appPhoto : appPhotos) {
-            appPhotoDAO.delete(appPhoto);
-        }
-        return true;
     }
 }
