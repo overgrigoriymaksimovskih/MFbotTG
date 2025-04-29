@@ -150,45 +150,54 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     @Transactional // Важно!
     public String sendReportMail(Long chatId, AppUser appUser) {
-
+        Long userId = appUser.getId();
         try {
-            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
-            if (appUsero != null) {
-                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
-                List<AppPhoto> appPhotos = appUsero.getPhotos();
-
-                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
-                List<byte[]> attachments = new ArrayList<>();
-                for (AppPhoto appPhoto : appPhotos) {
-                    if (appPhoto.getBinaryContent() != null) {
-                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-                        attachments.add(binaryContent);
-                    }
-                }
-
-                // 3. Отправляем письмо
-                var mailParams = MailParams.builder()
-                        .id(appUser.getId())
-                        .chatId(chatId)
-                        .email(appUser.getEmail())
-                        .siteUid(appUser.getSiteUserId())
-                        .phoneNumber(appUser.getPhoneNumber())
-                        .message("qwerty")
-                        .photos(attachments)
-                        .build();
-                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-
-                // 4. Удаляем фотографии (в рамках той же транзакции, что и получение фотографий)
-                appPhotoDAO.deleteByOwnerId(appUser.getId());
-
-                return "Отправляем в очередь registrationMailQueue, mailParams";
-            } else {
-                return "Пользователь не найден в методе sendReportMail";
-            }
+            appPhotoDAO.deleteByOwnerId(userId);
+            return "Все фотографии пользователя с ID " + userId + " удалены.";
         } catch (Exception e) {
-            // Обрабатываем исключения
             e.printStackTrace();
-            return "Ошибка при отправке отчета: " + e.getMessage();
+            return "Ошибка при удалении фотографий: " + e.getMessage();
         }
+//        try {
+//            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
+//            if (appUsero != null) {
+//                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
+//                List<AppPhoto> appPhotos = appUsero.getPhotos();
+//
+//                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
+//                List<byte[]> attachments = new ArrayList<>();
+//                for (AppPhoto appPhoto : appPhotos) {
+//                    if (appPhoto.getBinaryContent() != null) {
+//                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+//                        attachments.add(binaryContent);
+//                    }
+//                }
+//
+//                // 3. Отправляем письмо
+//                var mailParams = MailParams.builder()
+//                        .id(appUser.getId())
+//                        .chatId(chatId)
+//                        .email(appUser.getEmail())
+//                        .siteUid(appUser.getSiteUserId())
+//                        .phoneNumber(appUser.getPhoneNumber())
+//                        .message("qwerty")
+//                        .photos(attachments)
+//                        .build();
+//                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+//
+//                // 4. Удаляем фотографии (в рамках той же транзакции, что и получение фотографий)
+//                for (AppPhoto appPhotoa : appPhotos) {
+//                    appPhotoDAO.delete(appPhotoa); // Удаляем фотографии в рамках транзакции
+//                }
+//
+//                return "Отправляем в очередь registrationMailQueue, mailParams";
+//            } else {
+//                return "Пользователь не найден в методе sendReportMail";
+//            }
+//        } catch (Exception e) {
+//            // Обрабатываем исключения
+//            e.printStackTrace();
+//            return "Ошибка при отправке отчета: " + e.getMessage();
+//        }
     }
 }
