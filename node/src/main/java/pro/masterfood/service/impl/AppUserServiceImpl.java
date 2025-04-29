@@ -154,29 +154,40 @@ public class AppUserServiceImpl implements AppUserService {
         List<byte[]> attachments;
 
         try {
-            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
-            if (appUsero != null) {
-                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
-                List<AppPhoto> appPhotos = appUsero.getPhotos();
-
-                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
-                attachments = new ArrayList<>();
-                for (AppPhoto appPhoto : appPhotos) {
-                    if (appPhoto.getBinaryContent() != null) {
-                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-                        attachments.add(binaryContent);
-                    }
-                }
-            }else {
-                return "Пользователь не найден в методе sendReportMail";
-            }
+//            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
+//            if (appUsero != null) {
+//                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
+//                List<AppPhoto> appPhotos = appUsero.getPhotos();
+//
+//                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
+//                attachments = new ArrayList<>();
+//                for (AppPhoto appPhoto : appPhotos) {
+//                    if (appPhoto.getBinaryContent() != null) {
+//                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+//                        attachments.add(binaryContent);
+//                    }
+//                }
+//            }else {
+//                return "Пользователь не найден в методе sendReportMail";
+//            }
 
             appPhotoDAO.deleteByOwnerId(userId);
-            return "Все фотографии пользователя с ID " + userId + " удалены." + attachments.get(0).toString();
+            return "Все фотографии пользователя с ID " + userId + " удалены.";
         } catch (Exception e) {
             e.printStackTrace();
             return "Ошибка при удалении фотографий: " + e.getMessage();
         }
+//         3. Отправляем письмо
+//                var mailParams = MailParams.builder()
+//                        .id(appUser.getId())
+//                        .chatId(chatId)
+//                        .email(appUser.getEmail())
+//                        .siteUid(appUser.getSiteUserId())
+//                        .phoneNumber(appUser.getPhoneNumber())
+//                        .message("qwerty")
+//                        .photos(attachments)
+//                        .build();
+//                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
 //        try {
 //            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
 //            if (appUsero != null) {
