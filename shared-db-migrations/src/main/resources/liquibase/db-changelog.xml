@@ -72,6 +72,9 @@
                              foreignKeyName="fk_app_photo_binary_content"
                              references="binary_content(id)"/>
             </column>
+            <column name="message" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
             <column name="file_size" type="INT">
                 <constraints nullable="true"/>
             </column>

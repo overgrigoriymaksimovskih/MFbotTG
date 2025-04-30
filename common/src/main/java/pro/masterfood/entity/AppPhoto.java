@@ -20,15 +20,18 @@ public class AppPhoto {
     @OneToOne(cascade = CascadeType.REMOVE)
     private BinaryContent binaryContent;
 
+    private String message;
+
     private Integer fileSize;
 
     public AppPhoto() {
     }
 
-    public AppPhoto(Long id, String telegramField, BinaryContent binaryContent, Integer fileSize) {
+    public AppPhoto(Long id, String telegramField, BinaryContent binaryContent,String message, Integer fileSize) {
         this.id = id;
         this.telegramField = telegramField;
         this.binaryContent = binaryContent;
+        this.message = message;
         this.fileSize = fileSize;
     }
 
@@ -64,6 +67,14 @@ public class AppPhoto {
         this.binaryContent = binaryContent;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public Integer getFileSize() {
         return fileSize;
     }
@@ -92,6 +103,7 @@ public class AppPhoto {
                 "owner=" + owner +
                 ", telegramField='" + telegramField + '\'' +
                 ", binaryContent=" + binaryContent +
+                ", message=" + message +
                 ", fileSize=" + fileSize +
                 '}';
     }
@@ -105,6 +117,7 @@ public class AppPhoto {
         private AppUser owner;
         private String telegramField;
         private BinaryContent binaryContent;
+        private String message;
         private Integer fileSize;
 
         private Builder() {
@@ -130,6 +143,10 @@ public class AppPhoto {
             return this;
         }
 
+        public Builder message(String message) {
+            this.message = message;
+            return this;
+        }
         public Builder fileSize(Integer fileSize) {
             this.fileSize = fileSize;
             return this;
@@ -141,6 +158,7 @@ public class AppPhoto {
             appDocument.setOwner(owner);
             appDocument.setTelegramField(telegramField);
             appDocument.setBinaryContent(binaryContent);
+            appDocument.setMessage(message);
             appDocument.setFileSize(fileSize);
             return appDocument;
         }
