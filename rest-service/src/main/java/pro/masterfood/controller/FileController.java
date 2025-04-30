@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pro.masterfood.service.FileService;
 
+import pro.masterfood.dao.AppPhotoDAO;
+
 import java.io.IOException;
 
 @RequestMapping("/api")
@@ -80,7 +82,14 @@ public class FileController {
     @GetMapping("/confirm")
     public ResponseEntity<String> confirm(@RequestParam("id") String id)
     {
-        String result = "Успешно!";
+        String result;
+        Long userId = Long.parseLong(id);
+        if(fileService.deletePhotos(userId)){
+            result = "Успешно!" + " письмо помечено прочитанным, данные удалены из БД";
+        }else{
+            result = "Успешно!" + " фото небыли удалены из БД, сообщите администратору...";
+        }
+
         if (result.startsWith("Успешно!")) {
             return ResponseEntity.ok().body(result); // Возвращаем JSON строку
         } else {

@@ -40,4 +40,13 @@ public class FileServiceImpl implements FileService {
         }
         return appPhotoDAO.findById(id).orElse(null);
     }
+
+    @Override
+    public boolean deletePhotos(Long id) {
+        try {
+            appPhotoDAO.deleteByOwnerId(id);
+        } catch (Exception e) {
+            return false;
+        } return true;
+    }
 }
