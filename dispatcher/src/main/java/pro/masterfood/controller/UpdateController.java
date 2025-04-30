@@ -98,7 +98,7 @@ public class UpdateController {
                 }
             }else {
                 // Больше одного типа контента или ни одного
-                setTooManyTypesOfConent(update);
+                setTooManyTypesOfContent(update);
             }
 
 
@@ -122,7 +122,7 @@ public class UpdateController {
         setView(sendMessage);
     }
 
-    private void setTooManyTypesOfConent(Update update) {
+    private void setTooManyTypesOfContent(Update update) {
         var sendMessage = messageUtils.generateSendMessageWithText(update,
                 "Пожалуйста отправляйте сообщения только с фото или только с текстом." + "\n"
                 +"Не отправляйте сообщения с текстом и фото одновременно." + "\n"
@@ -135,8 +135,15 @@ public class UpdateController {
     }
 
     private void processPhotoMessage (Update update){
-        updateProducer.produce(rabbitConfiguration.getPhotoMessageUpdateQueue(), update);
-        setFileIsReceivedView(update);
+        Message message = update.getMessage();
+        // 1. Проверяем размер текста (если он есть)
+        if (message.hasText()) {// Значит с фото был отправлен текст
+            setTooManyTypesOfContent(update); // Отправляем ответ с ошибкой
+        }else{
+            updateProducer.produce(rabbitConfiguration.getPhotoMessageUpdateQueue(), update);
+            setFileIsReceivedView(update);
+        }
+
     }
 
     private void processDocMessage (Update update){
