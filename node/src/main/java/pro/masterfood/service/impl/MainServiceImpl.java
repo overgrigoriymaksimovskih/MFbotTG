@@ -73,6 +73,11 @@ public class MainServiceImpl implements MainService {
         } else if (WAIT_FOR_ANSWER.equals(userState)) {
             output = "Дождитесь выполнения команды... Если команда выполняется слишком долго - отмените ее...";
             //----------------------------------------------------------------------------------------------------------
+
+            //Все команды с состоянием ОЖИДАЕМ СООБЩЕНИЕ ДЛЯ РЕПОРТА обрабатываются отдельной коммандой в АппЮзерСервис
+        } else if (WAIT_FOR_REPORT_MESSAGE.equals(userState)) {
+            output = appUserService.sendReportMail(chatId, appUser, text);
+            //----------------------------------------------------------------------------------------------------------
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! введите /cancel и попробуйте снова...";
@@ -156,13 +161,15 @@ public class MainServiceImpl implements MainService {
         var serviceCommand = ServiceCommand.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)){
             return appUserService.registerUser(appUser);
+
         } else if (GET_USER_INFO.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.checkBalance(chatId, appUser);
+
         } else if (STATUS.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.checkStatus(chatId, appUser);
 
         } else if (REPORT.equals(serviceCommand) && appUser.getIsActive()) {
-            return appUserService.sendReportMail(chatId, appUser);
+            return appUserService.createReportMail(chatId, appUser);
         //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();

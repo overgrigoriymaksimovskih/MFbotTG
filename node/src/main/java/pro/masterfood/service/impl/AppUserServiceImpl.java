@@ -131,12 +131,20 @@ public class AppUserServiceImpl implements AppUserService {
         return "Уточняем...";
     }
 
+
+    @Override
+    public String createReportMail(Long chatId, AppUser appUser) {
+        appUser.setState(WAIT_FOR_REPORT_MESSAGE);
+        appUserDAO.save(appUser);
+        return "Добавьте фото и введите текст сообщения, или просто отправтье сообщение без фотографий.";
+    }
+
     @Override
     @Transactional // Важно!
-    public String sendReportMail(Long chatId, AppUser appUser) {
+    public String sendReportMail(Long chatId, AppUser appUser, String message) {
         try {
             AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null);
-            StringBuilder resultMesssage = new StringBuilder("qwerty");
+            StringBuilder resultMesssage = new StringBuilder(message);
             if (userForSession != null) {
                 List<AppPhoto> appPhotos = userForSession.getPhotos();
 
@@ -160,13 +168,19 @@ public class AppUserServiceImpl implements AppUserService {
                         .photos(attachments)
                         .build();
                 rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+                appUser.setState(BASIC_STATE);
+                appUserDAO.save(appUser);
                 return "Сообщение отправлено в очередь registrationMailQueue";
 
             } else {
+                appUser.setState(BASIC_STATE);
+                appUserDAO.save(appUser);
                 return "Пользователь не найден в методе sendReportMail";
             }
         } catch (Exception e) {
             e.printStackTrace();
+            appUser.setState(BASIC_STATE);
+            appUserDAO.save(appUser);
             return "Ошибка при отправке фотографий: " + e.getMessage();
         }
     }
