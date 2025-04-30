@@ -137,7 +137,7 @@ public class UpdateController {
     private void processPhotoMessage (Update update){
         Message message = update.getMessage();
         // 1. Проверяем размер текста (если он есть)
-        if (message.getText() != null) {// Значит с фото был отправлен текст
+        if (message.getCaption() != null) {// Значит с фото был отправлен текст
             setTooManyTypesOfContent(update); // Отправляем ответ с ошибкой
         }else{
             updateProducer.produce(rabbitConfiguration.getPhotoMessageUpdateQueue(), update);
