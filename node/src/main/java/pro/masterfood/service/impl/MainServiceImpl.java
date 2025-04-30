@@ -117,7 +117,7 @@ public class MainServiceImpl implements MainService {
         }
 
         try{
-//            AppPhoto photo = fileService.processPhoto(update.getMessage(), appUser, message);
+            fileService.processPhoto(update.getMessage(), appUser, message);
 //            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
             var answer = "Фото успешно загружено." ;//+ link;
             sendAnswer(answer, chatId);
