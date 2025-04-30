@@ -144,7 +144,7 @@ public class AppUserServiceImpl implements AppUserService {
     public String sendReportMail(Long chatId, AppUser appUser, String message) {
         try {
             AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null);
-            StringBuilder resultMesssage = new StringBuilder(message);
+            StringBuilder resultMesssage = new StringBuilder(message + "\n");
             if (userForSession != null) {
                 List<AppPhoto> appPhotos = userForSession.getPhotos();
 

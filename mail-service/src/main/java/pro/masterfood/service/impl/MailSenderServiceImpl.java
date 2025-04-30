@@ -83,8 +83,8 @@ public class MailSenderServiceImpl  implements MailSenderService {
                 }
             }
 
-            var subject = "Тестовое письмо из бота (с вложениями)";
-            var messageBody = "Текст тестового письма из бота: \n"
+            var subject = "Письмо из TG бота";
+            var messageBody = "------------------------------------- \n"
                     + "От: "
                     + mailParams.getEmail() + "\n"
                     + "Телефон:  "
@@ -93,8 +93,7 @@ public class MailSenderServiceImpl  implements MailSenderService {
                     + mailParams.getSiteUid() + "\n"
                     + "Текст сообщения:  " + "\n"
                     + mailParams.getMessage() + "\n"
-                    + "\n"
-                    + "-------------------------------" + "\n"
+                    + "-------------------------------------" + "\n"
                     + "Ссылка для подтверждения получения :  "+ "\n"
                     + "http://81.200.158.74:8086" + "/api" + "/confirm?id=" + mailParams.getId();
 

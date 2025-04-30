@@ -117,13 +117,13 @@ public class MainServiceImpl implements MainService {
         }
 
         try{
-            AppPhoto photo = fileService.processPhoto(update.getMessage(), appUser, message);
-            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
-            var answer = "Фото успешно загружено. Ссылка для скачивания: " + link;
+//            AppPhoto photo = fileService.processPhoto(update.getMessage(), appUser, message);
+//            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
+            var answer = "Фото успешно загружено." ;//+ link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Произошла ошибка при загрузке фото", ex);
-            String error = "Не удалось загрузить ФОТО...";
+            String error = "Не удалось загрузить ФОТО... " + ex.getMessage();
             sendAnswer(error, chatId);
         }
 
@@ -136,8 +136,8 @@ public class MainServiceImpl implements MainService {
                 + "свою учетную запись для загрузки контента";
             sendAnswer(error, chatId);
             return true;
-        } else if (!BASIC_STATE.equals(userState)) {
-            var error = "Отмените текущую команду с помощью /cancel для отправки файлов";
+        } else if (!WAIT_FOR_REPORT_MESSAGE.equals(userState)) {
+            var error = "Чтобы отправить фото воспользуйтесь командой /report (Обратная связь)";
             sendAnswer(error, chatId);
             return true;
         }
