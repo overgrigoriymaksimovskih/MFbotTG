@@ -89,8 +89,6 @@ public class UpdateController {
             if (contentCount == 1) {
                 if(message.hasText()){
                     processTextMessage(update);
-                }else if (message.hasDocument()){
-                    processDocMessage(update);
                 }else if (message.hasPhoto()){
                     processPhotoMessage(update);
                 }else{
@@ -113,20 +111,22 @@ public class UpdateController {
     }
 
     private void setUnsupportedMessageTypeView(Update update){
-        var sendMessage = messageUtils.generateSendMessageWithText(update, "Не поддерживаемый тип сообщения");
-        setView(sendMessage);
-    }
-
-    private void setFileIsReceivedView(Update update) {
-        var sendMessage = messageUtils.generateSendMessageWithText(update, "Файл получен и обрабатывается ...");
+        var sendMessage = messageUtils.generateSendMessageWithText(update,
+                "Не поддерживаемый тип сообщения" + "\n"
+                        + "Допустимы только текст или фото");
         setView(sendMessage);
     }
 
     private void setTooManyTypesOfContent(Update update) {
         var sendMessage = messageUtils.generateSendMessageWithText(update,
                 "Пожалуйста отправляйте сообщения только с фото или только с текстом." + "\n"
-                +"Не отправляйте сообщения с текстом и фото одновременно." + "\n"
-                +"Такие сообщения не будут обработаны...");
+                        +"Не отправляйте сообщения с текстом и фото одновременно." + "\n"
+                        +"Такие сообщения не будут обработаны...");
+        setView(sendMessage);
+    }
+
+    private void setFileIsReceivedView(Update update) {
+        var sendMessage = messageUtils.generateSendMessageWithText(update, "Файл получен и обрабатывается ...");
         setView(sendMessage);
     }
 
@@ -137,7 +137,7 @@ public class UpdateController {
     private void processPhotoMessage (Update update){
         Message message = update.getMessage();
         // 1. Проверяем размер текста (если он есть)
-        if (message.hasText()) {// Значит с фото был отправлен текст
+        if (message.getText() != null) {// Значит с фото был отправлен текст
             setTooManyTypesOfContent(update); // Отправляем ответ с ошибкой
         }else{
             updateProducer.produce(rabbitConfiguration.getPhotoMessageUpdateQueue(), update);
