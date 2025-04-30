@@ -49,15 +49,59 @@ public class UpdateController {
         //TODO реализовать ограничение запросов в еденицу времени (redis или Token Bucket Algorithm...)
         Message message = update.getMessage();
         if (checkMessageSize(update)) {
-            if(message.hasText()){
-                processTextMessage(update);
-            }else if (message.hasDocument()){
-                processDocMessage(update);
-            }else if (message.hasPhoto()){
-                processPhotoMessage(update);
-            }else{
-                setUnsupportedMessageTypeView(update);
+            int contentCount = 0;
+
+            // Проверяем все типы контента
+            if (message.hasText()) {
+                contentCount++;
             }
+            if (message.hasDocument()) {
+                contentCount++;
+            }
+            if (message.hasPhoto()) {
+                contentCount++;
+            }
+            if (message.hasAudio()) {
+                contentCount++;
+            }
+            if (message.hasVideo()) {
+                contentCount++;
+            }
+            if (message.hasVoice()) {
+                contentCount++;
+            }
+            if (message.hasSticker()) {
+                contentCount++;
+            }
+            if (message.hasVideoNote()) {
+                contentCount++;
+            }
+            if (message.hasContact()) {
+                contentCount++;
+            }
+            if (message.hasLocation()) {
+                contentCount++;
+            }
+            if (message.hasPoll()) {
+                contentCount++;
+            }
+
+            if (contentCount == 1) {
+                if(message.hasText()){
+                    processTextMessage(update);
+                }else if (message.hasDocument()){
+                    processDocMessage(update);
+                }else if (message.hasPhoto()){
+                    processPhotoMessage(update);
+                }else{
+                    setUnsupportedMessageTypeView(update);
+                }
+            }else {
+                // Больше одного типа контента или ни одного
+                setTooManyTypesOfConent(update);
+            }
+
+
         } else {
             setTooBigMessageView(update);
         }
@@ -75,6 +119,14 @@ public class UpdateController {
 
     private void setFileIsReceivedView(Update update) {
         var sendMessage = messageUtils.generateSendMessageWithText(update, "Файл получен и обрабатывается ...");
+        setView(sendMessage);
+    }
+
+    private void setTooManyTypesOfConent(Update update) {
+        var sendMessage = messageUtils.generateSendMessageWithText(update,
+                "Пожалуйста отправляйте сообщения только с фото или только с текстом." + "\n"
+                +"Не отправляйте сообщения с текстом и фото одновременно." + "\n"
+                +"Такие сообщения не будут обработаны...");
         setView(sendMessage);
     }
 
