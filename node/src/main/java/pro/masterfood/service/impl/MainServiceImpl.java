@@ -103,6 +103,7 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public void processPhotoMessage(Update update) {
+        String message = update.getMessage().getCaption();
         saveRawData(update);
         var appUser = findOrSaveAppUser(update);
         var chatId = update.getMessage().getChatId();
@@ -111,7 +112,7 @@ public class MainServiceImpl implements MainService {
         }
 
         try{
-            AppPhoto photo = fileService.processPhoto(update.getMessage(), appUser);
+            AppPhoto photo = fileService.processPhoto(update.getMessage(), appUser, message);
             String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
             var answer = "Фото успешно загружено. Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
