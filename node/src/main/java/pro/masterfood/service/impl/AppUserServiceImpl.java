@@ -23,9 +23,6 @@ import pro.masterfood.service.AppUserService;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import java.util.ArrayList;
 import java.util.List;
 

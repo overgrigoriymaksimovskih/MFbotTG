@@ -74,7 +74,7 @@ public class MailSenderServiceImpl  implements MailSenderService {
                 + "\n"
                 + "-------------------------------" + "\n"
                 + "Ссылка для подтверждения получения :  "+ "\n"
-                + "81.200.158.74" + "/api" + "/?id" + "=" + mailParams.getId();
+                + "http://81.200.158.74:8086" + "/api" + "/confirm?id=" + mailParams.getId();
 
         var emailTo = "master-2m@yandex.ru";
         List<byte[]> photos = mailParams.getPhotos();
