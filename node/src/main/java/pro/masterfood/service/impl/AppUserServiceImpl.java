@@ -158,8 +158,8 @@ public class AppUserServiceImpl implements AppUserService {
                         .message("qwerty")
                         .photos(attachments)
                         .build();
-                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-                return "Сообщение отправлено в очередь registrationMailQueue";
+//                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+                return "Сообщение НЕотправлено в очередь registrationMailQueue";
 
             } else {
                 return "Пользователь не найден в методе sendReportMail";
