@@ -136,12 +136,16 @@ public class AppUserServiceImpl implements AppUserService {
     public String sendReportMail(Long chatId, AppUser appUser) {
         try {
             AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null);
+            StringBuilder resultMesssage = new StringBuilder("qwerty");
             if (userForSession != null) {
                 List<AppPhoto> appPhotos = userForSession.getPhotos();
 
                 List<byte[]> attachments = new ArrayList<>();
                 for (AppPhoto appPhoto : appPhotos) {
                     if (appPhoto.getBinaryContent() != null) {
+                        if (appPhoto.getMessage() != null){
+                            resultMesssage.append("\n + Дополнительный текст к фото во вложении: " + appPhoto.getMessage());
+                        }
                         byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
                         attachments.add(binaryContent);
                     }
@@ -152,7 +156,7 @@ public class AppUserServiceImpl implements AppUserService {
                         .email(appUser.getEmail())
                         .siteUid(appUser.getSiteUserId())
                         .phoneNumber(appUser.getPhoneNumber())
-                        .message("qwerty")
+                        .message(resultMesssage.toString())
                         .photos(attachments)
                         .build();
                 rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);

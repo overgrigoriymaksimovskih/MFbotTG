@@ -60,33 +60,15 @@ public class MailSenderServiceImpl  implements MailSenderService {
 
     @Override
     public void send(MailParams mailParams) {
-        sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
-        var subject = "Тестовое письмо из бота (с вложениями)";
-        var messageBody = "Текст тестового письма из бота: \n"
-                + "От: "
-                + mailParams.getEmail() + "\n"
-                + "Телефон:  "
-                + mailParams.getPhoneNumber() + "\n"
-                + "ИД сайта:  "
-                + mailParams.getSiteUid() + "\n"
-                + "Текст сообщения:  " + "\n"
-                + mailParams.getMessage() + "\n"
-                + "\n"
-                + "-------------------------------" + "\n"
-                + "Ссылка для подтверждения получения :  "+ "\n"
-                + "http://81.200.158.74:8086" + "/api" + "/confirm?id=" + mailParams.getId();
 
+        sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
         var emailTo = "master-2m@yandex.ru";
-        List<byte[]> photos = mailParams.getPhotos();
 
         try {
+            List<byte[]> photos = mailParams.getPhotos();
+
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8"); // true - multipart, кодировка UTF-8
-
-            helper.setFrom(emailFrom); // Используй emailFrom из настроек
-            helper.setTo(emailTo);
-            helper.setSubject(subject);
-            helper.setText(messageBody, false); // false - plain text
 
             int attachments = 0;
             if (photos != null && !photos.isEmpty()) {
@@ -100,14 +82,33 @@ public class MailSenderServiceImpl  implements MailSenderService {
                     i++;
                 }
             }
+
+            var subject = "Тестовое письмо из бота (с вложениями)";
+            var messageBody = "Текст тестового письма из бота: \n"
+                    + "От: "
+                    + mailParams.getEmail() + "\n"
+                    + "Телефон:  "
+                    + mailParams.getPhoneNumber() + "\n"
+                    + "ИД сайта:  "
+                    + mailParams.getSiteUid() + "\n"
+                    + "Текст сообщения:  " + "\n"
+                    + mailParams.getMessage() + "\n"
+                    + "\n"
+                    + "-------------------------------" + "\n"
+                    + "Ссылка для подтверждения получения :  "+ "\n"
+                    + "http://81.200.158.74:8086" + "/api" + "/confirm?id=" + mailParams.getId();
+
+            helper.setFrom(emailFrom); // Используй emailFrom из настроек
+            helper.setTo(emailTo);
+            helper.setSubject(subject);
+            helper.setText(messageBody, false); // false - plain text
+
             javaMailSender.send(message);
             if(attachments == 0){
                 sendAnswer("Успешно отправлено MailSenderServiceImpl (без фото)", mailParams.getChatId());
             }else{
                 sendAnswer("Успешно отправлено MailSenderServiceImpl (с " + attachments +" фото)", mailParams.getChatId());
             }
-
-
 
         } catch (MessagingException e) {
             sendAnswer("Ошибка отправки (MessagingException): " + e.getMessage(), mailParams.getChatId());
