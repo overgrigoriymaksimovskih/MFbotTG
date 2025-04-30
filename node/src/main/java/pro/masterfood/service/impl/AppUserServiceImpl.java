@@ -55,12 +55,12 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String registerUser(AppUser appUser) {
-        if (appUser.getIsActive()){
+        if (appUser.getIsActive()) {
             return "Вы уже зарегистрированы";
-        } else if (appUser.getEmail() != null && !appUser.getIsActive()){
+        } else if (appUser.getEmail() != null && !appUser.getIsActive()) {
             appUser.setState(WAIT_FOR_PASSWORD_STATE);
             appUserDAO.save(appUser);
-            return  "Ваш email " +  appUser.getEmail() +"\n"
+            return "Ваш email " + appUser.getEmail() + "\n"
                     + " введите пароль";
         }
         appUser.setState(WAIT_FOR_EMAIL_STATE);
@@ -70,10 +70,10 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String setEmail(AppUser appUser, String email) {
-        try{
+        try {
             InternetAddress emailAddr = new InternetAddress(email);
             emailAddr.validate();
-        } catch (AddressException e){
+        } catch (AddressException e) {
             return "Введите пожалуйста корректный адрес. Для отмены команды введите /cancel";
         }
 //        var appUserOpt = appUserDAO.findByEmail(email);
@@ -134,214 +134,39 @@ public class AppUserServiceImpl implements AppUserService {
         return "Уточняем...";
     }
 
-//    private void sendLoginPassword(String email, String password) {
-//        var loginParams = LoginParams.builder()
-//                .email(email)
-//                .password(password)
-//                .build();
-//        rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
-//    }
+    @Override
+    @Transactional // Важно!
+    public String sendReportMail(Long chatId, AppUser appUser) {
+        try {
+            AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null);
+            if (userForSession != null) {
+                List<AppPhoto> appPhotos = userForSession.getPhotos();
 
-//    private void sendRegistrationMail(String cryptoUserId, String email) {
-//        var mailParams = MailParams.builder()
-//                .id(cryptoUserId)
-//                .emailTo(email)
-//                .build();
-//        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-//    }
-
-//    @Override
-//    @Transactional // Важно!
-//    public String sendReportMail(Long chatId, AppUser appUser) {
-//        Long userId = appUser.getId();
-//        List<byte[]> attachments;
-//
-//        try {
-//            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
-//            if (appUsero != null) {
-//                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
-//                List<AppPhoto> appPhotos = appUsero.getPhotos();
-//
-//                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
-//                attachments = new ArrayList<>();
-//                for (AppPhoto appPhoto : appPhotos) {
-//                    if (appPhoto.getBinaryContent() != null) {
-//                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-//                        attachments.add(binaryContent);
-//                    }
-//                }
-//            }else {
-//                return "Пользователь не найден в методе sendReportMail";
-//            }
-//
-//            appPhotoDAO.deleteByOwnerId(userId);
-//            return "Все фотографии пользователя с ID " + userId + " удалены." + attachments.get(0).toString();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return "Ошибка при удалении фотографий: " + e.getMessage();
-//        }
-
-
-
-    public void mailGo (Long chatId, AppUser appUser, List<byte[]> attachments){
-//            3. Отправляем письмо
-        var mailParams = MailParams.builder()
-                .id(appUser.getId())
-                .chatId(chatId)
-                .email(appUser.getEmail())
-                .siteUid(appUser.getSiteUserId())
-                .phoneNumber(appUser.getPhoneNumber())
-                .message("qwerty")
-                .photos(attachments)
-                .build();
-//        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-    }
-
-        @Override
-        @Transactional // Важно!
-        public String sendReportMail(Long chatId, AppUser appUser) {
-            Long userId = appUser.getId();
-            List<byte[]> attachments = new ArrayList<>();
-
-            try {
-                AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null);
-                if (appUsero != null) {
-                    List<AppPhoto> appPhotos = appUsero.getPhotos();
-
-                    // Создаем независимый список байтовых массивов
-                    List<byte[]> independentAttachments = appPhotos.stream()
-                            .filter(appPhoto -> appPhoto.getBinaryContent() != null)
-                            .map(appPhoto -> appPhoto.getBinaryContent().getFileAsArrayOfBytes())
-                            .map(byteArr -> Arrays.copyOf(byteArr, byteArr.length)) // Создаем копии байтовых массивов
-                            .collect(Collectors.toList());
-
-                    mailGo(chatId, appUser, independentAttachments); // Отправляем письмо
-
-                } else {
-                    return "Пользователь не найден в методе sendReportMail";
+                List<byte[]> attachments = new ArrayList<>();
+                for (AppPhoto appPhoto : appPhotos) {
+                    if (appPhoto.getBinaryContent() != null) {
+                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                        attachments.add(binaryContent);
+                    }
                 }
+                var mailParams = MailParams.builder()
+                        .id(appUser.getId())
+                        .chatId(chatId)
+                        .email(appUser.getEmail())
+                        .siteUid(appUser.getSiteUserId())
+                        .phoneNumber(appUser.getPhoneNumber())
+                        .message("qwerty")
+                        .photos(attachments)
+                        .build();
+                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+                return "Сообщение отправлено в очередь registrationMailQueue";
 
-                appPhotoDAO.deleteByOwnerId(userId); // Удаляем фотографии после отправки письма
-                return "Все фотографии пользователя с ID " + userId + " удалены.";
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "Ошибка при удалении фотографий: " + e.getMessage();
+            } else {
+                return "Пользователь не найден в методе sendReportMail";
             }
-
-
-
-
-
-
-
-
-
-//            Long userId = appUser.getId();
-//
-//            try {
-//                AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null);
-//                if (appUsero != null) {
-//                    List<AppPhoto> appPhotos = appUsero.getPhotos();
-//
-//                    List<byte[]> attachments = new ArrayList<>();
-//                    for (AppPhoto appPhoto : appPhotos) {
-//                        if (appPhoto.getBinaryContent() != null) {
-//                            byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-//                            attachments.add(binaryContent);
-//                        }
-//                    }
-//                    //тут можно использовать attachments, до удаления
-////                    3. Отправляем письмо
-////                var mailParams = MailParams.builder()
-////                        .id(appUser.getId())
-////                        .chatId(chatId)
-////                        .email(appUser.getEmail())
-////                        .siteUid(appUser.getSiteUserId())
-////                        .phoneNumber(appUser.getPhoneNumber())
-////                        .message("qwerty")
-////                        .photos(attachments)
-////                        .build();
-////                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-//
-//                } else {
-//                    return "Пользователь не найден в методе sendReportMail";
-//                }
-//                appPhotoDAO.deleteByOwnerId(userId);
-//                return "Все фотографии пользователя с ID " + userId + " удалены.";
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return "Ошибка при удалении фотографий: " + e.getMessage();
-//            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//         3. Отправляем письмо
-//                var mailParams = MailParams.builder()
-//                        .id(appUser.getId())
-//                        .chatId(chatId)
-//                        .email(appUser.getEmail())
-//                        .siteUid(appUser.getSiteUserId())
-//                        .phoneNumber(appUser.getPhoneNumber())
-//                        .message("qwerty")
-//                        .photos(attachments)
-//                        .build();
-//                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-//        try {
-//            AppUser appUsero = appUserDAO.findById(appUser.getId()).orElse(null); // Получаем пользователя
-//            if (appUsero != null) {
-//                // 1. Получаем фотографии. Важно, чтобы они были загружены в рамках транзакции.
-//                List<AppPhoto> appPhotos = appUsero.getPhotos();
-//
-//                // 2. Создаем List<byte[]> для всех вложений (перед удалением, но в рамках той же транзакции)
-//                List<byte[]> attachments = new ArrayList<>();
-//                for (AppPhoto appPhoto : appPhotos) {
-//                    if (appPhoto.getBinaryContent() != null) {
-//                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-//                        attachments.add(binaryContent);
-//                    }
-//                }
-//
-//                // 3. Отправляем письмо
-//                var mailParams = MailParams.builder()
-//                        .id(appUser.getId())
-//                        .chatId(chatId)
-//                        .email(appUser.getEmail())
-//                        .siteUid(appUser.getSiteUserId())
-//                        .phoneNumber(appUser.getPhoneNumber())
-//                        .message("qwerty")
-//                        .photos(attachments)
-//                        .build();
-//                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-//
-//                // 4. Удаляем фотографии (в рамках той же транзакции, что и получение фотографий)
-//                for (AppPhoto appPhotoa : appPhotos) {
-//                    appPhotoDAO.delete(appPhotoa); // Удаляем фотографии в рамках транзакции
-//                }
-//
-//                return "Отправляем в очередь registrationMailQueue, mailParams";
-//            } else {
-//                return "Пользователь не найден в методе sendReportMail";
-//            }
-//        } catch (Exception e) {
-//            // Обрабатываем исключения
-//            e.printStackTrace();
-//            return "Ошибка при отправке отчета: " + e.getMessage();
-//        }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Ошибка при отправке фотографий: " + e.getMessage();
+        }
     }
 }

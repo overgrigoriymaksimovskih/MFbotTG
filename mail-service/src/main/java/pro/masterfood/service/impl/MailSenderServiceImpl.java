@@ -70,7 +70,10 @@ public class MailSenderServiceImpl  implements MailSenderService {
                 + "ИД сайта:  "
                 + mailParams.getSiteUid() + "\n"
                 + "Текст сообщения:  " + "\n"
-                + mailParams.getMessage();
+                + mailParams.getMessage()
+                + "-------------------------" + "\n"
+                + "Ссылка для подтверждения получения :  " + "ываыфваываыва";
+
         var emailTo = "master-2m@yandex.ru";
         List<byte[]> photos = mailParams.getPhotos();
 
@@ -83,15 +86,6 @@ public class MailSenderServiceImpl  implements MailSenderService {
             helper.setSubject(subject);
             helper.setText(messageBody, false); // false - plain text
 
-            // Добавляем вложения, если они есть
-//            if (photos != null && !photos.isEmpty()) {
-//                int i = 1;
-//                for (byte[] photo : photos) {
-//                    ByteArrayResource resource = new ByteArrayResource(photo);
-//                    helper.addAttachment("photo_" + i + ".jpg", resource); // Укажи правильное имя и расширение
-//                    i++;
-//                }
-//            }
             int attachments = 0;
             if (photos != null && !photos.isEmpty()) {
                 int i = 1;
