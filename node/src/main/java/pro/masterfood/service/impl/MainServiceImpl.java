@@ -4,12 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dao.RawDataDAO;
-import pro.masterfood.entity.AppDocument;
-import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.entity.RawData;
 import pro.masterfood.exceptions.UploadFileException;
@@ -17,8 +16,11 @@ import pro.masterfood.service.AppUserService;
 import pro.masterfood.service.FileService;
 import pro.masterfood.service.MainService;
 import pro.masterfood.service.ProducerService;
-import pro.masterfood.service.enums.LinkType;
 import pro.masterfood.service.enums.ServiceCommand;
+import pro.masterfood.utils.OneCmessageHandler;
+
+import java.util.List;
+import java.util.Map;
 
 import static pro.masterfood.enums.UserState.*;
 import static pro.masterfood.service.enums.ServiceCommand.*;
@@ -31,13 +33,15 @@ public class MainServiceImpl implements MainService {
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
     private final AppUserService appUserService;
+    private final OneCmessageHandler oneCmessageHandler;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, OneCmessageHandler oneCmessageHandler) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.fileService = fileService;
         this.appUserService = appUserService;
+        this.oneCmessageHandler = oneCmessageHandler;
     }
 
     @Override
@@ -85,24 +89,16 @@ public class MainServiceImpl implements MainService {
         sendAnswer(output, chatId);
     }
 
-    @Override
-    public void processDocMessage(Update update) {
-        saveRawData(update);
-        var appUser = findOrSaveAppUser(update);
-        var chatId = update.getMessage().getChatId();
-        if (isNotAllowToSendContent(chatId, appUser)){
-            return;
-        }
-        try{
-            AppDocument doc = fileService.processDoc(update.getMessage());
-            String link = fileService.generateLink(doc.getId(), LinkType.GET_DOC);
-            var answer = "Документ успешно загружен "
-                    + "Ссылка для скачивания: " + link;
-            sendAnswer(answer, chatId);
-        } catch (UploadFileException ex) {
-            log.error("Произошла ошибка при загрузке файла", ex);
-            String error = "Не удалось загрузить...";
-            sendAnswer(error, chatId);
+    public void processDocMessage(String oneCmessage) {
+        String message = oneCmessageHandler.getMessageText(oneCmessage);
+        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage);
+
+        if (listOfChatsIds != null && message != null) {
+            for (Long chatId : listOfChatsIds) {
+                sendAnswer(message, chatId); // chatId - это уже telegramUserId
+            }
+        } else {
+            log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
         }
     }
 
