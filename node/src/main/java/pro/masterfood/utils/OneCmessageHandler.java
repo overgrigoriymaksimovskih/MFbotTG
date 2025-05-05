@@ -38,20 +38,19 @@ public class OneCmessageHandler {
             List<User> userList = distributionMessage.getUserList();
 
             for (User user : userList) {
-                // Ищем пользователя в БД по siteUserId
                 try {
                     Long siteUserId = Long.parseLong(user.getSiteUserId());
-                    Optional<AppUser> appUserOptional = appUserDAO.findBySiteUserId(siteUserId); // Ищем по siteUserId
+                    List<AppUser> appUsers = appUserDAO.findBySiteUserId(siteUserId); // Получаем список пользователей
 
-                    if (appUserOptional.isPresent()) {
-                        AppUser appUser = appUserOptional.get();
-                        Long telegramUserId = appUser.getTelegramUserId(); // Получаем telegramUserId
-                        if (telegramUserId != null) {
-                            usersChatIds.add(telegramUserId); // Добавляем telegramUserId в список
-                        } else {
-                            System.err.println("Для siteUserId " + user.getSiteUserId() + " не найден telegramUserId");
+                    if (!appUsers.isEmpty()) {
+                        for (AppUser appUser : appUsers) { // Итерируемся по списку пользователей
+                            Long telegramUserId = appUser.getTelegramUserId();
+                            if (telegramUserId != null) {
+                                usersChatIds.add(telegramUserId);
+                            } else {
+                                System.err.println("Для siteUserId " + user.getSiteUserId() + " не найден telegramUserId");
+                            }
                         }
-
                     } else {
                         System.err.println("Не найден AppUser с siteUserId: " + user.getSiteUserId());
                     }
@@ -62,9 +61,8 @@ public class OneCmessageHandler {
             return usersChatIds;
 
         } catch (IOException e) {
-            return new ArrayList<>(610200129);
-//            System.err.println("Ошибка десериализации JSON: " + e.getMessage());
-//            return null; // Или выбросить исключение
+            System.err.println("Ошибка десериализации JSON: " + e.getMessage());
+            return null; // Или выбросить исключение
         }
 
     }
