@@ -90,6 +90,7 @@ public class MainServiceImpl implements MainService {
     }
 
     public void processDocMessage(String oneCmessage) {
+        producerService.producerAnswerTo1C("Принятоооо методом обработки очереди из 1С");
         String message = oneCmessageHandler.getMessageText(oneCmessage);
         List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage);
 

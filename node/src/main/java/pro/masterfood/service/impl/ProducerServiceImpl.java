@@ -13,6 +13,9 @@ public class ProducerServiceImpl implements ProducerService {
     @Value("${spring.rabbitmq.queues.answer-message}")
     private String answerMessageQueue;
 
+    @Value("${spring.rabbitmq.queues.answer-to-1C}")
+    private String answerTo1CQueue;
+
     public ProducerServiceImpl(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
@@ -20,5 +23,10 @@ public class ProducerServiceImpl implements ProducerService {
     @Override
     public void producerAnswer(SendMessage sendMessage) {
         rabbitTemplate.convertAndSend(answerMessageQueue, sendMessage);
+    }
+
+    @Override
+    public void producerAnswerTo1C(String answerTo1C ) {
+        rabbitTemplate.convertAndSend(answerTo1CQueue, answerTo1C);
     }
 }
