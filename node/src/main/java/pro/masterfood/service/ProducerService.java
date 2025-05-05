@@ -4,5 +4,5 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 public interface ProducerService {
     void producerAnswer(SendMessage sendMessage);
-    public void producerAnswerTo1C(String answerTo1C );
+    void producerAnswerTo1C(String answerTo1C );
 }
