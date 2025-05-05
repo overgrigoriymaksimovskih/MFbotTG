@@ -91,16 +91,17 @@ public class MainServiceImpl implements MainService {
 
     public void processDocMessage(String oneCmessage) {
         String message = oneCmessageHandler.getMessageText(oneCmessage);
-//        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage);
-//
-//        if (listOfChatsIds != null && message != null) {
-//            for (Long chatId : listOfChatsIds) {
-//                sendAnswer(message, chatId); // chatId - это уже telegramUserId
-//            }
-//        } else {
-//            log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
-//        }
-        sendAnswer(message, 6128969029L);
+        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage);
+
+        if (listOfChatsIds != null && message != null) {
+            for (Long chatId : listOfChatsIds) {
+                sendAnswer(message, chatId); // chatId - это уже telegramUserId
+            }
+        } else {
+            log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
+            sendAnswer("Ошибкаааа!", 6128969029L);
+        }
+//        sendAnswer(message, 6128969029L);
     }
 
     @Override

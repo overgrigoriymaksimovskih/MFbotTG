@@ -62,8 +62,9 @@ public class OneCmessageHandler {
             return usersChatIds;
 
         } catch (IOException e) {
-            System.err.println("Ошибка десериализации JSON: " + e.getMessage());
-            return null; // Или выбросить исключение
+            return new ArrayList<>(610200129);
+//            System.err.println("Ошибка десериализации JSON: " + e.getMessage());
+//            return null; // Или выбросить исключение
         }
 
     }
