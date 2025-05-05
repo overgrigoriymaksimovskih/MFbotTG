@@ -90,7 +90,7 @@ public class MainServiceImpl implements MainService {
     }
 
     public void processDocMessage(String oneCmessage) {
-//        String message = oneCmessageHandler.getMessageText(oneCmessage);
+        String message = oneCmessageHandler.getMessageText(oneCmessage);
 //        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage);
 //
 //        if (listOfChatsIds != null && message != null) {
@@ -100,7 +100,7 @@ public class MainServiceImpl implements MainService {
 //        } else {
 //            log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
 //        }
-        sendAnswer("esdfjsldifglsdyhfkjsdhfkj", 6128969029L);
+        sendAnswer(message, 6128969029L);
     }
 
     @Override
