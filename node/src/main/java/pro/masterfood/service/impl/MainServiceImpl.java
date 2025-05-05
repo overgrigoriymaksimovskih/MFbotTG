@@ -90,16 +90,17 @@ public class MainServiceImpl implements MainService {
     }
 
     public void processDocMessage(String oneCmessage) {
-        String message = oneCmessageHandler.getMessageText(oneCmessage);
-        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage);
-
-        if (listOfChatsIds != null && message != null) {
-            for (Long chatId : listOfChatsIds) {
-                sendAnswer(message, chatId); // chatId - это уже telegramUserId
-            }
-        } else {
-            log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
-        }
+//        String message = oneCmessageHandler.getMessageText(oneCmessage);
+//        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage);
+//
+//        if (listOfChatsIds != null && message != null) {
+//            for (Long chatId : listOfChatsIds) {
+//                sendAnswer(message, chatId); // chatId - это уже telegramUserId
+//            }
+//        } else {
+//            log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
+//        }
+        sendAnswer("esdfjsldifglsdyhfkjsdhfkj", 6128969029L);
     }
 
     @Override
@@ -116,7 +117,7 @@ public class MainServiceImpl implements MainService {
             fileService.processPhoto(update.getMessage(), appUser, message);
 //            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
             var answer = "Фото успешно загружено." ;//+ link;
-            sendAnswer(answer, chatId);
+            sendAnswer(answer + chatId, chatId);
         } catch (UploadFileException ex) {
             log.error("Произошла ошибка при загрузке фото", ex);
             String error = "Не удалось загрузить ФОТО... " + ex.getMessage();
