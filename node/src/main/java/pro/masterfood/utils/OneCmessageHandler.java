@@ -49,7 +49,8 @@ public class OneCmessageHandler {
                         for (AppUser appUser : appUsers) {
                             botUsersCount++;
                             Long telegramUserId = appUser.getTelegramUserId();
-                            if (telegramUserId != null) {
+                            Boolean userIsActive = appUser.getIsActive();
+                            if (telegramUserId != null && userIsActive) {
                                 usersChatIds.add(telegramUserId);
                             } else {
                                 System.err.println("Для siteUserId " + siteUserIdString + " не найден telegramUserId");
