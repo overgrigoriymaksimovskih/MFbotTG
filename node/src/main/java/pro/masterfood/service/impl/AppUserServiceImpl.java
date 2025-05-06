@@ -62,7 +62,9 @@ public class AppUserServiceImpl implements AppUserService {
         }
         appUser.setState(WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);
-        return "Введите e-mail";
+        return "ВВЕДИТЕ E-MAIL: \n" +
+                "(Напомнить логин/пароль: \n" +
+                "https://m.master-food.pro/private/forgot/ )";
     }
 
     @Override
@@ -73,21 +75,6 @@ public class AppUserServiceImpl implements AppUserService {
         } catch (AddressException e) {
             return "Введите пожалуйста корректный адрес. Для отмены команды введите /cancel";
         }
-//        var appUserOpt = appUserDAO.findByEmail(email);
-//        if (appUserOpt.isEmpty()) {
-//            appUser.setEmail(email);
-//            appUser.setState(BASIC_STATE);
-//            appUser = appUserDAO.save(appUser);
-//
-//            var cryptoUserId = hashids.encode(appUser.getId());
-//            sendRegistrationMail(cryptoUserId, email);
-//
-//            return "Вам на почту было выслано письмо \n"
-//                    + " перейдите по ссылке в письме для завершения регистрации";
-//        } else {
-//            return "Этот e-mail уже используется, введите корректный адрес эл. почты... \n"
-//                    + "Для отмены команды введите /cancel";
-//        }
         appUser.setEmail(email);
         appUser.setState(WAIT_FOR_PASSWORD_STATE);
         appUserDAO.save(appUser);
@@ -195,6 +182,7 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public String exit(Long chatId, AppUser appUser) {
         appUser.setEmail(null);
+        appUser.setSiteUserId(null);
         appUser.setPhoneNumber(null);
         appUser.setIsActive(false);
         appUser.setState(BASIC_STATE);

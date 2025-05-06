@@ -4,6 +4,7 @@ public enum ServiceCommand {
     EXIT("/quit_accept"),
     QUIT("/quit"),
     HELP("/help"),
+    REMIND("/remind"),
     REGISTRATION("/registration"),
     GET_USER_INFO("/present"),
     STATUS("/status"),
