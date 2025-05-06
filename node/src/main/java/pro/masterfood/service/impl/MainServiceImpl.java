@@ -90,19 +90,24 @@ public class MainServiceImpl implements MainService {
     }
 
     public void processDocMessage(String oneCmessage) {
-        producerService.producerAnswerTo1C("Принятоооо методом обработки очереди из 1С");
-        String message = oneCmessageHandler.getMessageText(oneCmessage);
-        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Принято методом обработки очереди из 1С \n");
+
+        String message = oneCmessageHandler.getMessageText(oneCmessage, sb);
+        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage, sb);
 
         if (listOfChatsIds != null && message != null) {
+            int usersCount = 0;
             for (Long chatId : listOfChatsIds) {
                 sendAnswer(message, chatId); // chatId - это уже telegramUserId
+                usersCount++;
             }
+            sb.append(", сообщение: \"" + message + "\"" + " отправлено" + usersCount + " пользователям");
         } else {
             log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
-            sendAnswer("Ошибкаааа!", 6128969029L);
+            sb.append(", список id пользователей либо поле \"message\" = null");
         }
-//        sendAnswer(message, 6128969029L);
+        producerService.producerAnswerTo1C(sb.toString());
     }
 
     @Override
