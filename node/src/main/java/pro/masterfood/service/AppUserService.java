@@ -12,4 +12,6 @@ public interface AppUserService {
 
     String createReportMail(Long chatId, AppUser appUser);
     String sendReportMail(Long chatId, AppUser appUser, String message);
+
+    String quit(Long chatId, AppUser appUser);
 }

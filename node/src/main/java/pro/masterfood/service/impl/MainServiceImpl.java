@@ -62,7 +62,7 @@ public class MainServiceImpl implements MainService {
             //----------------------------------------------------------------------------------------------------------
             //Все команды имеющие БАСИК_СТЕЙТ обрабатываются в процессСервисеКомманд
             //это основная обрабатывающая комманда которая обрабатывает все текстовые сообщения в том числе сервисные
-            //по сути вообще все, которые не касаются активации пользователя
+            //по сути вообще все, которые не касаются активации пользователя и отправки письма
         } else if (BASIC_STATE.equals(userState)) {
             output = processServiceCommand(chatId, appUser, text);
 
@@ -174,6 +174,9 @@ public class MainServiceImpl implements MainService {
 
         } else if (REPORT.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.createReportMail(chatId, appUser);
+
+        } else if (QUIT.equals(serviceCommand) && appUser.getIsActive()) {
+            return appUserService.quit(chatId, appUser);
         //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();

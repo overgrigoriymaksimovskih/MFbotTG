@@ -184,4 +184,12 @@ public class AppUserServiceImpl implements AppUserService {
             return "Ошибка при отправке фотографий: " + e.getMessage();
         }
     }
+
+    @Override
+    public String quit(Long chatId, AppUser appUser) {
+        appUser.setEmail(null);
+        appUser.setIsActive(false);
+        appUserDAO.save(appUser);
+        return "Вы успешно вышли из аккаунта. Для входа в аккаунт пройдете авторизацию /Activation";
+    }
 }
