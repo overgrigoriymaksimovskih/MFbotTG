@@ -34,45 +34,6 @@ public class ProducerServiceImpl implements ProducerService {
 
     @Override
     public void producerAnswerTo1C(String answerTo1C ) {
-
-        try {
-            // Создаем ObjectMapper для преобразования объекта в JSON
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonMessage = objectMapper.writeValueAsString(answerTo1C); // Преобразуем String в JSON
-
-            // Создаем MessageProperties
-            MessageProperties messageProperties = new MessageProperties();
-            messageProperties.setContentType(MessageProperties.CONTENT_TYPE_JSON); // Указываем ContentType
-            messageProperties.setContentEncoding("UTF-8"); // Указываем кодировку
-
-            // Преобразуем JSON в byte[]
-            byte[] messageBodyBytes = jsonMessage.getBytes("UTF-8");
-
-            // Создаем Message
-            Message message = new Message(messageBodyBytes, messageProperties);
-
-            // Отправляем Message
-            rabbitTemplate.send(answerTo1CQueue, message);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
-//        // Создаем MessageProperties
-//        MessageProperties messageProperties = new MessageProperties();
-//        messageProperties.setContentType(MessageProperties.CONTENT_TYPE_TEXT_PLAIN); // Указываем ContentType
-//        messageProperties.setContentEncoding("UTF-8"); // Указываем кодировку
-//
-//        // Преобразуем строку в byte[]
-//        byte[] messageBodyBytes = answerTo1C.getBytes();
-//
-//        // Создаем Message
-//        Message message = new Message(messageBodyBytes, messageProperties);
-//
-//        // Отправляем Message
-//        rabbitTemplate.send(answerTo1CQueue, message);
-////        rabbitTemplate.convertAndSend(answerTo1CQueue, answerTo1C); // Используем внедренное имя очереди
+        rabbitTemplate.convertAndSend(answerTo1CQueue, answerTo1C); // Используем внедренное имя очереди
     }
 }
