@@ -187,8 +187,16 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String quit(Long chatId, AppUser appUser) {
+        return "Подтвердите выход:\n"
+                + "Хочу выйти: /exit \n"
+                + "Отмена: /cancel";
+    }
+
+    @Override
+    public String exit(Long chatId, AppUser appUser) {
         appUser.setEmail(null);
         appUser.setIsActive(false);
+        appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
         return "Вы успешно вышли из аккаунта. Для входа в аккаунт пройдете авторизацию /Activation";
     }

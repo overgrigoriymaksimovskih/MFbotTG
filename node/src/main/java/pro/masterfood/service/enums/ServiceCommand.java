@@ -1,6 +1,7 @@
 package pro.masterfood.service.enums;
 
 public enum ServiceCommand {
+    EXIT("/exit"),
     QUIT("/quit"),
     HELP("/help"),
     REGISTRATION("/registration"),

@@ -177,6 +177,8 @@ public class MainServiceImpl implements MainService {
 
         } else if (QUIT.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.quit(chatId, appUser);
+        } else if (EXIT.equals(serviceCommand) && appUser.getIsActive()) {
+            return appUserService.exit(chatId, appUser);
         //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();
