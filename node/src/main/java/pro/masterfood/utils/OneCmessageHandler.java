@@ -38,16 +38,16 @@ public class OneCmessageHandler {
             DistributionMessage distributionMessage = objectMapper.readValue(message, DistributionMessage.class);
             List<Long> usersChatIds = new ArrayList<>();
             List<String> userList = distributionMessage.getUserList();
-            sb.append("Список пользователей успешно десериализован из JSON\n");
+            int botUsersCount = 0;
+            sb.append("Список пользователей САЙТА успешно десериализован из JSON\n");
 
             for (String siteUserIdString : userList) { // Итерируемся по списку строк
                 try {
                     Long siteUserId = Long.parseLong(siteUserIdString); // Преобразуем строку в Long
                     List<AppUser> appUsers = appUserDAO.findBySiteUserId(siteUserId);
-                    sb.append("Список пользователей бота для рассылки составлен успешно\n");
-
                     if (!appUsers.isEmpty()) {
                         for (AppUser appUser : appUsers) {
+                            botUsersCount++;
                             Long telegramUserId = appUser.getTelegramUserId();
                             if (telegramUserId != null) {
                                 usersChatIds.add(telegramUserId);
@@ -64,6 +64,8 @@ public class OneCmessageHandler {
                     sb.append("Ошибка при составлении списка пользователей бота для рассылки\n");
                 }
             }
+            sb.append("Список пользователей БОТА для рассылки составлен успешно\n");
+            sb.append("Найдено " + botUsersCount + " пользователей\n");
             return usersChatIds;
 
         } catch (IOException e) {

@@ -102,7 +102,7 @@ public class MainServiceImpl implements MainService {
                 sendAnswer(message, chatId); // chatId - это уже telegramUserId
                 usersCount++;
             }
-            sb.append(", сообщение: \"" + message + "\"" + " отправлено" + usersCount + " пользователям");
+            sb.append("сообщение: \"" + message + "\"" + " отправлено: " + usersCount + " пользователям");
         } else {
             log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
             sb.append(", список id пользователей либо поле \"message\" = null");
