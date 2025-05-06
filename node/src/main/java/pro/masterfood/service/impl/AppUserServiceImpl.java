@@ -8,6 +8,7 @@ import org.hashids.Hashids;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,8 +64,7 @@ public class AppUserServiceImpl implements AppUserService {
         appUser.setState(WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);
         return "ВВЕДИТЕ E-MAIL: \n" +
-                "(Напомнить логин/пароль: \n" +
-                "https://m.master-food.pro/private/forgot/ )";
+                "(Получить СМС с логином/паролем: /remind)";
     }
 
     @Override
