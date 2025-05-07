@@ -50,7 +50,15 @@ public class UserActivationImpl implements UserActivationService {
                 user.setPhoneNumber(res.get("PhoneNumber").toString());
                 user.setSiteUserId(Long.valueOf(res.get("SiteUid").toString()));
                 appUserDAO.save(user);
-                sendAnswer(res.get("Message"), requestParams.getChatId());
+                sendAnswer(res.get("Message\n\n" +
+                        "Список доступных команд: \n"
+                        + "Накопления на подарок и бонусы\n/present\n "
+                        + "Статус текущего заказа\n/status\n   "
+                        + "Отправить жалобу\n /report\n "
+                        + "Отмена выполнения текущей команды\n/cancel\n "
+                        + "\n"
+                        + "Выйти\n/quit"
+                        ), requestParams.getChatId());
             }else{
                 sendAnswer("Ошибка в интерпритации ответа при авторизации \n" + "Введите email..." , requestParams.getChatId());
             }

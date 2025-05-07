@@ -124,7 +124,7 @@ public class MainServiceImpl implements MainService {
         try{
             fileService.processPhoto(update.getMessage(), appUser, message);
 //            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
-            var answer = "Фото успешно загружено. \n\nОТПРАВЬТЕ ТЕКСТ СООБЩЕНИЯ" ;
+            var answer = "Фото успешно загружено. \n\nотправьте текст сообщения:" ;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Произошла ошибка при загрузке фото", ex);
@@ -210,12 +210,12 @@ public class MainServiceImpl implements MainService {
 
     private String helpIsActive() {
         return "Список доступных команд: \n"
-                + "/present - Накопления на подарок и бонусы\n"
-                + "/status  - Статус текущего заказа\n"
-                + "/report  - Отправить жалобу\n"
-                + "/cancel  - Отмена выполнения текущей команды\n"
+                + "Накопления на подарок и бонусы\n/present\n "
+                + "Статус текущего заказа\n/status\n   "
+                + "Отправить жалобу\n /report\n "
+                + "Отмена выполнения текущей команды\n/cancel\n "
                 + "\n"
-                + "/quit - Выйти\n";
+                + "Выйти\n/quit";
     }
 
     private String help() {

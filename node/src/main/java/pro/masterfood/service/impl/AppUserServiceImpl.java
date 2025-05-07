@@ -66,9 +66,10 @@ public class AppUserServiceImpl implements AppUserService {
         }
         appUser.setState(WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);
-        return "ВВЕДИТЕ E-MAIL: \n" +
-                "(Получить СМС с логином/паролем: \n" +
-                "https://m.master-food.pro/private/forgot/ )";
+        return "(Если вы забыли свои \"логин/пароль\" воспользуйтесь СМС-сервисом восстановления:\n" +
+                "https://m.master-food.pro/private/forgot/ )\n\n" +
+                "ВВЕДИТЕ E-MAIL: \n"
+                ;
     }
 
     @Override
