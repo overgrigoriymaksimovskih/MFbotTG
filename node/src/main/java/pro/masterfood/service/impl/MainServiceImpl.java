@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import pro.masterfood.dao.AppUserDAO;
@@ -17,16 +16,10 @@ import pro.masterfood.service.FileService;
 import pro.masterfood.service.MainService;
 import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.enums.ServiceCommand;
+import pro.masterfood.utils.HelpButton;
 import pro.masterfood.utils.OneCmessageHandler;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import static pro.masterfood.enums.UserState.*;
 import static pro.masterfood.service.enums.ServiceCommand.*;
@@ -40,14 +33,16 @@ public class MainServiceImpl implements MainService {
     private final FileService fileService;
     private final AppUserService appUserService;
     private final OneCmessageHandler oneCmessageHandler;
+    private final HelpButton helpButton;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, OneCmessageHandler oneCmessageHandler) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, OneCmessageHandler oneCmessageHandler, HelpButton helpButton) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.fileService = fileService;
         this.appUserService = appUserService;
         this.oneCmessageHandler = oneCmessageHandler;
+        this.helpButton = helpButton;
     }
 
     @Override
@@ -75,11 +70,7 @@ public class MainServiceImpl implements MainService {
             //----------------------------------------------------------------------------------------------------------
             //Все команды с состоянием ОЖИДАЕМ ЕМАЙЛ обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
-            if (REMIND.equals(serviceCommand)){
-                output = "Пожалуйста, поделитесь своим номером телефона, чтобы мы могли отправить на него СМС с логином и паролем:";
-            }else{
-                output = appUserService.setEmail(appUser, text);
-            }
+            output = appUserService.setEmail(appUser, text);
             //Все команды с состоянием ОЖИДАЕМ ПАРОЛЬ обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
             output = appUserService.checkPassword(chatId, appUser, text);
@@ -161,34 +152,17 @@ public class MainServiceImpl implements MainService {
 
 
     private void sendAnswer(String output, Long chatId) {
-        if(output.equals("Пожалуйста, поделитесь своим номером телефона, чтобы мы могли отправить на него СМС с логином и паролем:")){
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(chatId);
-            sendMessage.setText("Пожалуйста, поделитесь своим номером телефона для связи:");
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(output);
+        producerService.producerAnswer(sendMessage);
+    }
 
-            // Создаем клавиатуру
-            ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-            List<KeyboardRow> keyboard = new ArrayList<>();
-            KeyboardRow row = new KeyboardRow();
-
-            // Создаем кнопку "Поделиться контактом"
-            KeyboardButton shareContactButton = new KeyboardButton();
-            shareContactButton.setText("Поделиться контактом");
-            shareContactButton.setRequestContact(true); // Это ключевой момент!
-
-            row.add(shareContactButton);
-            keyboard.add(row);
-            keyboardMarkup.setKeyboard(keyboard);
-            sendMessage.setReplyMarkup(keyboardMarkup);
-
-            producerService.producerAnswer(sendMessage);
-        }
-        else{
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(chatId);
-            sendMessage.setText(output);
-            producerService.producerAnswer(sendMessage);
-        }
+    private void sendHelpButton(Long chatId) {
+        SendMessage sendMessage = helpButton.getHelpMessage(chatId);
+//        sendMessage.setChatId(chatId);
+//        sendMessage.setText(output);
+        producerService.producerAnswer(sendMessage);
     }
 
 
@@ -221,6 +195,7 @@ public class MainServiceImpl implements MainService {
         } else if (START.equals(serviceCommand)) {
             return "Здравствуйте, чтобы посмотреть список доступных команд введите /help";
         } else {
+            sendHelpButton(chatId);
             return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
         }
     }

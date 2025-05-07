@@ -27,6 +27,11 @@ import javax.mail.internet.InternetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+
 import static pro.masterfood.enums.UserState.*;
 
 @Component
@@ -64,7 +69,8 @@ public class AppUserServiceImpl implements AppUserService {
         appUser.setState(WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);
         return "ВВЕДИТЕ E-MAIL: \n" +
-                "(Получить СМС с логином/паролем: /remind)";
+                "(Получить СМС с логином/паролем: \n" +
+                "https://m.master-food.pro/private/forgot/ )";
     }
 
     @Override
