@@ -77,7 +77,7 @@ public class AppUserServiceImpl implements AppUserService {
             InternetAddress emailAddr = new InternetAddress(email);
             emailAddr.validate();
         } catch (AddressException e) {
-            return "Введите пожалуйста корректный адрес. Для отмены команды введите /cancel";
+            return "Введите пожалуйста корректный e-mail адрес. Для отмены команды введите /cancel";
         }
         if(commandPatternChecker.isNotACommand(email)){
             appUser.setEmail(email);
@@ -85,7 +85,8 @@ public class AppUserServiceImpl implements AppUserService {
             appUserDAO.save(appUser);
             return "Введите пароль";
         }else{
-            return "Введите e-mail";
+            return "Введите e-mail\n" +
+            "или отмените процесс авторизации /cancel";
         }
     }
 
@@ -102,7 +103,8 @@ public class AppUserServiceImpl implements AppUserService {
             rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
             return "Отправлено на проверку...";
         }else{
-            return "Введите пароль";
+            return "Введите пароль \n" +
+                    "или отмените процесс авторизации /cancel";
         }
 
     }
@@ -183,7 +185,8 @@ public class AppUserServiceImpl implements AppUserService {
                 return "Ошибка при отправке фотографий: " + e.getMessage();
             }
         }else{
-            return "Введите сообщение чтобы отправить жалобу";
+            return "Введите сообщение чтобы отправить жалобу \n" +
+                    "или отмените процесс отправки жалобы /cancel";
         }
 
     }

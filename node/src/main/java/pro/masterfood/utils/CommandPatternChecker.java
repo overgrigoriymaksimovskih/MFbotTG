@@ -11,6 +11,7 @@ public class CommandPatternChecker {
                 || string.equals("/cancel")
                 || string.equals("/quit")
                 || string.equals("/registration")
+                || string.equals("/help")
         ){
             return false;
         }else{
