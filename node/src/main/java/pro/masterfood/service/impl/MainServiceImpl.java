@@ -193,9 +193,10 @@ public class MainServiceImpl implements MainService {
             return helpIsActive();
         //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
+            sendHelpButton(chatId);
             return "Здравствуйте, чтобы посмотреть список доступных команд введите /help";
         } else {
-            sendHelpButton(chatId);
+
             return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
         }
     }
