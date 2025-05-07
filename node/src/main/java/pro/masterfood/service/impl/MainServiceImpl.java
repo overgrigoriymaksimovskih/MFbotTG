@@ -156,6 +156,7 @@ public class MainServiceImpl implements MainService {
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
+        sendHelpButton(chatId);
     }
 
     private void sendHelpButton(Long chatId) {
@@ -193,10 +194,8 @@ public class MainServiceImpl implements MainService {
             return helpIsActive();
         //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
-            sendHelpButton(chatId);
             return "Здравствуйте, чтобы посмотреть список доступных команд введите /help";
         } else {
-
             return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
         }
     }
