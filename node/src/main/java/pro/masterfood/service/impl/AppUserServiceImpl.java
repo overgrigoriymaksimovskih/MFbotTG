@@ -163,7 +163,7 @@ public class AppUserServiceImpl implements AppUserService {
                 rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
                 appUser.setState(BASIC_STATE);
                 appUserDAO.save(appUser);
-                return "Сообщение отправлено в очередь registrationMailQueue";
+                return "Отправляется...";
 
             } else {
                 appUser.setState(BASIC_STATE);

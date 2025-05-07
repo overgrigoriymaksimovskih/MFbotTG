@@ -69,22 +69,18 @@ public class MainServiceImpl implements MainService {
 
             //----------------------------------------------------------------------------------------------------------
             //Все команды с состоянием ОЖИДАЕМ ЕМАЙЛ обрабатываются отдельной коммандой в АппЮзерСервис
-        } else if (WAIT_FOR_EMAIL_STATE.equals(userState)
-                && !"/help".equals(serviceCommand)) {
+        } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
             //Все команды с состоянием ОЖИДАЕМ ПАРОЛЬ обрабатываются отдельной коммандой в АппЮзерСервис
-        } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)
-                && !"/help".equals(serviceCommand)) {
+        } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
             output = appUserService.checkPassword(chatId, appUser, text);
             //Все команды с состоянием ОЖИДАЕМ ОТВЕТ возвращают ответ ОБОЖДИТЕ...
-        } else if (WAIT_FOR_ANSWER.equals(userState)
-                && !"/help".equals(serviceCommand)) {
+        } else if (WAIT_FOR_ANSWER.equals(userState)) {
             output = "Дождитесь выполнения команды... Если команда выполняется слишком долго - отмените ее...";
             //----------------------------------------------------------------------------------------------------------
 
             //Все команды с состоянием ОЖИДАЕМ СООБЩЕНИЕ ДЛЯ РЕПОРТА обрабатываются отдельной коммандой в АппЮзерСервис
-        } else if (WAIT_FOR_REPORT_MESSAGE.equals(userState)
-                && !"/help".equals(serviceCommand)) {
+        } else if (WAIT_FOR_REPORT_MESSAGE.equals(userState)) {
             output = appUserService.sendReportMail(chatId, appUser, text);
             //----------------------------------------------------------------------------------------------------------
         } else {
@@ -214,9 +210,9 @@ public class MainServiceImpl implements MainService {
     private String helpIsActive() {
         return "Список доступных команд: \n"
                 + "/present - Накопления на подарок и бонусы\n"
-                + "/status - Статус текущего заказа\n"
-                + "/report - Отправить жалобу\n"
-                + "/cancel - Отмена выполнения текущей команды\n"
+                + "/status  - Статус текущего заказа\n"
+                + "/report  - Отправить жалобу\n"
+                + "/cancel  - Отмена выполнения текущей команды\n"
                 + "\n"
                 + "/quit - Выйти\n";
     }

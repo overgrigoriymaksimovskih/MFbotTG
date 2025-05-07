@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Getter
 @Configuration
@@ -23,7 +26,11 @@ public class RabbitConfiguration {
 
     @Bean
     public Queue textMessageQueue() {
-        return new Queue(registrationMailQueue);
+        //установим время жизни для сообщения после его попадания в очередь, на случай если консьюмер
+        // не сможет его обработать по какой то причине
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-message-ttl", 6000);
+        return new Queue(registrationMailQueue, true, false, false, args);
     }
 
 }
