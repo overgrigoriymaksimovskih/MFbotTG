@@ -124,7 +124,7 @@ public class MainServiceImpl implements MainService {
         try{
             fileService.processPhoto(update.getMessage(), appUser, message);
 //            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
-            var answer = "Фото успешно загружено. \nОТПРАВЬТЕ ТЕКСТ СООБЩЕНИЯ" ;
+            var answer = "Фото успешно загружено. \n\nОТПРАВЬТЕ ТЕКСТ СООБЩЕНИЯ" ;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Произошла ошибка при загрузке фото", ex);
@@ -137,8 +137,8 @@ public class MainServiceImpl implements MainService {
     private boolean isNotAllowToSendContent(Long chatId, AppUser appUser) {
         var userState = appUser.getState();
         if(!appUser.getIsActive()){
-            var error = "Зарегистрируйтесь или активируйте "
-                + "свою учетную запись для загрузки контента";
+            var error = "Активируйте "
+                + "свою учетную запись";
             sendAnswer(error, chatId);
             return true;
         } else if (!WAIT_FOR_REPORT_MESSAGE.equals(userState)) {
@@ -195,13 +195,14 @@ public class MainServiceImpl implements MainService {
             return helpIsActive();
         //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
-            return "Здравствуйте, для использования бота авторизуйтесь" +
-                    "с тем же логином и паролем," +
-                    "которые используете для входа в личный кабинет" +
-                    "на сайте master-food.pro" +
-                    "если Вы еще не зарегистрированы на сайте" +
-                    "пройдите регистрацию: https://m.master-food.pro/private/register_new/" +
-                    "чтобы посмотреть список доступных команд введите /help";
+            return "Здравствуйте, для использования бота авторизуйтесь " +
+                    "с тем же логином и паролем, " +
+                    "которые используете для входа в личный кабинет " +
+                    "на сайте master-food.pro " +
+                    "если Вы еще не зарегистрированы на сайте " +
+                    "пройдите регистрацию: https://m.master-food.pro/private/register_new/ " +
+                    "\n" +
+                    "Авторизоваться в боте /registration";
         } else {
             return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
         }
@@ -219,8 +220,8 @@ public class MainServiceImpl implements MainService {
 
     private String help() {
         return "Список доступных команд: \n"
-                + "/cancel - Отмена выполнения текущей команды\n"
-                + "/registration - Авторизоваться в боте\n";
+                + "/registration - Авторизоваться в боте\n"
+                + "/cancel - Отмена выполнения текущей команды\n";
     }
 
     private String cancelProcess(AppUser appUser) {

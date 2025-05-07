@@ -5,7 +5,6 @@ package pro.masterfood.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.hashids.Hashids;
-import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 
@@ -27,10 +26,7 @@ import javax.mail.internet.InternetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import pro.masterfood.utils.CommandPatternChecker;
 
 import static pro.masterfood.enums.UserState.*;
 
@@ -39,12 +35,14 @@ public class AppUserServiceImpl implements AppUserService {
     private static final Logger log = LoggerFactory.getLogger(AppUserServiceImpl.class);
     private final RabbitTemplate rabbitTemplate;
     private final AppUserDAO appUserDAO;
+    private final CommandPatternChecker commandPatternChecker;
     private final AppPhotoDAO appPhotoDAO;
     private final Hashids hashids;
 
-    public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, AppPhotoDAO appPhotoDAO, Hashids hashids) {
+    public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, CommandPatternChecker commandPatternChecker, AppPhotoDAO appPhotoDAO, Hashids hashids) {
         this.appUserDAO = appUserDAO;
         this.rabbitTemplate = rabbitTemplate;
+        this.commandPatternChecker = commandPatternChecker;
         this.appPhotoDAO = appPhotoDAO;
         this.hashids = hashids;
     }
@@ -81,25 +79,32 @@ public class AppUserServiceImpl implements AppUserService {
         } catch (AddressException e) {
             return "Введите пожалуйста корректный адрес. Для отмены команды введите /cancel";
         }
-        appUser.setEmail(email);
-        appUser.setState(WAIT_FOR_PASSWORD_STATE);
-        appUserDAO.save(appUser);
-        return "Введите пароль";
+        if(commandPatternChecker.isNotACommand(email)){
+            appUser.setEmail(email);
+            appUser.setState(WAIT_FOR_PASSWORD_STATE);
+            appUserDAO.save(appUser);
+            return "Введите пароль";
+        }else{
+            return "Введите e-mail";
+        }
     }
 
     @Override
     public String checkPassword(Long chatId, AppUser appUser, String password) {
-//        String email = appUser.getEmail();
-//        sendLoginPassword(email, password);
-        var loginParams = RequestParams.builder()
-                .requestType(RequestsToREST.LOGIN_REQUEST)
-                .id(appUser.getId())
-                .chatId(chatId)
-                .email(appUser.getEmail())
-                .password(password)
-                .build();
-        rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
-        return "Отправлено на проверку...";
+        if(commandPatternChecker.isNotACommand(password)){
+            var loginParams = RequestParams.builder()
+                    .requestType(RequestsToREST.LOGIN_REQUEST)
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .email(appUser.getEmail())
+                    .password(password)
+                    .build();
+            rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
+            return "Отправлено на проверку...";
+        }else{
+            return "Введите пароль";
+        }
+
     }
 
     @Override
@@ -135,47 +140,52 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     @Transactional // Важно!
     public String sendReportMail(Long chatId, AppUser appUser, String message) {
-        try {
-            AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null);
-            StringBuilder resultMesssage = new StringBuilder(message + "\n");
-            if (userForSession != null) {
-                List<AppPhoto> appPhotos = userForSession.getPhotos();
+        if(commandPatternChecker.isNotACommand(message)){
+            try {
+                AppUser userForSession = appUserDAO.findById(appUser.getId()).orElse(null);
+                StringBuilder resultMesssage = new StringBuilder(message + "\n");
+                if (userForSession != null) {
+                    List<AppPhoto> appPhotos = userForSession.getPhotos();
 
-                List<byte[]> attachments = new ArrayList<>();
-                for (AppPhoto appPhoto : appPhotos) {
-                    if (appPhoto.getBinaryContent() != null) {
-                        if (appPhoto.getMessage() != null){
-                            resultMesssage.append("\n + Дополнительный текст к фото во вложении: " + appPhoto.getMessage());
+                    List<byte[]> attachments = new ArrayList<>();
+                    for (AppPhoto appPhoto : appPhotos) {
+                        if (appPhoto.getBinaryContent() != null) {
+                            if (appPhoto.getMessage() != null){
+                                resultMesssage.append("\n + Дополнительный текст к фото во вложении: " + appPhoto.getMessage());
+                            }
+                            byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
+                            attachments.add(binaryContent);
                         }
-                        byte[] binaryContent = appPhoto.getBinaryContent().getFileAsArrayOfBytes();
-                        attachments.add(binaryContent);
                     }
-                }
-                var mailParams = MailParams.builder()
-                        .id(appUser.getId())
-                        .chatId(chatId)
-                        .email(appUser.getEmail())
-                        .siteUid(appUser.getSiteUserId())
-                        .phoneNumber(appUser.getPhoneNumber())
-                        .message(resultMesssage.toString())
-                        .photos(attachments)
-                        .build();
-                rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
-                appUser.setState(BASIC_STATE);
-                appUserDAO.save(appUser);
-                return "Отправляется...";
+                    var mailParams = MailParams.builder()
+                            .id(appUser.getId())
+                            .chatId(chatId)
+                            .email(appUser.getEmail())
+                            .siteUid(appUser.getSiteUserId())
+                            .phoneNumber(appUser.getPhoneNumber())
+                            .message(resultMesssage.toString())
+                            .photos(attachments)
+                            .build();
+                    rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+                    appUser.setState(BASIC_STATE);
+                    appUserDAO.save(appUser);
+                    return "Отправляется...";
 
-            } else {
+                } else {
+                    appUser.setState(BASIC_STATE);
+                    appUserDAO.save(appUser);
+                    return "Пользователь не найден в методе sendReportMail";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
                 appUser.setState(BASIC_STATE);
                 appUserDAO.save(appUser);
-                return "Пользователь не найден в методе sendReportMail";
+                return "Ошибка при отправке фотографий: " + e.getMessage();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            appUser.setState(BASIC_STATE);
-            appUserDAO.save(appUser);
-            return "Ошибка при отправке фотографий: " + e.getMessage();
+        }else{
+            return "Введите сообщение чтобы отправить жалобу";
         }
+
     }
 
     @Override
@@ -195,4 +205,5 @@ public class AppUserServiceImpl implements AppUserService {
         appUserDAO.save(appUser);
         return "Вы успешно вышли из аккаунта. Для входа в аккаунт пройдете авторизацию /registration";
     }
+
 }
