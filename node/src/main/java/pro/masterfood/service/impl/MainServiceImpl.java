@@ -152,11 +152,12 @@ public class MainServiceImpl implements MainService {
 
 
     private void sendAnswer(String output, Long chatId) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
+//        SendMessage sendMessage = new SendMessage();
+//        sendMessage.setChatId(chatId);
+        SendMessage sendMessage = helpButton.getHelpMessage(chatId);
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
-        sendHelpButton(chatId);
+//        sendHelpButton(chatId);
     }
 
     private void sendHelpButton(Long chatId) {
