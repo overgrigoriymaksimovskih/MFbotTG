@@ -15,7 +15,7 @@ public class HelpButton {
     public SendMessage getHelpMessage(Long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText("Доступные команды:\n/help - Показать справку");
+//        message.setText("Доступные команды:\n/help - Показать справку");
 
         // Создаем клавиатуру
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
