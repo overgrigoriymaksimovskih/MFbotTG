@@ -39,29 +39,11 @@ public class MailSenderServiceImpl  implements MailSenderService {
         this.fileTypeDetector = fileTypeDetector;
     }
 
-//    public void sendSimpleEmail(String to, String subject, String text, MailParams mailParams) {
-//        try {
-//            MimeMessage message = javaMailSender.createMimeMessage();
-//            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8"); // Укажем кодировку UTF-8
-//
-//            helper.setTo(to);
-//            helper.setSubject(subject);
-//            helper.setText(text, false); // false означает, что это plain text
-//
-//            javaMailSender.send(message);
-//            sendAnswer("Успешно отправлено MailSenderServiceImpl", mailParams.getChatId());
-//        } catch (MessagingException e) {
-//            sendAnswer("Ошибка при отправке письма (MessagingException): " + e.getMessage(), mailParams.getChatId());
-//        } catch (MailException e) {
-//            sendAnswer("Ошибка при отправке письма (MailException): " + e.getMessage(), mailParams.getChatId());
-//        }
-//    }
-
 
     @Override
     public void send(MailParams mailParams) {
 
-        sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
+//        sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
         var emailTo = "master-2m@yandex.ru";
 
         try {
@@ -104,9 +86,9 @@ public class MailSenderServiceImpl  implements MailSenderService {
 
             javaMailSender.send(message);
             if(attachments == 0){
-                sendAnswer("Успешно отправлено MailSenderServiceImpl (без фото)", mailParams.getChatId());
+                sendAnswer("Успешно отправлено (без фото)", mailParams.getChatId());
             }else{
-                sendAnswer("Успешно отправлено MailSenderServiceImpl (с " + attachments +" фото)", mailParams.getChatId());
+                sendAnswer("Успешно отправлено (с " + attachments +" фото)", mailParams.getChatId());
             }
 
         } catch (MessagingException e) {

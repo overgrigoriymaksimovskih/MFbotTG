@@ -31,7 +31,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @PostConstruct
     public void init(){
         updateController.registerBot(this);
-        setBotCommands();  // Вызываем метод для установки команд
+        setBotCommands();  // Установка команд
     }
 
     @Override
@@ -61,9 +61,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     // Метод для установки команд
     public void setBotCommands() {
         List<BotCommand> listOfCommands = new ArrayList<>();
-        listOfCommands.add(new BotCommand("/start", "Запустить бота"));
-        listOfCommands.add(new BotCommand("/help", "Получить справку"));
-        listOfCommands.add(new BotCommand("/myinfo", "Показать информацию о себе"));
+        listOfCommands.add(new BotCommand("/present", "Накопления на подарок и бонусы"));
+        listOfCommands.add(new BotCommand("/status", "Статус текущего заказа"));
+        listOfCommands.add(new BotCommand("/report", "Отправить жалобу"));
+        listOfCommands.add(new BotCommand("/cancel", "Отмена выполнения текущей команды"));
+        listOfCommands.add(new BotCommand("/quit", "Выйти"));
 
         try {
             SetMyCommands setMyCommands = new SetMyCommands();

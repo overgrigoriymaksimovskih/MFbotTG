@@ -69,23 +69,27 @@ public class MainServiceImpl implements MainService {
 
             //----------------------------------------------------------------------------------------------------------
             //Все команды с состоянием ОЖИДАЕМ ЕМАЙЛ обрабатываются отдельной коммандой в АппЮзерСервис
-        } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
+        } else if (WAIT_FOR_EMAIL_STATE.equals(userState)
+                && !"/help".equals(serviceCommand)) {
             output = appUserService.setEmail(appUser, text);
             //Все команды с состоянием ОЖИДАЕМ ПАРОЛЬ обрабатываются отдельной коммандой в АппЮзерСервис
-        } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
+        } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)
+                && !"/help".equals(serviceCommand)) {
             output = appUserService.checkPassword(chatId, appUser, text);
             //Все команды с состоянием ОЖИДАЕМ ОТВЕТ возвращают ответ ОБОЖДИТЕ...
-        } else if (WAIT_FOR_ANSWER.equals(userState)) {
+        } else if (WAIT_FOR_ANSWER.equals(userState)
+                && !"/help".equals(serviceCommand)) {
             output = "Дождитесь выполнения команды... Если команда выполняется слишком долго - отмените ее...";
             //----------------------------------------------------------------------------------------------------------
 
             //Все команды с состоянием ОЖИДАЕМ СООБЩЕНИЕ ДЛЯ РЕПОРТА обрабатываются отдельной коммандой в АппЮзерСервис
-        } else if (WAIT_FOR_REPORT_MESSAGE.equals(userState)) {
+        } else if (WAIT_FOR_REPORT_MESSAGE.equals(userState)
+                && !"/help".equals(serviceCommand)) {
             output = appUserService.sendReportMail(chatId, appUser, text);
             //----------------------------------------------------------------------------------------------------------
         } else {
             log.error("Unknown user state: " + userState);
-            output = "Неизвестная ошибка! введите /cancel и попробуйте снова...";
+            output = "Ошибка! Завершите текущую операцию, либо введите /cancel и попробуйте снова...";
         }
         sendAnswer(output, chatId);
     }
@@ -124,8 +128,8 @@ public class MainServiceImpl implements MainService {
         try{
             fileService.processPhoto(update.getMessage(), appUser, message);
 //            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
-            var answer = "Фото успешно загружено." ;//+ link;
-            sendAnswer(answer + chatId, chatId);
+            var answer = "Фото успешно загружено. \nОТПРАВЬТЕ ТЕКСТ СООБЩЕНИЯ" ;
+            sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Произошла ошибка при загрузке фото", ex);
             String error = "Не удалось загрузить ФОТО... " + ex.getMessage();
@@ -195,7 +199,13 @@ public class MainServiceImpl implements MainService {
             return helpIsActive();
         //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
-            return "Здравствуйте, чтобы посмотреть список доступных команд введите /help";
+            return "Здравствуйте, для использования бота авторизуйтесь" +
+                    "с тем же логином и паролем," +
+                    "которые используете для входа в личный кабинет" +
+                    "на сайте master-food.pro" +
+                    "если Вы еще не зарегистрированы на сайте" +
+                    "пройдите регистрацию: https://m.master-food.pro/private/register_new/" +
+                    "чтобы посмотреть список доступных команд введите /help";
         } else {
             return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
         }
@@ -203,18 +213,18 @@ public class MainServiceImpl implements MainService {
 
     private String helpIsActive() {
         return "Список доступных команд: \n"
-                + "/present - накоплено на подарок\n"
-                + "/status - статус текущего заказа\n"
-                + "/report - отправить жалобу\n"
-                + "/cancel - отмена выполнения текущей команды\n"
+                + "/present - Накопления на подарок и бонусы\n"
+                + "/status - Статус текущего заказа\n"
+                + "/report - Отправить жалобу\n"
+                + "/cancel - Отмена выполнения текущей команды\n"
                 + "\n"
-                + "/quit - выйти\n";
+                + "/quit - Выйти\n";
     }
 
     private String help() {
         return "Список доступных команд: \n"
-                + "/cancel - отмена выполнения текущей команды\n"
-                + "/registration - регистрация пользователя\n";
+                + "/cancel - Отмена выполнения текущей команды\n"
+                + "/registration - Авторизоваться в боте\n";
     }
 
     private String cancelProcess(AppUser appUser) {

@@ -96,25 +96,4 @@ public class FileController {
             return ResponseEntity.internalServerError().body(result); // Возвращаем JSON строку с ошибкой
         }
     }
-//    @RequestMapping(method = RequestMethod.GET, value = "/confirm-email")
-//    public void confirmEmail(@RequestParam("id") String id, HttpServletResponse response){
-//        //TODO для формирования БадРеквест добавить ControllerAdvice
-//        var photo = fileService.getPhoto(id);
-//        if (photo == null){
-//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//            return;
-//        }
-//        response.setContentType(MediaType.IMAGE_JPEG.toString());
-//        response.setHeader("Content-disposition", "attachment;");
-//        response.setStatus(HttpServletResponse.SC_OK);
-//
-//        var binaryContent = photo.getBinaryContent();
-//        try (var out = response.getOutputStream()) {
-//            out.write(binaryContent.getFileAsArrayOfBytes());
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//        }
-//
-//    }
 }
