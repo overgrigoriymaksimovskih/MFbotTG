@@ -35,7 +35,7 @@ public class HelpButton {
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);
 
-        message.setParseMode("MarkdownV2");
+//        message.setParseMode("MarkdownV2");
         message.setDisableWebPagePreview(true); // Отключаем сниппеты
 
         return message;
