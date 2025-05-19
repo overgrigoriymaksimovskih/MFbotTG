@@ -12,6 +12,8 @@ public class MessageUtils {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId().toString());
         sendMessage.setText(text);
+        sendMessage.setParseMode("HTML");
+
         return sendMessage;
     }
 }
