@@ -63,10 +63,10 @@ public class ProductConsultant {
         }
 
         StringBuilder details = new StringBuilder();
-        details.append("<b>").append(offer.getName()).append("</b>\n");
+        details.append("*").append(escapeMarkdown(offer.getName())).append("*\n"); // Жирный шрифт
         details.append("Цена: ").append(offer.getPrice()).append(" ").append(offer.getCurrencyId()).append("\n");
-        details.append("Описание: ").append(offer.getDescription()).append("\n");
-        details.append("Ссылка: <a href=\"").append(offer.getUrl()).append("\">Перейти на сайт</a>\n");
+        details.append("Описание: ").append(escapeMarkdown(offer.getDescription())).append("\n");
+        details.append("[Перейти на сайт](").append(offer.getUrl()).append(")\n"); // Ссылка
 
         return details.toString();
     }
@@ -100,4 +100,11 @@ public class ProductConsultant {
         return result.toString();
     }
 
+    private String escapeMarkdown(String text) {
+        if (text == null) return "";
+        return text.replace("_", "\\_")
+                .replace("*", "\\*")
+                .replace("[", "\\[")
+                .replace("`", "\\`");
+    }
 }
