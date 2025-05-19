@@ -48,13 +48,15 @@ public class ProductConsultant {
             return "Мы искали товар " + offerId + " - Товар не найден.";
         }
 
+        String escapedName = escapeMarkdown(offer.getName());
+        String url = offer.getUrl(); // Не экранируем URL целиком!
         StringBuilder details = new StringBuilder();
-        details.append("").append(escapeMarkdown(offer.getName())).append("\n");
+        details.append("*").append(escapedName).append("*\n");
         details.append("Цена: ").append(offer.getPrice()).append(" ").append(offer.getCurrencyId()).append("\n");
-        details.append("\n").append(escapeMarkdown(offer.getDescription())).append("\n");
-        details.append("[Смотреть на сайте](").append(escapeMarkdown(offer.getUrl())).append(")\n"); // Inline ссылка
-
+        details.append("Описание: ").append(escapeMarkdown(offer.getDescription())).append("\n");
+        details.append("[Смотреть на сайте](").append(url).append(")\n"); // Используем URL без экранирования
         return details.toString();
+
     }
     @Scheduled(fixedRate = 3600000) // Каждые 60 минут (1 час)
     public void reloadData() {
@@ -99,9 +101,13 @@ public class ProductConsultant {
     }
     private String escapeMarkdown(String text) {
         if (text == null) return "";
-        return text.replace("_", "\\_")
-                .replace("*", "\\*")
-                .replace("[", "\\[")
-                .replace("`", "\\`");
+        StringBuilder sb = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            if ("[]()".contains(String.valueOf(c))) { // Экранируем только скобки
+                sb.append("\\");
+            }
+            sb.append(c);
+        }
+        return sb.toString();
     }
 }
