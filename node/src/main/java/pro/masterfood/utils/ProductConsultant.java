@@ -51,7 +51,7 @@ public class ProductConsultant {
         String escapedName = escapeMarkdown(offer.getName());
         String url = offer.getUrl(); // Не экранируем URL целиком!
         StringBuilder details = new StringBuilder();
-        details.append("").append(escapedName).append("*\n");
+        details.append("").append(escapedName).append("\n");
         details.append("Цена: ").append(offer.getPrice()).append(" ").append(offer.getCurrencyId()).append("\n");
         details.append("\n").append(escapeMarkdown(offer.getDescription())).append("\n");
         details.append("").append(url); // Используем URL без экранирования
