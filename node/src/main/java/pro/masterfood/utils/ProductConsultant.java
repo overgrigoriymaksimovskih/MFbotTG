@@ -73,8 +73,10 @@ public class ProductConsultant {
 
     public String getOfferDetails(String offerId) {
         List<Map<String, Object>> allOffers = getAllOffers();
-        if (allOffers == null || allOffers.isEmpty()) {
-            return "Товар не найден.";
+        if (allOffers == null) {
+            return "Товар не найден. Потому что список всех товаров полученный из getOfferDetails is null";
+        }else if (allOffers.isEmpty()){
+            return "Товар не найден. Потому что список всех товаров полученный из getOfferDetails пуст";
         }
 
         Map<String, Object> offer = allOffers.stream()
@@ -83,7 +85,7 @@ public class ProductConsultant {
                 .orElse(null);
 
         if (offer == null) {
-            return "Товар не найден.";
+            return "Мы искали товар " + offerId + " - Товар не найден.";
         }
 
         StringBuilder details = new StringBuilder();
