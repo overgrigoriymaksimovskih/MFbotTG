@@ -12,8 +12,7 @@ public class MessageUtils {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId().toString());
         sendMessage.setText(text);
-        sendMessage.setParseMode("MarkdownV2");
-        sendMessage.setDisableWebPagePreview(true); // Отключаем сниппеты
+
 
         return sendMessage;
     }

@@ -159,6 +159,8 @@ public class MainServiceImpl implements MainService {
 //        sendMessage.setChatId(chatId);
         SendMessage sendMessage = helpButton.getHelpMessage(chatId);
         sendMessage.setText(output);
+        sendMessage.setParseMode("MarkdownV2");
+        sendMessage.setDisableWebPagePreview(true); // Отключаем сниппеты
         producerService.producerAnswer(sendMessage);
 //        sendHelpButton(chatId);
     }
