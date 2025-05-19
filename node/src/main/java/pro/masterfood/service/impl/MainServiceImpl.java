@@ -18,6 +18,7 @@ import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.enums.ServiceCommand;
 import pro.masterfood.utils.HelpButton;
 import pro.masterfood.utils.OneCmessageHandler;
+import pro.masterfood.utils.ProductConsultant;
 
 import java.util.List;
 
@@ -32,15 +33,17 @@ public class MainServiceImpl implements MainService {
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
     private final AppUserService appUserService;
+    private final ProductConsultant productConsultant;
     private final OneCmessageHandler oneCmessageHandler;
     private final HelpButton helpButton;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, OneCmessageHandler oneCmessageHandler, HelpButton helpButton) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, ProductConsultant productConsultant, OneCmessageHandler oneCmessageHandler, HelpButton helpButton) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.fileService = fileService;
         this.appUserService = appUserService;
+        this.productConsultant = productConsultant;
         this.oneCmessageHandler = oneCmessageHandler;
         this.helpButton = helpButton;
     }
@@ -204,7 +207,9 @@ public class MainServiceImpl implements MainService {
                     "\n" +
                     "Авторизоваться в боте /registration";
         } else {
-            return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
+//            return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
+            String offerDetails = productConsultant.getOfferDetails(cmd);
+            return offerDetails;
         }
     }
 

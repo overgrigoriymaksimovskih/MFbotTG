@@ -32,6 +32,9 @@
         <hashids.version>1.0.1</hashids.version>
         <liquibase-core.version>4.24.0</liquibase-core.version>
         <io.github.cdimascio.version>3.0.0</io.github.cdimascio.version>
+        <!--
+        <jsoup.version>1.17.2</jsoup.version>
+        -->
 
         <lombok.servion>1.18.30</lombok.servion>
 
@@ -171,6 +174,13 @@
             <artifactId>dotenv-java</artifactId>
             <version>${io.github.cdimascio.version}</version>
         </dependency>
+
+        <!-- Для парсинга YML списка товаров:
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+        </dependency>-->
 
         <dependency>
         <groupId>org.projectlombok</groupId>
