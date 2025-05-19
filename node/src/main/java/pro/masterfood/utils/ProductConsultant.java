@@ -1,86 +1,60 @@
 package pro.masterfood.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
 public class ProductConsultant {
 
-//    private static final Logger log = LoggerFactory.getLogger(ProductConsultant.class);
-    private final Map<String, Object> data;
+    private static final Logger log = LoggerFactory.getLogger(ProductConsultant.class);
+    private final YmlCatalog ymlCatalog;
 
     public ProductConsultant() {
-        this.data = loadDataFromYaml();
+        this.ymlCatalog = loadDataFromXml();
     }
 
-    private Map<String, Object> loadDataFromYaml() {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("products.xml")) { // Changed to xml
+    private YmlCatalog loadDataFromXml() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("products.xml")) {
             if (inputStream == null) {
-//                log.error("Не удалось найти файл products.xml");
-                return new HashMap<>();
+                log.error("Не удалось найти файл products.xml");
+                return null;
             }
-            Yaml yaml = new Yaml();
-            return yaml.load(inputStream); // Load as generic Map
+
+            JAXBContext jaxbContext = JAXBContext.newInstance(YmlCatalog.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (YmlCatalog) unmarshaller.unmarshal(inputStream);
+
+        } catch (JAXBException e) {
+            log.error("Ошибка при загрузке XML файла: {}", e.getMessage(), e);
+            return null;
         } catch (Exception e) {
-//            log.error("Ошибка при загрузке YML файла: {}", e.getMessage(), e);
-            return new HashMap<>();
+            log.error("Неизвестная ошибка при загрузке XML файла: {}", e.getMessage(), e);
+            return null;
         }
-    }
-
-    public List<Map<String, Object>> getAllOffers() {
-        try {
-            Map<String, Object> ymlCatalog = (Map<String, Object>) data.get("yml_catalog");
-            Map<String, Object> shop = (Map<String, Object>) ymlCatalog.get("shop");
-            Map<String, Object> offers = (Map<String, Object>) shop.get("offers");
-            List<Map<String, Object>> offerList = (List<Map<String, Object>>) ((Map<?, ?>) offers).get("offer"); // Corrected type casting
-            return offerList;
-        } catch (Exception e) {
-//            log.error("Ошибка при получении списка товаров: {}", e.getMessage(), e);
-            return new ArrayList<>();
-        }
-    }
-
-    public List<Map<String, Object>> findOffersByCategoryId(String categoryId) {
-        List<Map<String, Object>> allOffers = getAllOffers();
-        if (allOffers == null || allOffers.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return allOffers.stream()
-                .filter(offer -> Objects.equals(offer.get("categoryId"), categoryId))
-                .collect(Collectors.toList());
-    }
-
-    public List<Map<String, Object>> findOffersByName(String name) {
-        List<Map<String, Object>> allOffers = getAllOffers();
-        if (allOffers == null || allOffers.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return allOffers.stream()
-                .filter(offer -> {
-                    String offerName = (String) offer.get("name");
-                    return offerName != null && offerName.toLowerCase().contains(name.toLowerCase());
-                })
-                .collect(Collectors.toList());
     }
 
     public String getOfferDetails(String offerId) {
-        List<Map<String, Object>> allOffers = getAllOffers();
-        if (allOffers == null) {
-            return "Товар не найден. Потому что список всех товаров полученный из getOfferDetails is null";
-        }else if (allOffers.isEmpty()){
-            return "Товар не найден. Потому что список всех товаров полученный из getOfferDetails пуст";
+        if (ymlCatalog == null || ymlCatalog.getShop() == null || ymlCatalog.getShop().getOffers() == null) {
+            return "Товар не найден.";
         }
 
-        Map<String, Object> offer = allOffers.stream()
-                .filter(o -> Objects.equals(o.get("id"), offerId))
+        List<Offer> allOffers = ymlCatalog.getShop().getOffers().getOffer();
+        if (allOffers == null || allOffers.isEmpty()) {
+            return "Товар не найден.";
+        }
+
+        Offer offer = allOffers.stream()
+                .filter(o -> Objects.equals(o.getId(), offerId))
                 .findFirst()
                 .orElse(null);
 
@@ -89,11 +63,41 @@ public class ProductConsultant {
         }
 
         StringBuilder details = new StringBuilder();
-        details.append("<b>").append(offer.get("name")).append("</b>\n");
-        details.append("Цена: ").append(offer.get("price")).append(" ").append(offer.get("currencyId")).append("\n");
-        details.append("Описание: ").append(offer.get("description")).append("\n");
-        details.append("Ссылка: <a href=\"").append(offer.get("url")).append("\">Перейти на сайт</a>\n");
+        details.append("<b>").append(offer.getName()).append("</b>\n");
+        details.append("Цена: ").append(offer.getPrice()).append(" ").append(offer.getCurrencyId()).append("\n");
+        details.append("Описание: ").append(offer.getDescription()).append("\n");
+        details.append("Ссылка: <a href=\"").append(offer.getUrl()).append("\">Перейти на сайт</a>\n");
 
         return details.toString();
     }
+    // Добавляем метод для поиска по имени
+    public String findOffersByName(String productName) {
+        if (ymlCatalog == null || ymlCatalog.getShop() == null || ymlCatalog.getShop().getOffers() == null) {
+            return "Товары не найдены.";
+        }
+
+        List<Offer> allOffers = ymlCatalog.getShop().getOffers().getOffer();
+        if (allOffers == null || allOffers.isEmpty()) {
+            return "Товары не найдены.";
+        }
+
+        List<Offer> foundOffers = allOffers.stream()
+                .filter(offer -> offer.getName().toLowerCase().contains(productName.toLowerCase()))
+                .collect(Collectors.toList());
+
+        if (foundOffers.isEmpty()) {
+            return "Товары с названием \"" + productName + "\" не найдены.";
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (Offer offer : foundOffers) {
+            result.append("<b>").append(offer.getName()).append("</b>\n");
+            result.append("Цена: ").append(offer.getPrice()).append(" ").append(offer.getCurrencyId()).append("\n");
+            result.append("Описание: ").append(offer.getDescription()).append("\n");
+            result.append("Ссылка: <a href=\"").append(offer.getUrl()).append("\">Перейти на сайт</a>\n");
+            result.append("------\n"); // Разделитель между товарами
+        }
+        return result.toString();
+    }
+
 }

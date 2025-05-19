@@ -175,12 +175,19 @@
             <version>${io.github.cdimascio.version}</version>
         </dependency>
 
-        <!-- Для парсинга YML списка товаров:
+        <!-- Для парсинга XML списка товаров:-->
         <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>${jsoup.version}</version>
-        </dependency>-->
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.1</version> <!-- Или самая последняя версия -->
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.4</version> <!-- Или самая последняя версия -->
+        </dependency>
+
+
 
         <dependency>
         <groupId>org.projectlombok</groupId>
