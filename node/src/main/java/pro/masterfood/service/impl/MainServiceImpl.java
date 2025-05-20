@@ -216,10 +216,10 @@ public class MainServiceImpl implements MainService {
 
     private String helpIsActive() {
         return "Список доступных команд: \n"
-                + "Накопления на подарок и бонусы: /present\n "
-                + "Статус текущего заказа: /status\n   "
+                + "Накопления на подарок и бонусы: /present\n"
+                + "Статус текущего заказа: /status\n"
                 + "Отправить жалобу: /report\n "
-                + "Отмена выполнения текущей команды: /cancel\n "
+                + "Отмена выполнения текущей команды: /cancel\n"
                 + "\n"
                 + "Выйти: /quit";
     }

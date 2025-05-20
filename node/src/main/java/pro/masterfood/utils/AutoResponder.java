@@ -296,7 +296,7 @@ public class AutoResponder {
             if (matcher.find()) {
                 List<String> responses = entry.getValue();
                 // Выбираем случайный ответ из списка
-                return responses.get(new Random().nextInt(responses.size())) + "\n Оформить заказ можно на нашем сайте (Кнопка \"На сайт\" в левом нижнем углу)\nЧтобы увидеть список команд введите /help";
+                return responses.get(new Random().nextInt(responses.size())) + "\n\nОформить заказ можно на нашем сайте (Кнопка \"На сайт\" в левом нижнем углу).\nЧтобы увидеть список команд введите /help";
             }
         }
         return "Упс... Странная ошибка, я не знаю что ответить Но и товар искать не буду... Очень странно... Такого не должно было случиться никогда";

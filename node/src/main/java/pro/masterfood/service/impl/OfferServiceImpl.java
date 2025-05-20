@@ -27,9 +27,10 @@ public class OfferServiceImpl implements OfferService {
 
     @Override
     public String handleTextMessage(String searchText) {
-        if(autoResponder.checkMessage(searchText)){
-            return autoResponder.getSimpleAnswer(searchText);
-        }else{
+        String lowerCaseSearchText = searchText.toLowerCase(); // Преобразуем в нижний регистр
+        if (autoResponder.checkMessage(lowerCaseSearchText)) {
+            return autoResponder.getSimpleAnswer(lowerCaseSearchText);
+        } else {
             return getOfferDetails(searchText);
         }
     }
@@ -38,7 +39,7 @@ public class OfferServiceImpl implements OfferService {
         int maxLength = 3000;
         List<Offer> allOffers = productDataHolder.getAllOffers();
         if (allOffers == null || allOffers.isEmpty()) {
-            return "Товары не найдены. Попробуйте поикать что то типа \"Пицца\" или \"Острое\" ";
+            return "Товары не найдены.\nПопробуйте поикать что то типа \"Пицца\" или \"Острое\" ";
         }
 
         // Фильтруем товары по тексту запроса
@@ -62,7 +63,7 @@ public class OfferServiceImpl implements OfferService {
                 String currencyId = (offer.getCurrencyId() != null) ? offer.getCurrencyId() : "";
                 String description = (offer.getDescription() != null) ? escapeMarkdown(offer.getDescription()) : "Описание отсутствует";
 
-                String offerDetails = "" + escapedName + "\n" +
+                String offerDetails = "\n" + "\n" + escapedName + "\n" +
                         "Цена: " + price + " " + currencyId + "\n" +
                         "\n" +
                         "Описание: " + description + "\n" +
