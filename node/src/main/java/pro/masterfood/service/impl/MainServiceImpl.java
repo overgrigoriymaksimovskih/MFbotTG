@@ -215,17 +215,17 @@ public class MainServiceImpl implements MainService {
     }
 
     private String helpIsActive() {
-        return "Список доступных команд: \n"
+        return "Список доступных команд: \n\n"
                 + "Накопления на подарок и бонусы: /present\n"
                 + "Статус текущего заказа: /status\n"
-                + "Отправить жалобу: /report\n "
+                + "Отправить жалобу: /report\n"
                 + "Отмена выполнения текущей команды: /cancel\n"
                 + "\n"
                 + "Выйти: /quit";
     }
 
     private String help() {
-        return "Список доступных команд: \n"
+        return "Список доступных команд: \n\n"
                 + "/registration - Авторизоваться в боте\n"
                 + "/cancel - Отмена выполнения текущей команды\n";
     }

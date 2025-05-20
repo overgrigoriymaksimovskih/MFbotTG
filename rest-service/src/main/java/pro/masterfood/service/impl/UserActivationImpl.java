@@ -50,10 +50,10 @@ public class UserActivationImpl implements UserActivationService {
                 user.setPhoneNumber(res.get("PhoneNumber").toString());
                 user.setSiteUserId(Long.valueOf(res.get("SiteUid").toString()));
                 appUserDAO.save(user);
-                sendAnswer(res.get("Message") + "\nСписок доступных команд: \n"
-                                + "Накопления на подарок и бонусы: /present\n "
-                                + "Статус текущего заказа: /status\n   "
-                                + "Отправить жалобу: /report\n "
+                sendAnswer(res.get("Message") + "\nСписок доступных команд:\n\n"
+                                + "Накопления на подарок и бонусы: /present\n"
+                                + "Статус текущего заказа: /status\n"
+                                + "Отправить жалобу: /report\n"
                                 + "Отмена выполнения текущей команды: /cancel\n "
                                 + "\n"
                                 + "Выйти: /quit"
