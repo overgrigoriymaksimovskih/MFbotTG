@@ -41,6 +41,8 @@ public class OfferServiceImpl implements OfferService {
 
         // Формируем ответ
         StringBuilder details = new StringBuilder();
+        details.append("***");
+
         if (foundOffers.isEmpty()) {
             return "Товары по запросу \"" + searchText + "\" не найдены.";
         }
