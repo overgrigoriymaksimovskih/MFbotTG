@@ -41,13 +41,26 @@ public class OfferServiceImpl implements OfferService {
 
         // Формируем ответ
         StringBuilder details = new StringBuilder();
-        for (Offer offer : foundOffers) {
-            String escapedName = escapeMarkdown(offer.getName());
-            String url = offer.getUrl();
-            details.append("*").append(escapedName).append("*\n");
-            details.append("Цена: ").append(offer.getPrice()).append(" ").append(offer.getCurrencyId()).append("\n");
-            details.append("Описание: ").append(escapeMarkdown(offer.getDescription())).append("\n");
-            details.append("[Смотреть на сайте](").append(url).append(")\n\n");
+        if (foundOffers.isEmpty()) {
+            return "Товары по запросу \"" + searchText + "\" не найдены.";
+        }
+
+        try {
+            for (Offer offer : foundOffers) {
+                String escapedName = (offer.getName() != null) ? escapeMarkdown(offer.getName()) : "Название отсутствует";
+                String url = (offer.getUrl() != null) ? offer.getUrl() : ""; // Можно не экранировать, если URL нет
+                Double price = (offer.getPrice() != null) ? Double.valueOf(offer.getPrice()) : 0.0;
+                String currencyId = (offer.getCurrencyId() != null) ? offer.getCurrencyId() : "";
+                String description = (offer.getDescription() != null) ? escapeMarkdown(offer.getDescription()) : "Описание отсутствует";
+
+                details.append("*").append(escapedName).append("*\n");
+                details.append("Цена: ").append(price).append(" ").append(currencyId).append("\n");
+                details.append("Описание: ").append(description).append("\n");
+                details.append("[Смотреть на сайте](").append(url).append(")\n\n");
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при формировании ответа: {}", e.getMessage(), e);
+            return "Произошла ошибка при формировании ответа." + e.getMessage();
         }
 
         return details.toString();
