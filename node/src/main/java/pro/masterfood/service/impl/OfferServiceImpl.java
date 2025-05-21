@@ -69,7 +69,7 @@ public class OfferServiceImpl implements OfferService {
                 String description = (offer.getDescription() != null) ? escapeMarkdown(offer.getDescription()) : "Описание отсутствует";
 
                 String offerDetails = "\n" + "\n" + escapedName + "\n" +
-                        "-- Цена: " + price + " " + currencyId + " --\n" +
+                        "--- Цена: " + price + " " + currencyId + "\n" +
                         "Описание: " + description + "\n" +
                         url +
                         "\n";
