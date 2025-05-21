@@ -32,7 +32,7 @@ public class OfferServiceImpl implements OfferService {
             if (isActive){
                 return autoResponder.getSimpleAnswerForActive(lowerCaseSearchText);
             }else{
-                return autoResponder.getSimpleAnswerForInActive(lowerCaseSearchText);
+                return autoResponder.getSimpleAnswerForInactive(lowerCaseSearchText);
             }
 
         } else {

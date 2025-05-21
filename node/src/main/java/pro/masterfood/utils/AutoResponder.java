@@ -402,20 +402,20 @@ public class AutoResponder {
         return "Упс... Странная ошибка, я не знаю что ответить Но и товар искать не буду... Очень странно... Такого не должно было случиться никогда";
     }
 
-    public String getSimpleAnswerForInActive(String searchText) {
+    public String getSimpleAnswerForInactive(String searchText) {
         for (Map.Entry<Pattern, List<String>> entry : regexResponses.entrySet()) {
             Matcher matcher = entry.getKey().matcher(searchText);
             if (matcher.find()) {
                 List<String> responses = entry.getValue();
                 // Выбираем случайный ответ из списка
                 return responses.get(new Random().nextInt(responses.size())) +
-                        "Для использования бота авторизуйтесь +\n" +
-                        "с тем же логином и паролем,+\n" +
-                        "которые используете для входа в личный кабинет+\n" +
-                        "на сайте master-food.pro+\n" +
-                        "если Вы еще не зарегистрированы на сайте+\n" +
-                        "пройдите регистрацию: https://m.master-food.pro/private/register_new/+\n" +
-                        "\n\" +\n" +
+                        "\nДля использования бота авторизуйтесь " +
+                        "с тем же логином и паролем, " +
+                        "которые используете для входа в личный кабинет " +
+                        "на сайте master-food.pro\n" +
+                        "\nесли Вы еще не зарегистрированы на сайте" +
+                        "пройдите регистрацию: https://m.master-food.pro/private/register_new/\n" +
+                        "\n" +
                         " Авторизоваться в боте /registration";
             }
         }
