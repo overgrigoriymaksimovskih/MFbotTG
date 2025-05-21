@@ -209,7 +209,7 @@ public class MainServiceImpl implements MainService {
                     "Авторизоваться в боте /registration";
         } else {
 //            return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
-            String offerDetails = offerService.handleTextMessage(cmd);
+            String offerDetails = offerService.handleTextMessage(cmd, appUser.getIsActive());
             return offerDetails;
         }
     }

@@ -26,10 +26,15 @@ public class OfferServiceImpl implements OfferService {
 
 
     @Override
-    public String handleTextMessage(String searchText) {
+    public String handleTextMessage(String searchText, Boolean isActive) {
         String lowerCaseSearchText = searchText.toLowerCase(); // Преобразуем в нижний регистр
         if (autoResponder.checkMessage(lowerCaseSearchText)) {
-            return autoResponder.getSimpleAnswer(lowerCaseSearchText);
+            if (isActive){
+                return autoResponder.getSimpleAnswerForActive(lowerCaseSearchText);
+            }else{
+                return autoResponder.getSimpleAnswerForInActive(lowerCaseSearchText);
+            }
+
         } else {
             return getOfferDetails(searchText);
         }
