@@ -39,7 +39,7 @@ public class OfferServiceImpl implements OfferService {
         int maxLength = 3000;
         List<Offer> allOffers = productDataHolder.getAllOffers();
         if (allOffers == null || allOffers.isEmpty()) {
-            return "Товары не найдены.\nПопробуйте поикать что то типа \"Пицца\" или \"Острое\" ";
+            return "Товары не найдены.\nПопробуйте поискать что то типа \"Пицца\" или \"Острое\" ";
         }
 
         // Фильтруем товары по тексту запроса
@@ -49,7 +49,7 @@ public class OfferServiceImpl implements OfferService {
                 .collect(Collectors.toList());
 
         if (foundOffers.isEmpty()) {
-            return "Товары по запросу \"" + searchText + "\" не найдены. Попробуйте поикать что то типа \"Пицца\" или \"Острое\" ";
+            return "Товары по запросу \"" + searchText + "\" не найдены. Попробуйте поискать что то типа \"Пицца\" или \"Острое\" ";
         }
 
         // Формируем ответ
@@ -64,8 +64,7 @@ public class OfferServiceImpl implements OfferService {
                 String description = (offer.getDescription() != null) ? escapeMarkdown(offer.getDescription()) : "Описание отсутствует";
 
                 String offerDetails = "\n" + "\n" + escapedName + "\n" +
-                        "Цена: " + price + " " + currencyId + "\n" +
-                        "\n" +
+                        "-- Цена: " + price + " " + currencyId + " --\n" +
                         "Описание: " + description + "\n" +
                         url +
                         "\n";
