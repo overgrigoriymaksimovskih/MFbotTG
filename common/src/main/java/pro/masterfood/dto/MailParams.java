@@ -1,8 +1,6 @@
 package pro.masterfood.dto;
 
 import lombok.*;
-import pro.masterfood.entity.AppPhoto;
-import pro.masterfood.entity.AppUser;
 
 import java.util.List;
 

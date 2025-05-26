@@ -9,13 +9,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 
-import pro.masterfood.dao.AppDocumentDAO;
 import pro.masterfood.dao.AppPhotoDAO;
 import pro.masterfood.dao.BinaryContentDAO;
-import pro.masterfood.entity.AppDocument;
 import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.entity.BinaryContent;
@@ -40,31 +37,16 @@ public class FileServiceImpl implements FileService {
     @Value("${link.adress}")
     private String linkAddress;
 
-    private final AppDocumentDAO appDocumentDAO;
     private final AppPhotoDAO appPhotoDAO;
     private final BinaryContentDAO binaryContentDAO;
     private final Hashids hashids;
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO, Hashids hashids) {
-        this.appDocumentDAO = appDocumentDAO;
+    public FileServiceImpl(AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO, Hashids hashids) {
         this.appPhotoDAO = appPhotoDAO;
         this.binaryContentDAO = binaryContentDAO;
         this.hashids = hashids;
     }
 
-    @Override
-    public AppDocument processDoc(Message telegramMessage){
-        Document telegramDoc = telegramMessage.getDocument();
-        String fileId = telegramDoc.getFileId();
-        ResponseEntity<String> response = getFilePath(fileId);
-        if (response.getStatusCode() == HttpStatus.OK){
-            BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
-            AppDocument transientAppDoc = buildTransientAppDoc(telegramDoc, persistentBinaryContent);
-            return appDocumentDAO.save(transientAppDoc);
-        } else {
-            throw new UploadFileException("Bad response from telegram service " + response);
-        }
-    }
     @Override
     public AppPhoto processPhoto(Message telegramMessage, AppUser owner, String message) {
 
@@ -99,15 +81,6 @@ public class FileServiceImpl implements FileService {
                 .getString("file_path"));
     }
 
-    private AppDocument buildTransientAppDoc(Document telegramDoc, BinaryContent persistentBinaryContent) {
-        return AppDocument.builder()
-                .telegramField(telegramDoc.getFileId())
-                .docName(telegramDoc.getFileName())
-                .binaryContent(persistentBinaryContent)
-                .mimeType(telegramDoc.getMimeType())
-                .fileSize(telegramDoc.getFileSize())
-                .build();
-    }
     private AppPhoto buildTransientAppPhoto(PhotoSize telegramPhoto, BinaryContent persistentBinaryContent, AppUser owner, String message) {
         return AppPhoto.builder()
                 .telegramField(telegramPhoto.getFileId())

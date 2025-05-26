@@ -14,7 +14,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     private final MailSenderService mailSenderService;
 
     @Override
-    @RabbitListener(queues = "${spring.rabbitmq.queues.registration-mail}")
+    @RabbitListener(queues = "${spring.rabbitmq.queues.mail}")
     public void consumeRegistrationMail(MailParams mailParams) {
         try {
 //            mailSenderService.sendAnswer("Успешно получено в слушателя mail-service", mailParams.getChatId());

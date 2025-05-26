@@ -18,8 +18,8 @@ public class RabbitConfiguration {
     @Value("${spring.rabbitmq.queues.text-message-update}")
     private String textMessageUpdateQueue;
 
-    @Value("${spring.rabbitmq.queues.doc-message-update}")
-    private String docMessageUpdateQueue;
+//    @Value("${spring.rabbitmq.queues.doc-message-update}")
+//    private String docMessageUpdateQueue;
 
     @Value("${spring.rabbitmq.queues.photo-message-update}")
     private String photoMessageUpdateQueue;
@@ -41,10 +41,10 @@ public class RabbitConfiguration {
         return new Queue(textMessageUpdateQueue, true, false, false, args);
     }
 
-    @Bean
-    public Queue docMessageQueue() {
-        return new Queue(docMessageUpdateQueue);
-    }
+//    @Bean
+//    public Queue docMessageQueue() {
+//        return new Queue(docMessageUpdateQueue);
+//    }
 
     @Bean
     public Queue photoMessageQueue() {

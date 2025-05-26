@@ -18,7 +18,6 @@ import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.enums.ServiceCommand;
 import pro.masterfood.utils.HelpButton;
 import pro.masterfood.utils.OneCmessageHandler;
-//import pro.masterfood.utils.ProductConsultant;
 import pro.masterfood.service.OfferService;
 
 import java.util.List;

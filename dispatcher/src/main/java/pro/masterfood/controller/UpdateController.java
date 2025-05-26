@@ -135,22 +135,10 @@ public class UpdateController {
     }
 
     private void processPhotoMessage (Update update){
-//        Message message = update.getMessage();
-//        // 1. Проверяем размер текста (если он есть)
-//        if (message.getCaption() != null) {// Значит с фото был отправлен текст
-//            setTooManyTypesOfContent(update); // Отправляем ответ с ошибкой
-//        }else{
-//            updateProducer.produce(rabbitConfiguration.getPhotoMessageUpdateQueue(), update);
-//            setFileIsReceivedView(update);
-//        }
         updateProducer.produce(rabbitConfiguration.getPhotoMessageUpdateQueue(), update);
         setFileIsReceivedView(update);
     }
 
-    private void processDocMessage (Update update){
-        updateProducer.produce(rabbitConfiguration.getDocMessageUpdateQueue(), update);
-        setFileIsReceivedView(update);
-    }
     private void processTextMessage (Update update){
         updateProducer.produce(rabbitConfiguration.getTextMessageUpdateQueue(), update);
     }

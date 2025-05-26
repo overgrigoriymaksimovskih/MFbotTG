@@ -16,7 +16,7 @@ import java.util.Map;
 @Configuration
 public class RabbitConfiguration {
 
-    @Value("${spring.rabbitmq.queues.registration-mail}")
+    @Value("${spring.rabbitmq.queues.mail}")
     private String registrationMailQueue;
 
     @Bean
