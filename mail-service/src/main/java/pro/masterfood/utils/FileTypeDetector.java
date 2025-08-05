@@ -1,7 +1,6 @@
 package pro.masterfood.utils;
 
 import org.springframework.stereotype.Component;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -51,9 +50,6 @@ public class FileTypeDetector {
                     return "heic";
                 }
             }
-
-
-
             return "Неизвестный тип фотографии"; // Неизвестный тип
         }
     }

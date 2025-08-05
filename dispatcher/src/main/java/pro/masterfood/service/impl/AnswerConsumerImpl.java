@@ -9,11 +9,9 @@ import pro.masterfood.service.AnswerConsumer;
 @Component
 public class AnswerConsumerImpl implements AnswerConsumer {
     private final UpdateController updateController;
-
     public AnswerConsumerImpl(UpdateController updateController) {
         this.updateController = updateController;
     }
-
     @Override
     @RabbitListener(queues = "${spring.rabbitmq.queues.answer-message}")
     public void consume(SendMessage sendMessage) {

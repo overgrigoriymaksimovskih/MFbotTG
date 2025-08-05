@@ -1,16 +1,14 @@
 package pro.masterfood.service.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import pro.masterfood.service.OfferService;
 import pro.masterfood.utils.AutoResponder;
 import pro.masterfood.utils.ProductDataHolder;
 import pro.masterfood.utils.catalogelements.Offer;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class OfferServiceImpl implements OfferService {

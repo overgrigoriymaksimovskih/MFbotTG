@@ -1,5 +1,9 @@
 package pro.masterfood.utils;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.*;
@@ -11,15 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.LinkedMultiValueMap;
-
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,14 +77,6 @@ public class SiteData {
                     result.put("Message", "Result is not a Map");
                 }
             }
-
-
-
-
-
-
-
-
         } finally {
             driver.quit();
         }
@@ -123,7 +112,6 @@ public class SiteData {
     // Метод для настройки web-драйвера страницей
     public WebDriver setWebDriver (WebDriver driver, String pageUrl){
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
-//        String loginPageUrl = "https://master-food.pro/private/";
         driver.manage().window().setSize(new Dimension(1920, 1080));
         driver.get(pageUrl);
 
@@ -135,7 +123,6 @@ public class SiteData {
                                                                       String email,
                                                                       String password) {
         HttpHeaders headers = null;
-
         String parsedCheckNum = null;
         String parsedToken = null;
 

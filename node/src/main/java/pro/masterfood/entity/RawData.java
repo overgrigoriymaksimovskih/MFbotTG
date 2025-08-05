@@ -1,13 +1,11 @@
 package pro.masterfood.entity;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-
-import jakarta.persistence.*;
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.Hibernate;
 import org.hibernate.type.SqlTypes;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
 import java.util.Objects;
 
 @Entity

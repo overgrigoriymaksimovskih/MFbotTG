@@ -9,12 +9,6 @@ import pro.masterfood.service.ConsumerService;
 import pro.masterfood.service.UserActivationService;
 import pro.masterfood.service.UserInformationProvider;
 
-import com.rabbitmq.client.Channel;
-
-
-
-
-
 @RequiredArgsConstructor
 @Service
 public class ConsumerServiceImpl implements ConsumerService {

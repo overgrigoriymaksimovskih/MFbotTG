@@ -7,7 +7,6 @@ import pro.masterfood.dto.RequestParams;
 import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.UserInformationProvider;
 import pro.masterfood.utils.SimpleHttpClient;
-
 import static pro.masterfood.enums.UserState.BASIC_STATE;
 import static pro.masterfood.enums.UserState.WAIT_FOR_ANSWER;
 
@@ -79,7 +78,6 @@ public class UserInformationProviderImpl implements UserInformationProvider {
 
     @Override
     public void sendAnswer(String output, Long chatId) {
-//        var message = update.getMessage();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);

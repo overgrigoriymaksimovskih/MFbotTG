@@ -9,7 +9,6 @@ import pro.masterfood.enums.RequestsToREST;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestParams {
-
     private RequestsToREST requestType;
 
     private Long id;

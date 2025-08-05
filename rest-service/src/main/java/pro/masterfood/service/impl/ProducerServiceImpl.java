@@ -1,8 +1,8 @@
 package pro.masterfood.service.impl;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.service.ProducerService;
 

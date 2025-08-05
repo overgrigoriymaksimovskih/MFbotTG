@@ -1,9 +1,9 @@
 package pro.masterfood.configuration;
 
-import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.hashids.Hashids;
 
 @Configuration
 public class NodeConfiguration {

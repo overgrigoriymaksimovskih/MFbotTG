@@ -1,16 +1,13 @@
 package pro.masterfood.service.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.hashids.Hashids;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
-
+import org.hashids.Hashids;
+import org.json.JSONObject;
 import pro.masterfood.dao.AppPhotoDAO;
 import pro.masterfood.dao.BinaryContentDAO;
 import pro.masterfood.entity.AppPhoto;
@@ -19,11 +16,12 @@ import pro.masterfood.entity.BinaryContent;
 import pro.masterfood.exceptions.UploadFileException;
 import pro.masterfood.service.FileService;
 import pro.masterfood.service.enums.LinkType;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class FileServiceImpl implements FileService {

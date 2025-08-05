@@ -2,7 +2,6 @@ package pro.masterfood.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,8 +22,6 @@ public class SimpleHttpClient {
         String password = "R1xHoHG";
 
         HttpURLConnection con = null;
-
-//        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
         String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
 
         try {
@@ -91,8 +88,7 @@ public class SimpleHttpClient {
         String password = "R1xHoHG";
 
         HttpURLConnection con = null;
-
-//        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetStatus/" + phone + "/";
+        //TODO werwerwerwerwerwer
         String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
 
         try {

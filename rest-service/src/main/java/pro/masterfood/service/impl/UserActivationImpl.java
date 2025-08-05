@@ -1,8 +1,5 @@
 package pro.masterfood.service.impl;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.dao.AppUserDAO;
@@ -11,6 +8,8 @@ import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.UserActivationService;
 import pro.masterfood.utils.Decoder;
 import pro.masterfood.utils.SiteData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static pro.masterfood.enums.UserState.*;
 

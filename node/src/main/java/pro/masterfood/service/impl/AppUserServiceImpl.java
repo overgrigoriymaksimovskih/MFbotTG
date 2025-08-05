@@ -1,16 +1,10 @@
 package pro.masterfood.service.impl;
 
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.hashids.Hashids;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.hashids.Hashids;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dao.AppPhotoDAO;
 import pro.masterfood.dto.MailParams;
@@ -18,17 +12,15 @@ import pro.masterfood.dto.RequestParams;
 import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.enums.RequestsToREST;
+import pro.masterfood.utils.CommandPatternChecker;
+import static pro.masterfood.enums.UserState.*;
 import pro.masterfood.service.AppUserService;
-
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import pro.masterfood.utils.CommandPatternChecker;
-
-import static pro.masterfood.enums.UserState.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class AppUserServiceImpl implements AppUserService {

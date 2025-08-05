@@ -1,14 +1,11 @@
 package pro.masterfood;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import org.springframework.boot.SpringApplication;
 
 @SpringBootApplication
 public class DispatcherApplication {
     public static void main(String[] args) {
-
-//        // Запуск Spring Boot
         SpringApplication.run(DispatcherApplication.class);
     }
 }

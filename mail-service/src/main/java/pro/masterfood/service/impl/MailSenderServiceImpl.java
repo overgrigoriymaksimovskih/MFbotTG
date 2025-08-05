@@ -1,25 +1,18 @@
 package pro.masterfood.service.impl;
 
-
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-
 import pro.masterfood.dto.MailParams;
 import pro.masterfood.service.MailSenderService;
 import pro.masterfood.service.ProducerService;
-
+import pro.masterfood.utils.FileTypeDetector;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.core.io.ByteArrayResource;
-
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-
-import pro.masterfood.utils.FileTypeDetector;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -42,8 +35,6 @@ public class MailSenderServiceImpl  implements MailSenderService {
 
     @Override
     public void send(MailParams mailParams) {
-
-//        sendAnswer("Успешно получено в метод send - MailSenderServiceImpl", mailParams.getChatId());
         var emailTo = "master-2m@yandex.ru";
 
         try {

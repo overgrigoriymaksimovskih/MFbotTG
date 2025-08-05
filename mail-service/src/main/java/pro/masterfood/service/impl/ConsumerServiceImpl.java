@@ -17,7 +17,6 @@ public class ConsumerServiceImpl implements ConsumerService {
     @RabbitListener(queues = "${spring.rabbitmq.queues.mail}")
     public void consumeRegistrationMail(MailParams mailParams) {
         try {
-//            mailSenderService.sendAnswer("Успешно получено в слушателя mail-service", mailParams.getChatId());
             mailSenderService.send(mailParams);
         } catch (Exception e) {
             System.err.println("Ошибка при отправке письма: " + e.getMessage());

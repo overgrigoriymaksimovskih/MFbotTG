@@ -1,7 +1,5 @@
 package pro.masterfood.service.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -19,6 +17,8 @@ import pro.masterfood.service.enums.ServiceCommand;
 import pro.masterfood.utils.HelpButton;
 import pro.masterfood.utils.OneCmessageHandler;
 import pro.masterfood.service.OfferService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -126,7 +126,6 @@ public class MainServiceImpl implements MainService {
 
         try{
             fileService.processPhoto(update.getMessage(), appUser, message);
-//            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
             var answer = "Фото успешно загружено. \n\nотправьте текст сообщения:" ;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {

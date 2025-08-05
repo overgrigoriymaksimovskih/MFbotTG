@@ -2,8 +2,8 @@ package pro.masterfood.utils;
 //Должен был использоваться при генерации ссылки в письме по которой удаляются сообщения пользователя и его фото
 //но вроде как нет смысла потому что ссылку видит только получатель и по ид хоть понятно кого в случае чего искать в БД
 import lombok.RequiredArgsConstructor;
-import org.hashids.Hashids;
 import org.springframework.stereotype.Component;
+import org.hashids.Hashids;
 
 @RequiredArgsConstructor
 @Component

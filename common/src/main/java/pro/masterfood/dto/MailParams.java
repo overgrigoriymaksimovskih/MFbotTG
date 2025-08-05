@@ -1,7 +1,6 @@
 package pro.masterfood.dto;
 
 import lombok.*;
-
 import java.util.List;
 
 @Getter

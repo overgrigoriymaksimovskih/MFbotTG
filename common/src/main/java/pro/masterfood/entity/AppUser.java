@@ -1,13 +1,23 @@
 package pro.masterfood.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.CascadeType;
+
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
-import pro.masterfood.enums.UserState;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+
+import pro.masterfood.enums.UserState;
 
 @Entity
 @Table(name = "app_user")

@@ -1,7 +1,5 @@
 package pro.masterfood.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Document;
@@ -11,8 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import pro.masterfood.configuration.RabbitConfiguration;
 import pro.masterfood.service.UpdateProducer;
 import pro.masterfood.utils.MessageUtils;
-
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Component
 public class UpdateController {
