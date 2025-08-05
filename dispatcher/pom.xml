@@ -25,6 +25,7 @@
         <liquibase-core.version>4.24.0</liquibase-core.version>
         <lombok.servion>1.18.30</lombok.servion>
         <io.github.cdimascio.version>3.0.0</io.github.cdimascio.version>
+        <caffeine.version>3.1.8</caffeine.version>
     </properties>
 
     <dependencies>
@@ -98,6 +99,13 @@
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
             <version>${io.github.cdimascio.version}</version>
+        </dependency>
+
+        <!-- Для рателимитера кеш с автоматическим удалением записей по расписанию -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeine.version}</version>
         </dependency>
 
     </dependencies>

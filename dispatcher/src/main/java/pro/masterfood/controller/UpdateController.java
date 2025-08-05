@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import pro.masterfood.configuration.RabbitConfiguration;
 import pro.masterfood.service.UpdateProducer;
+import pro.masterfood.utils.MessageRateLimiter;
 import pro.masterfood.utils.MessageUtils;
 import java.util.List;
 import org.slf4j.Logger;
@@ -22,11 +23,16 @@ public class UpdateController {
     private final MessageUtils messageUtils;
     private final UpdateProducer updateProducer;
     private final RabbitConfiguration rabbitConfiguration;
+    private final MessageRateLimiter messageRateLimiter;
 
-    public UpdateController(MessageUtils messageUtils, UpdateProducer updateProducer, RabbitConfiguration rabbitConfiguration){
+    public UpdateController(MessageUtils messageUtils,
+                            UpdateProducer updateProducer,
+                            RabbitConfiguration rabbitConfiguration,
+                            MessageRateLimiter messageRateLimiter){
         this.messageUtils = messageUtils;
         this.updateProducer = updateProducer;
         this.rabbitConfiguration = rabbitConfiguration;
+        this.messageRateLimiter = messageRateLimiter;
     }
 
     public void registerBot(TelegramBot telegramBot){
@@ -48,61 +54,72 @@ public class UpdateController {
     private void distributeMessageByType (Update update){
         //TODO реализовать ограничение запросов в еденицу времени (redis или Token Bucket Algorithm...)
         Message message = update.getMessage();
-        if (checkMessageSize(update)) {
-            int contentCount = 0;
 
-            // Проверяем все типы контента
-            if (message.hasText()) {
-                contentCount++;
-            }
-            if (message.hasDocument()) {
-                contentCount++;
-            }
-            if (message.hasPhoto()) {
-                contentCount++;
-            }
-            if (message.hasAudio()) {
-                contentCount++;
-            }
-            if (message.hasVideo()) {
-                contentCount++;
-            }
-            if (message.hasVoice()) {
-                contentCount++;
-            }
-            if (message.hasSticker()) {
-                contentCount++;
-            }
-            if (message.hasVideoNote()) {
-                contentCount++;
-            }
-            if (message.hasContact()) {
-                contentCount++;
-            }
-            if (message.hasLocation()) {
-                contentCount++;
-            }
-            if (message.hasPoll()) {
-                contentCount++;
-            }
+        //Отправляем сообщение на проверку и если проверка успешна, то на обработку
+        if (messageRateLimiter.allowRequestAtomic(message.getChatId().toString())) {
+            if (checkMessageSize(update)) {
+                int contentCount = 0;
 
-            if (contentCount == 1) {
-                if(message.hasText()){
-                    processTextMessage(update);
-                }else if (message.hasPhoto()){
-                    processPhotoMessage(update);
-                }else{
-                    setUnsupportedMessageTypeView(update);
+                // Проверяем все типы контента
+                if (message.hasText()) {
+                    contentCount++;
                 }
-            }else {
-                // Больше одного типа контента или ни одного
-                setTooManyTypesOfContent(update);
+                if (message.hasDocument()) {
+                    contentCount++;
+                }
+                if (message.hasPhoto()) {
+                    contentCount++;
+                }
+                if (message.hasAudio()) {
+                    contentCount++;
+                }
+                if (message.hasVideo()) {
+                    contentCount++;
+                }
+                if (message.hasVoice()) {
+                    contentCount++;
+                }
+                if (message.hasSticker()) {
+                    contentCount++;
+                }
+                if (message.hasVideoNote()) {
+                    contentCount++;
+                }
+                if (message.hasContact()) {
+                    contentCount++;
+                }
+                if (message.hasLocation()) {
+                    contentCount++;
+                }
+                if (message.hasPoll()) {
+                    contentCount++;
+                }
+
+                if (contentCount == 1) {
+                    if(message.hasText()){
+                        processTextMessage(update);
+                    }else if (message.hasPhoto()){
+                        processPhotoMessage(update);
+                    }else{
+                        setUnsupportedMessageTypeView(update);
+                    }
+                }else {
+                    // Больше одного типа контента или ни одного
+                    setTooManyTypesOfContent(update);
+                }
+
+
+            } else {
+                setTooBigMessageView(update);
             }
-
-
         } else {
-            setTooBigMessageView(update);
+            setTooManyRequestsPerSecondView(update);
         }
+    }
+
+    private void setTooManyRequestsPerSecondView(Update update){
+        var sendMessage = messageUtils.generateSendMessageWithText(update, "Вы отправляете сообщения слишком часто. Попробуйте отправить сообщение позже...");
+        setView(sendMessage);
     }
 
     private void setTooBigMessageView(Update update){
