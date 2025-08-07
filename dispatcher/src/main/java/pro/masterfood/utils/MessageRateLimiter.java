@@ -25,6 +25,7 @@ public class MessageRateLimiter {
             lastRequestTimes.put(userId, now);
             return true;
         } else {
+            lastRequestTimes.put(userId, now);
             return false;
         }
     }

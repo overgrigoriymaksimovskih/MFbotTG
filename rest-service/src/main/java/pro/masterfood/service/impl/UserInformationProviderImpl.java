@@ -1,5 +1,7 @@
 package pro.masterfood.service.impl;
 
+import jakarta.persistence.QueryHint;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.dao.AppUserDAO;
@@ -50,6 +52,7 @@ public class UserInformationProviderImpl implements UserInformationProvider {
     }
 
     @Override
+//    @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "false"))
     public void consumeGetOrderStatus(RequestParams requestParams) {
         var optional = appUserDAO.findById(requestParams.getId());
         var user = optional.get();

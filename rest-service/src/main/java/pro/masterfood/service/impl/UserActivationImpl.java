@@ -11,6 +11,8 @@ import pro.masterfood.utils.SiteData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 import static pro.masterfood.enums.UserState.*;
 
 @Component
@@ -41,7 +43,15 @@ public class UserActivationImpl implements UserActivationService {
         var user = optional.get();
         user.setState(WAIT_FOR_ANSWER);
         appUserDAO.save(user);
-        var res = siteData.activationFromSite(email, password);
+        Map<String, String> res = null;
+        try {
+            res = siteData.activationFromSite(email, password);
+        } catch (Exception e) {
+            user.setState(BASIC_STATE);
+            user.setEmail(null);
+            appUserDAO.save(user);
+            throw new RuntimeException(e);
+        }
         if(res.containsKey("PhoneNumber") && res.containsKey("SiteUid")){
             if(!res.get("PhoneNumber").equalsIgnoreCase("null") && !res.get("SiteUid").equalsIgnoreCase("0")){
                 user.setIsActive(true);

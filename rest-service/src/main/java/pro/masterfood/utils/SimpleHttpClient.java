@@ -9,8 +9,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Set;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import javax.swing.text.html.parser.Entity;
 
 @RequiredArgsConstructor
 @Component
@@ -22,8 +26,8 @@ public class SimpleHttpClient {
         String password = "R1xHoHG";
 
         HttpURLConnection con = null;
-        String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
-
+//        String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
+        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
         try {
             URL obj = new URL(url);
             con = (HttpURLConnection) obj.openConnection();
@@ -54,9 +58,10 @@ public class SimpleHttpClient {
                     int bonusPoints = 0;
 
                     StringBuilder sb = new StringBuilder();
-                    sb.append("На вашем счету: " + balance + "р." + "\n");
+//                    sb.append("На вашем счету: " + balance + "р." + "\n");
+                    sb.append("Доступно бонусных рублей: " + balance + "р." + "\n");
                     sb.append("Накоплено подарков: " + presents + "\n");
-                    sb.append("Доступно бонусных рублей: " + bonusPoints + "р." + "\n");
+//                    sb.append("Доступно бонусных рублей: " + bonusPoints + "р." + "\n");
                     sb.append("До следующего подарка осталось: " + reachToPresent + "р." + "\n");
 
                     return sb.toString(); // Возвращаем Map
@@ -88,9 +93,10 @@ public class SimpleHttpClient {
         String password = "R1xHoHG";
 
         HttpURLConnection con = null;
-        //TODO werwerwerwerwerwer
-        String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
-
+//        String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
+//        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
+        String url = "http://192.168.127.36:54321/sushi2/hs/PC/GetStatusByPhone/" + phone.replace("+", "") + "/";
+//        String url = "http://192.168.127.36:54321/sushi2/hs/PC/GetStatusByPhone/79517790515/";
         try {
             URL obj = new URL(url);
             con = (HttpURLConnection) obj.openConnection();
@@ -108,7 +114,6 @@ public class SimpleHttpClient {
             if (responseCode == HttpURLConnection.HTTP_OK) { // success
                 // Читаем ответ из потока ввода
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
-
                     // Преобразуем JSON в Map<String, Object> с использованием Gson
                     Gson gson = new Gson();
                     // Используем TypeToken для правильной типизации Map
@@ -119,24 +124,22 @@ public class SimpleHttpClient {
                     String statusNumber = responseMap.get("Status").toString();
 
                     if(statusNumber.equals("8.0")){
-                        sb.append("Номер заказа: " + responseMap.get("OrderiD").toString().replace("z", "") + "\n");
                         sb.append("Заказ принят и оплачен" + "\n");
-                    } else if (statusNumber.equals("0.0") || statusNumber.equals("1.0") || statusNumber.equals("2.0")) {
-                        sb.append("Номер заказа: " + responseMap.get("OrderiD").toString().replace("z", "") + "\n");
+                    } else if (statusNumber.equals("0.0")) {
+                        sb.append("Заказ не найден" + "\n");
+                    }else if (statusNumber.equals("1.0")) {
                         sb.append("Заказ принят" + "\n");
+                    }else if (statusNumber.equals("2.0")) {
+                        sb.append("Заказ принят и одобрен" + "\n");
                     } else if (statusNumber.equals("3.0")) {
-                        sb.append("Номер заказа: " + responseMap.get("OrderiD").toString().replace("z", "") + "\n");
                         sb.append("Заказ изготавливается ..." + "\n");
                     } else if (statusNumber.equals("4.0")) {
-                        sb.append("Номер заказа: " + responseMap.get("OrderiD").toString().replace("z", "") + "\n");
                         sb.append("Изготовлен и ожидает доставки" + "\n");
                     } else if (statusNumber.equals("5.0")) {
-                        sb.append("Номер заказа: " + responseMap.get("OrderiD").toString().replace("z", "") + "\n");
                         sb.append("Ваш заказ в доставке" + "\n");
                         sb.append("Курьер: " + responseMap.get("Courier").toString() + "\n");
                         sb.append("Телефон: " + responseMap.get("CourierPhone").toString());
-                    } else if (statusNumber.equals("6.0")) {
-                        sb.append("Номер заказа: " + responseMap.get("OrderiD").toString().replace("z", "") + "\n");
+                    } else if (statusNumber.equals("6.0") || statusNumber.equals("7.0")) {
                         sb.append("Выполнен" + "\n");
                     }else{
                         sb.append("Заказы не найдены. " + "\n"
