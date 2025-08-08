@@ -79,7 +79,7 @@ public class OfferServiceImpl implements OfferService {
                 }
             }
         } catch (Exception e) {
-            log.error("Ошибка при формировании ответа: {}", e.getMessage(), e);
+            log.error("Error with creating answer on OfferService: {}", e.getMessage(), e);
             return "Произошла ошибка при формировании ответа." + e.getMessage();
         }
 

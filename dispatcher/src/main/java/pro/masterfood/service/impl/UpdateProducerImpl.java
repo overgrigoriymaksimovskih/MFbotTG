@@ -1,5 +1,6 @@
 package pro.masterfood.service.impl;
 
+import org.springframework.amqp.AmqpException;
 import org.springframework.stereotype.Component;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,7 +17,10 @@ public class UpdateProducerImpl implements UpdateProducer {
     }
     @Override
     public void produce(String rabbitQueue, Update update) {
-        log.debug(update.getMessage().getText());
-        rabbitTemplate.convertAndSend(rabbitQueue, update);
+        try {
+            rabbitTemplate.convertAndSend(rabbitQueue, update);
+        } catch (AmqpException e) {
+            log.error("Ошибка при отправке сообщения в очередь {}: {}", rabbitQueue, e.getMessage(), e);
+        }
     }
 }

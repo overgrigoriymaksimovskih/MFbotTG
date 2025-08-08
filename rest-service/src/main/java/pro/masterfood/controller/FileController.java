@@ -24,7 +24,8 @@ public class FileController {
         if(photoService.deletePhotos(userId)){
             result = "Успешно!" + " письмо помечено прочитанным, данные удалены из БД";
         }else{
-            result = "Успешно!" + " фото небыли удалены из БД, сообщите администратору...";
+            log.error("(Delete link in mail) Photo not deleted from DB for user: " + userId);
+            result = "Фиаско!" + " фото небыли удалены из БД, сообщите администратору...";
         }
 
         if (result.startsWith("Успешно!")) {

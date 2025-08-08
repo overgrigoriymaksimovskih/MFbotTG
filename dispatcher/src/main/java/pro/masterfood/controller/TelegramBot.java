@@ -52,7 +52,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             try {
                 execute(message);
             } catch (TelegramApiException e) {
-                log.error(e.getMessage());
+                log.error("Error with sending answer message to user:  " + message.getChatId() + " " + e.getMessage());
             }
         }
     }

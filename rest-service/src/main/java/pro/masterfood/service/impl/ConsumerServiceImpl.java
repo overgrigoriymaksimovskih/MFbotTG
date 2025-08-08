@@ -30,7 +30,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                 userActivationService.sendAnswer("Сервис не может обработать сообщение " + requestParams.getRequestType(), requestParams.getChatId());
             }
         } catch (Exception e) {
-            userActivationService.sendAnswer("Ошибка при обработке запросаA: " + e.getMessage(), requestParams.getChatId());
+            userActivationService.sendAnswer("Ошибка при обработке запроса: " + e.getMessage(), requestParams.getChatId());
         }
     }
 }

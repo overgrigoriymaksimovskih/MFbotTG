@@ -126,10 +126,10 @@ public class MainServiceImpl implements MainService {
 
         try{
             fileService.processPhoto(update.getMessage(), appUser, message);
-            var answer = "Фото успешно загружено. \n\nотправьте текст сообщения:" ;
+            var answer = "Фото успешно загружено." ;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
-            log.error("Произошла ошибка при загрузке фото", ex);
+            log.error("Process photo in MainServiceImpl was failed ", ex);
             String error = "Не удалось загрузить ФОТО... " + ex.getMessage();
             sendAnswer(error, chatId);
         }

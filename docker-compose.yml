@@ -5,7 +5,13 @@ volumes:
     driver: local
   postgres-data:
     driver: local
-  traefik-certs:
+  dispatcher-data:
+    driver: local
+  mail-service-data:
+    driver: local
+  node-data:
+    driver: local
+  rest-service-data:
     driver: local
 
 services:
@@ -15,7 +21,8 @@ services:
     build:
       context: ./
       dockerfile: ./dispatcher/Dockerfile
-
+    volumes:
+      - dispatcher-data:/var/lib/dispatcher
     ports:
       - ${DISPATCHER_PORT}:${DISPATCHER_PORT}
     environment:
@@ -33,11 +40,11 @@ services:
       RABBIT_MESSAGE_FROM_1C_QUEUE: ${RABBIT_MESSAGE_FROM_1C_QUEUE}
       RABBIT_ANSWER_MESSAGE_QUEUE: ${RABBIT_ANSWER_MESSAGE_QUEUE}
 
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '100m'
-        max-file: '3'
+    #logging:
+    #  driver: 'json-file'
+    #  options:
+    #    max-size: '100m'
+    #    max-file: '3'
     depends_on:
       rabbit-mq:
         condition: service_healthy
@@ -48,6 +55,8 @@ services:
     build:
       context: ./
       dockerfile: ./node/Dockerfile
+    volumes:
+      - node-data:/var/lib/node
     environment:
       NODE_PORT: ${NODE_PORT}
       RABBIT_HOST: ${RABBIT_HOST}
@@ -71,11 +80,11 @@ services:
       TG_BOT_FILE_STORAGE_URI: ${TG_BOT_FILE_STORAGE_URI}
       TG_BOT_URI: ${TG_BOT_URI}
       SALT: ${SALT}
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '100m'
-        max-file: '3'
+    #logging:
+    #  driver: 'json-file'
+    #  options:
+    #    max-size: '100m'
+    #    max-file: '3'
     depends_on:
       rabbit-mq:
         condition: service_healthy
@@ -88,7 +97,8 @@ services:
     build:
       context: ./
       dockerfile: ./rest-service/Dockerfile
-
+    volumes:
+      - rest-service-data:/var/lib/rest-service
     ports:
     - ${REST_SERVICE_PORT}:${REST_SERVICE_PORT}
     environment:
@@ -103,11 +113,11 @@ services:
       RABBIT_LOGIN_QUEUE: ${RABBIT_LOGIN_QUEUE}
       RABBIT_ANSWER_MESSAGE_QUEUE: ${RABBIT_ANSWER_MESSAGE_QUEUE}
       SALT: ${SALT}
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '100m'
-        max-file: '3'
+    #logging:
+    #  driver: 'json-file'
+    #  options:
+    #    max-size: '100m'
+    #    max-file: '3'
     depends_on:
       postgres-db:
         condition: service_healthy
@@ -118,6 +128,8 @@ services:
     build:
       context: ./
       dockerfile: ./mail-service/Dockerfile
+    volumes:
+      - mail-service-data:/var/lib/mail-service
     environment:
       MAIL_SERVICE_PORT: ${MAIL_SERVICE_PORT}
       MAIL_HOST: ${MAIL_HOST}
@@ -132,11 +144,11 @@ services:
       RABBIT_MAIL_QUEUE: ${RABBIT_MAIL_QUEUE}
       RABBIT_ANSWER_MESSAGE_QUEUE: ${RABBIT_ANSWER_MESSAGE_QUEUE}
       ACTIVATION_URI: ${ACTIVATION_URI}
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '100m'
-        max-file: '3'
+    #logging:
+    #  driver: 'json-file'
+    #  options:
+    #    max-size: '100m'
+    #    max-file: '3'
     depends_on:
       rabbit-mq:
         condition: service_healthy
@@ -145,14 +157,14 @@ services:
     container_name: rabbit-mq
     hostname: rabbitmq
     image: rabbitmq:3.12.12-management-alpine
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
     ports:
       - ${RABBIT_AMQP_PORT_MAPPING}
       - ${RABBIT_GUI_PORT_MAPPING}
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBIT_USERNAME}
       RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "--silent", "--quiet", "ping" ]
       interval: 10s

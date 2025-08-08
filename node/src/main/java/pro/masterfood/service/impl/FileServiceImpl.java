@@ -59,6 +59,7 @@ public class FileServiceImpl implements FileService {
             AppPhoto transientAppDoc = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent, owner, message);
             return appPhotoDAO.save(transientAppDoc);
         } else {
+            log.error("Bad response from telegram service " + response);
             throw new UploadFileException("Bad response from telegram service " + response);
         }
     }

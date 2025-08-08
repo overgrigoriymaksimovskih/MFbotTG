@@ -1,6 +1,8 @@
 package pro.masterfood.utils;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import javax.swing.text.html.parser.Entity;
 @RequiredArgsConstructor
 @Component
 public class SimpleHttpClient {
+    private static final Logger log = LoggerFactory.getLogger(SimpleHttpClient.class);
 
     public static String getBalance(String clientId) {
 
@@ -68,17 +71,17 @@ public class SimpleHttpClient {
 
 
                 } catch (IOException e) {
-                    System.err.println("Error reading response: " + e.getMessage());
+                    log.error("IOException during connection for user " + e.getMessage());
                     return null; // Обработка ошибки чтения ответа
                 }
             } else {
                 String errorMessage = "GET request failed. Response code: " + responseCode + ", Message: " + con.getResponseMessage();
-                System.err.println(errorMessage);
+                log.error("IOException during connection for user " + errorMessage);
                 return null; // Обработка ошибки ответа сервера (например, 401 Unauthorized)
             }
 
         } catch (IOException e) {
-            System.err.println("IOException during connection: " + e.getMessage());
+            log.error("IOException during connection for user " + clientId + " : " + e.getMessage());
             return null; // Обработка общей ошибки соединения
         } finally {
             if (con != null) {
@@ -150,17 +153,17 @@ public class SimpleHttpClient {
 
 
                 } catch (IOException e) {
-                    System.err.println("Error reading response: " + e.getMessage());
+                    log.error("IOException with server response " +  e.getMessage());
                     return null; // Обработка ошибки чтения ответа
                 }
             } else {
                 String errorMessage = "GET request failed. Response code: " + responseCode + ", Message: " + con.getResponseMessage();
-                System.err.println(errorMessage);
+                log.error("IOException with server response " + errorMessage);
                 return null; // Обработка ошибки ответа сервера (например, 401 Unauthorized)
             }
 
         } catch (IOException e) {
-            System.err.println("IOException during connection: " + e.getMessage());
+            log.error("IOException during connection for phone " + phone + " : " + e.getMessage());
             return null; // Обработка общей ошибки соединения
         } finally {
             if (con != null) {

@@ -1,8 +1,11 @@
 package pro.masterfood.service.impl;
 
+import org.springframework.amqp.AmqpException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hashids.Hashids;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import pro.masterfood.dao.AppUserDAO;
@@ -19,8 +22,6 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class AppUserServiceImpl implements AppUserService {
@@ -47,6 +48,7 @@ public class AppUserServiceImpl implements AppUserService {
 
 
     @Override
+    //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
     public String registerUser(AppUser appUser) {
         if (appUser.getIsActive()) {
             return "Вы уже зарегистрированы";
@@ -66,6 +68,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
     public String setEmail(AppUser appUser, String email) {
         try {
             InternetAddress emailAddr = new InternetAddress(email);
@@ -94,7 +97,11 @@ public class AppUserServiceImpl implements AppUserService {
                     .email(appUser.getEmail())
                     .password(password)
                     .build();
-            rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
+            try {
+                rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
+            } catch (AmqpException e) {
+                log.error("Ошибка при отправке сообщения в очередь {}: {}", registrationLoginQueue, e.getMessage(), e);
+            }
             return "Отправлено на проверку...";
         }else{
             return "Введите пароль \n" +
@@ -110,7 +117,11 @@ public class AppUserServiceImpl implements AppUserService {
                 .id(appUser.getId())
                 .chatId(chatId)
                 .build();
-        rabbitTemplate.convertAndSend(registrationLoginQueue, getBalanceParams);
+        try {
+            rabbitTemplate.convertAndSend(registrationLoginQueue, getBalanceParams);
+        } catch (AmqpException e) {
+            log.error("Ошибка при отправке сообщения в очередь {}: {}", registrationLoginQueue, e.getMessage(), e);
+        }
         return "Уточняем...";
     }
 
@@ -121,7 +132,11 @@ public class AppUserServiceImpl implements AppUserService {
                 .id(appUser.getId())
                 .chatId(chatId)
                 .build();
-        rabbitTemplate.convertAndSend(registrationLoginQueue, getOrderStatus);
+        try {
+            rabbitTemplate.convertAndSend(registrationLoginQueue, getOrderStatus);
+        } catch (AmqpException e) {
+            log.error("Ошибка при отправке сообщения в очередь {}: {}", registrationLoginQueue, e.getMessage(), e);
+        }
         return "Уточняем...";
     }
 
@@ -130,11 +145,11 @@ public class AppUserServiceImpl implements AppUserService {
     public String createReportMail(Long chatId, AppUser appUser) {
         appUser.setState(WAIT_FOR_REPORT_MESSAGE);
         appUserDAO.save(appUser);
-        return "Добавьте фото и введите текст сообщения, или просто отправтье сообщение без фотографий.";
+        return "Отпрвьте фото, а затем отправьте текст сообщения, или просто отправтье сообщение без фотографий.";
     }
 
     @Override
-    @Transactional // Важно!
+    @Transactional // а вот тут мы уже то туда то сюда сохраняем поэтому надо все откатить если где то что то...
     public String sendReportMail(Long chatId, AppUser appUser, String message) {
         if(commandPatternChecker.isNotACommand(message)){
             try {
@@ -162,7 +177,11 @@ public class AppUserServiceImpl implements AppUserService {
                             .message(resultMesssage.toString())
                             .photos(attachments)
                             .build();
-                    rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+                    try {
+                        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
+                    } catch (AmqpException e) {
+                        log.error("Ошибка при отправке сообщения в очередь {}: {}", registrationLoginQueue, e.getMessage(), e);
+                    }
                     appUser.setState(BASIC_STATE);
                     appUserDAO.save(appUser);
                     return "Отправляется...";
@@ -170,12 +189,14 @@ public class AppUserServiceImpl implements AppUserService {
                 } else {
                     appUser.setState(BASIC_STATE);
                     appUserDAO.save(appUser);
+                    log.error("User is not found at method sendReportMail, chatId:" + chatId + " user:" + appUser + " message:" + message);
                     return "Пользователь не найден в методе sendReportMail";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 appUser.setState(BASIC_STATE);
                 appUserDAO.save(appUser);
+                log.error("Error with sending photos, chatId:" + chatId + " user:" + appUser + " message:" + message + " " + e.getMessage());
                 return "Ошибка при отправке фотографий: " + e.getMessage();
             }
         }else{

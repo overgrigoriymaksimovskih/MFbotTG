@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
-        <!--<RollingFile name="DebugLog" fileName="dispatcher/logs/debug/debug.log"-->
-        <RollingFile name="DebugLog" fileName="/var/lib/dispatcher/debug/debug.log"
-                     filePattern="/var/lib/dispatcher/debug/debug-%d{yyyy-MM-dd}-%i.log.gz">
-                     <!--filePattern="dispatcher/logs/debug-%d{yyyy-MM-dd}-%i.log.gz">-->
+        <!--<RollingFile name="DebugLog" fileName="mail-service/logs/debug/debug.log"-->
+        <RollingFile name="DebugLog" fileName="/var/lib/mail-service/debug/debug.log"
+                     filePattern="/var/lib/mail-service/debug/debug-%d{yyyy-MM-dd}-%i.log.gz">
+            <!--filePattern="mail-service/logs/debug-%d{yyyy-MM-dd}-%i.log.gz">-->
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>
@@ -16,10 +16,10 @@
             <DefaultRolloverStrategy max="3"/>
         </RollingFile>
 
-        <!--<RollingFile name="InfoLog" fileName="dispatcher/logs/info/info.log"-->
-        <RollingFile name="InfoLog" fileName="/var/lib/dispatcher/info/info.log"
-                     filePattern="/var/lib/dispatcher/info/info-%d{yyyy-MM-dd}-%i.log.gz">
-                    <!--filePattern="dispatcher/logs/info-%d{yyyy-MM-dd}-%i.log.gz">-->
+        <!--<RollingFile name="InfoLog" fileName="mail-service/logs/info/info.log"-->
+        <RollingFile name="InfoLog" fileName="/var/lib/mail-service/info/info.log"
+                     filePattern="/var/lib/mail-service/info/info-%d{yyyy-MM-dd}-%i.log.gz">
+            <!--filePattern="mail-service/logs/info-%d{yyyy-MM-dd}-%i.log.gz">-->
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>
@@ -32,10 +32,10 @@
             <DefaultRolloverStrategy max="2"/>
         </RollingFile>
 
-        <!--<RollingFile name="WarnErrorLog" fileName="dispatcher/logs/warn/warn.log"-->
-        <RollingFile name="WarnErrorLog" fileName="/var/lib/dispatcher/warn/warn.log"
-                     filePattern="/var/lib/dispatcher/warn/warn_error-%d{yyyy-MM-dd}-%i.log.gz">
-                    <!--filePattern="dispatcher/logs/warn_error-%d{yyyy-MM-dd}-%i.log.gz">-->
+        <!--<RollingFile name="WarnErrorLog" fileName="mail-service/logs/warn/warn.log"-->
+        <RollingFile name="WarnErrorLog" fileName="/var/lib/mail-service/warn/warn.log"
+                     filePattern="/var/lib/mail-service/warn/warn_error-%d{yyyy-MM-dd}-%i.log.gz">
+            <!--filePattern="mail-service/logs/warn_error-%d{yyyy-MM-dd}-%i.log.gz">-->
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>

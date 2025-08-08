@@ -41,18 +41,17 @@ public class UpdateController {
 
     public void processUpdate(Update update){
         if (update == null){
-            log.error("Received object is null");
+            log.error("Received object is null ");
             return;
         }
         if (update.hasMessage()){
             distributeMessageByType(update);
         }else{
-            log.error("Unsupported message type received: " + update);
+            log.error("Unsupported message type received. ChatID: " + update.getMessage().getChatId());
         }
     }
 
     private void distributeMessageByType (Update update){
-        //TODO реализовать ограничение запросов в еденицу времени (redis или Token Bucket Algorithm...)
         Message message = update.getMessage();
 
         //Отправляем сообщение на проверку и если проверка успешна, то на обработку
@@ -143,7 +142,7 @@ public class UpdateController {
     }
 
     private void setFileIsReceivedView(Update update) {
-        var sendMessage = messageUtils.generateSendMessageWithText(update, "Файл получен и обрабатывается ...");
+        var sendMessage = messageUtils.generateSendMessageWithText(update, "Файл получен и обрабатывается...");
         setView(sendMessage);
     }
 

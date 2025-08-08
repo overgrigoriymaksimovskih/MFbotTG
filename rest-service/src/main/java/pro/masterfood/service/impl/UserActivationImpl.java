@@ -50,6 +50,7 @@ public class UserActivationImpl implements UserActivationService {
             user.setState(BASIC_STATE);
             user.setEmail(null);
             appUserDAO.save(user);
+            log.error("Error in utils -> SiteData " + e.getMessage(), e);
             throw new RuntimeException(e);
         }
         if(res.containsKey("PhoneNumber") && res.containsKey("SiteUid")){
@@ -69,6 +70,7 @@ public class UserActivationImpl implements UserActivationService {
                         , requestParams.getChatId())
                 ;
             }else{
+                log.error("Error with handle answer in UserActivationImpl " + requestParams.getChatId());
                 sendAnswer("Ошибка в интерпритации ответа при авторизации \n" + "Введите email..." , requestParams.getChatId());
             }
 

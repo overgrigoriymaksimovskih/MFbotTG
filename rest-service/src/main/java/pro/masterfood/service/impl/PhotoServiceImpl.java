@@ -33,6 +33,7 @@ public class PhotoServiceImpl implements PhotoService {
         try {
             appPhotoDAO.deleteByOwnerId(id);
         } catch (Exception e) {
+            log.error("Error with delete photo in PhotoServiceImpl" + e.getMessage(), e);
             return false;
         } return true;
     }

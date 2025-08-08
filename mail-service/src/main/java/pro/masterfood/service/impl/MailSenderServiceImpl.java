@@ -1,5 +1,7 @@
 package pro.masterfood.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @Component
 public class MailSenderServiceImpl  implements MailSenderService {
+    private static final Logger log = LoggerFactory.getLogger(MailSenderServiceImpl.class);
 
     @Value("${spring.mail.username}")
     private String emailFrom;
@@ -84,8 +87,10 @@ public class MailSenderServiceImpl  implements MailSenderService {
 
         } catch (MessagingException e) {
             sendAnswer("Ошибка отправки (MessagingException): " + e.getMessage(), mailParams.getChatId());
+            log.error("Ошибка отправки (MessagingException): " + e.getMessage(), mailParams.getChatId());
         } catch (MailException e) {
             sendAnswer("Ошибка отправки (MailException): " + e.getMessage(), mailParams.getChatId());
+            log.error("Ошибка отправки (MailException): " + e.getMessage(), mailParams.getChatId());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

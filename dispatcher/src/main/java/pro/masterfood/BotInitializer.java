@@ -1,5 +1,7 @@
 package pro.masterfood;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.CommandLineRunner;
@@ -10,6 +12,7 @@ import pro.masterfood.controller.TelegramBot;
 
 @Component
 public class BotInitializer implements CommandLineRunner {
+    private static final Logger log = LoggerFactory.getLogger(BotInitializer.class);
     @Autowired
     private TelegramBot telegramBot;
     @Override
@@ -18,7 +21,7 @@ public class BotInitializer implements CommandLineRunner {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(telegramBot);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("Error with initializing bot:  " + e.getMessage());
         }
     }
 }
