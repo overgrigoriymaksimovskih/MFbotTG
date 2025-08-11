@@ -3,6 +3,7 @@ package pro.masterfood.utils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,14 +24,18 @@ import javax.swing.text.html.parser.Entity;
 public class SimpleHttpClient {
     private static final Logger log = LoggerFactory.getLogger(SimpleHttpClient.class);
 
+    @Value("${server.user}")
+    private static String username;
+    @Value("${server.password}")
+    private static String password;
     public static String getBalance(String clientId) {
 
-        String username = "ws";
-        String password = "R1xHoHG";
+
 
         HttpURLConnection con = null;
 //        String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
-        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
+//        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
+        String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
         try {
             URL obj = new URL(url);
             con = (HttpURLConnection) obj.openConnection();
@@ -71,7 +76,7 @@ public class SimpleHttpClient {
 
 
                 } catch (IOException e) {
-                    log.error("IOException during connection for user " + e.getMessage());
+                    log.error("-=РЕСТ СЕРВИС -ГЕТ БАЛАНС- НЕ ОТВЕЧАЕТ=-: IOException during connection for user " + e.getMessage());
                     return null; // Обработка ошибки чтения ответа
                 }
             } else {
@@ -98,7 +103,7 @@ public class SimpleHttpClient {
         HttpURLConnection con = null;
 //        String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
 //        String url = "http://192.168.127.36:54321/sushi2/hs/PC//GetStatus/" + "z727784" + "/";
-        String url = "http://192.168.127.36:54321/sushi2/hs/PC/GetStatusByPhone/" + phone.replace("+", "") + "/";
+        String url = "http://78.29.24.26:54321/sushi2/hs/PC/GetStatusByPhone/" + phone.replace("+", "") + "/";
 //        String url = "http://192.168.127.36:54321/sushi2/hs/PC/GetStatusByPhone/79517790515/";
         try {
             URL obj = new URL(url);
@@ -163,7 +168,7 @@ public class SimpleHttpClient {
             }
 
         } catch (IOException e) {
-            log.error("IOException during connection for phone " + phone + " : " + e.getMessage());
+            log.error("-=РЕСТ СЕРВИС -ГЕТ СТАТУС- НЕ ОТВЕЧАЕТ=-: IOException during connection for phone " + phone + " : " + e.getMessage());
             return null; // Обработка общей ошибки соединения
         } finally {
             if (con != null) {

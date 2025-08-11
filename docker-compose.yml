@@ -40,11 +40,6 @@ services:
       RABBIT_MESSAGE_FROM_1C_QUEUE: ${RABBIT_MESSAGE_FROM_1C_QUEUE}
       RABBIT_ANSWER_MESSAGE_QUEUE: ${RABBIT_ANSWER_MESSAGE_QUEUE}
 
-    #logging:
-    #  driver: 'json-file'
-    #  options:
-    #    max-size: '100m'
-    #    max-file: '3'
     depends_on:
       rabbit-mq:
         condition: service_healthy
@@ -80,11 +75,7 @@ services:
       TG_BOT_FILE_STORAGE_URI: ${TG_BOT_FILE_STORAGE_URI}
       TG_BOT_URI: ${TG_BOT_URI}
       SALT: ${SALT}
-    #logging:
-    #  driver: 'json-file'
-    #  options:
-    #    max-size: '100m'
-    #    max-file: '3'
+
     depends_on:
       rabbit-mq:
         condition: service_healthy
@@ -113,11 +104,7 @@ services:
       RABBIT_LOGIN_QUEUE: ${RABBIT_LOGIN_QUEUE}
       RABBIT_ANSWER_MESSAGE_QUEUE: ${RABBIT_ANSWER_MESSAGE_QUEUE}
       SALT: ${SALT}
-    #logging:
-    #  driver: 'json-file'
-    #  options:
-    #    max-size: '100m'
-    #    max-file: '3'
+
     depends_on:
       postgres-db:
         condition: service_healthy
@@ -144,11 +131,7 @@ services:
       RABBIT_MAIL_QUEUE: ${RABBIT_MAIL_QUEUE}
       RABBIT_ANSWER_MESSAGE_QUEUE: ${RABBIT_ANSWER_MESSAGE_QUEUE}
       ACTIVATION_URI: ${ACTIVATION_URI}
-    #logging:
-    #  driver: 'json-file'
-    #  options:
-    #    max-size: '100m'
-    #    max-file: '3'
+
     depends_on:
       rabbit-mq:
         condition: service_healthy

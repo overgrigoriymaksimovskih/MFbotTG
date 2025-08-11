@@ -10,7 +10,7 @@ public class CommandPatternChecker {
                 || string.equals("/report")
                 || string.equals("/cancel")
                 || string.equals("/quit")
-                || string.equals("/registration")
+                || string.equals("/login")
                 || string.equals("/help")
         ){
             return false;
