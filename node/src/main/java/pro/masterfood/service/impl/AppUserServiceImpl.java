@@ -221,7 +221,7 @@ public class AppUserServiceImpl implements AppUserService {
         appUser.setIsActive(false);
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
-        return "Вы успешно вышли из аккаунта. Для входа в аккаунт пройдете авторизацию /registration";
+        return "Вы успешно вышли из аккаунта. Для входа в аккаунт пройдете авторизацию /login";
     }
 
 }

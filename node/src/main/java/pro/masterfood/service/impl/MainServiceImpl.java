@@ -204,7 +204,7 @@ public class MainServiceImpl implements MainService {
                     "если Вы еще не зарегистрированы на сайте " +
                     "пройдите регистрацию: https://m.master-food.pro/private/register_new/ " +
                     "\n" +
-                    "Авторизоваться в боте /registration";
+                    "Авторизоваться в боте /login";
         } else {
 //            return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
             String offerDetails = offerService.handleTextMessage(cmd, appUser.getIsActive());
