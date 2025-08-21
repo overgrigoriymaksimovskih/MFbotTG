@@ -12,9 +12,9 @@
 * Docker для запуска сервисов в отдельных контейнерах
 -----------------------------------------------------------------------------------------------------------------
 Логи пишутся в volumes внутри каждого контейнера
-/var/lib/"module"/warn/warn.log
-/var/lib/"module"/debug/debug.log
-("module": rest-service mail-service node dispatcher)
+* /var/lib/"module"/warn/warn.log
+* /var/lib/"module"/debug/debug.log
+* ("module": rest-service mail-service node dispatcher)
 
 -----------------------------------------------------------------------------------------------------------------
 
