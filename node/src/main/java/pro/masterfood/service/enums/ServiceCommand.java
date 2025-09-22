@@ -5,7 +5,13 @@ public enum ServiceCommand {
     QUIT("/quit"),
     HELP("/help"),
     REMIND("/remind"),
+//--------------------------------
     REGISTRATION("/login"),
+    REGISTRATIONEMAIL("/email"),
+    REGISTRATIONPHONE("/phone"),
+    REGISTRATIONPHONEINPUT("/phoneinput"),
+    REGISTRATIONPHONESHARE("/phoneshare"),
+//--------------------------------
     GET_USER_INFO("/present"),
     STATUS("/status"),
     REPORT("/report"),

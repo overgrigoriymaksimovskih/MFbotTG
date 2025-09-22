@@ -51,7 +51,7 @@ public class UserActivationImpl implements UserActivationService {
             user.setEmail(null);
             appUserDAO.save(user);
             log.error("Error in utils -> SiteData " + e.getMessage(), e);
-            throw new RuntimeException(e);
+            sendAnswer("Ошибка проверки логина/пароля на сайте с использованием siteData.activationFromSite: " + e.getMessage(), requestParams.getChatId());
         }
         if(res.containsKey("PhoneNumber") && res.containsKey("SiteUid")){
             if(!res.get("PhoneNumber").equalsIgnoreCase("null") && !res.get("SiteUid").equalsIgnoreCase("0")){
@@ -83,6 +83,44 @@ public class UserActivationImpl implements UserActivationService {
     }
 
 
+    @Override
+    public void consumeSMS(RequestParams requestParams) {
+
+        var optional = appUserDAO.findById(requestParams.getId());
+
+        var user = optional.get();
+        String smsFromDB = user.getSmsCode();
+        String sms = requestParams.getSmsCode();
+
+        user.setState(WAIT_FOR_ANSWER);
+        appUserDAO.save(user);
+
+        if(smsFromDB.equals(sms)){
+            user.setIsActive(true);
+            user.setState(BASIC_STATE);
+            user.setSmsCode(null);
+            appUserDAO.save(user);
+
+            sendAnswer("Добро пожаловать!" + "\nСписок доступных команд:\n\n"
+                            + "Накопления на подарок и бонусы: /present\n"
+                            + "Статус текущего заказа: /status\n"
+                            + "Отправить жалобу: /report\n"
+                            + "Отмена выполнения текущей команды: /cancel\n "
+                            + "\n"
+                            + "Выйти: /quit"
+                    , requestParams.getChatId())
+            ;
+        }else{
+            user.setPhoneNumber(null);
+            user.setSmsCode(null);
+            user.setSiteUserId(null);
+            user.setState(WAIT_FOR_PHONE_STATE);
+            appUserDAO.save(user);
+            sendAnswer("Неверный код подтверждения\n" +"" +
+                    "Введите номер в формате: 7 *** *** ** **\n" +
+                    "или отмените процесс авторизации /cancel", requestParams.getChatId());
+        }
+    }
 
 
     @Override

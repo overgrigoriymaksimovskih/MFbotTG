@@ -55,7 +55,7 @@ public class UpdateController {
         Message message = update.getMessage();
 
         //Отправляем сообщение на проверку и если проверка успешна, то на обработку
-        if (messageRateLimiter.allowRequestAtomic(message.getChatId().toString())) {
+        if (message.hasPhoto() || messageRateLimiter.allowRequestAtomic(message.getChatId().toString())) {
             if (checkMessageSize(update)) {
                 int contentCount = 0;
 

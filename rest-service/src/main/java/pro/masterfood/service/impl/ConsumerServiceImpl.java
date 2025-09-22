@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import pro.masterfood.dto.RequestParams;
 import pro.masterfood.enums.RequestsToREST;
 import pro.masterfood.service.ConsumerService;
+import pro.masterfood.service.PhoneHandler;
 import pro.masterfood.service.UserActivationService;
 import pro.masterfood.service.UserInformationProvider;
 
@@ -14,7 +15,9 @@ import pro.masterfood.service.UserInformationProvider;
 public class ConsumerServiceImpl implements ConsumerService {
 
     private final UserActivationService userActivationService;
+    private final PhoneHandler phoneHandler;
     private final UserInformationProvider userInformationProvider;
+
 
     @Override
     @RabbitListener(queues = "${spring.rabbitmq.queues.login}")
@@ -22,6 +25,12 @@ public class ConsumerServiceImpl implements ConsumerService {
         try {
             if(RequestsToREST.LOGIN_REQUEST.equals(requestParams.getRequestType())){
                 userActivationService.consumeLogin(requestParams);
+
+            } else if (RequestsToREST.CHECK_PHONE_REQUEST.equals(requestParams.getRequestType())) {
+                phoneHandler.handlePhone(requestParams);
+            } else if (RequestsToREST.CHECK_SMS_REQUEST.equals(requestParams.getRequestType())) {
+                userActivationService.consumeSMS(requestParams);
+
             } else if (RequestsToREST.PRESENTS_REQUEST.equals(requestParams.getRequestType())) {
                 userInformationProvider.consumeGetBalance(requestParams);
             } else if (RequestsToREST.ORDER_STATUS_REQUEST.equals(requestParams.getRequestType())) {

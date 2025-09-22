@@ -71,7 +71,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             setMyCommands.setCommands(listOfCommands);
             this.execute(setMyCommands);
         } catch (TelegramApiException e) {
-            System.err.println("Ошибка при установке команд бота: " + e.getMessage());
+            log.error("Ошибка при установке команд бота: " + e.getMessage());
         }
     }
 

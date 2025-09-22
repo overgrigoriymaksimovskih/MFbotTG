@@ -16,6 +16,7 @@ import pro.masterfood.entity.AppPhoto;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.enums.RequestsToREST;
 import pro.masterfood.utils.CommandPatternChecker;
+import pro.masterfood.utils.PhoneFormatChecker;
 import static pro.masterfood.enums.UserState.*;
 import pro.masterfood.service.AppUserService;
 import javax.mail.internet.AddressException;
@@ -29,13 +30,20 @@ public class AppUserServiceImpl implements AppUserService {
     private final RabbitTemplate rabbitTemplate;
     private final AppUserDAO appUserDAO;
     private final CommandPatternChecker commandPatternChecker;
+    private final PhoneFormatChecker phoneFormatChecker;
     private final AppPhotoDAO appPhotoDAO;
     private final Hashids hashids;
 
-    public AppUserServiceImpl(AppUserDAO appUserDAO, RabbitTemplate rabbitTemplate, CommandPatternChecker commandPatternChecker, AppPhotoDAO appPhotoDAO, Hashids hashids) {
+    public AppUserServiceImpl(AppUserDAO appUserDAO,
+                              RabbitTemplate rabbitTemplate,
+                              CommandPatternChecker commandPatternChecker,
+                              PhoneFormatChecker phoneFormatChecker,
+                              AppPhotoDAO appPhotoDAO,
+                              Hashids hashids) {
         this.appUserDAO = appUserDAO;
         this.rabbitTemplate = rabbitTemplate;
         this.commandPatternChecker = commandPatternChecker;
+        this.phoneFormatChecker = phoneFormatChecker;
         this.appPhotoDAO = appPhotoDAO;
         this.hashids = hashids;
     }
@@ -49,14 +57,21 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
-    public String registerUser(AppUser appUser) {
+    public String chooseLoginType(AppUser appUser) {
+        return "Войти используя логин-пароль: /email  " +
+                "\n" +
+                "Войти по номеру телефона: /phone";
+    }
+    @Override
+    public String loginByPassword(AppUser appUser) {
         if (appUser.getIsActive()) {
-            return "Вы уже зарегистрированы";
-        } else if (appUser.getEmail() != null && !appUser.getIsActive()) {
+            return "Вы уже авторизованы";
+        }
+        else if (appUser.getEmail() != null && !appUser.getIsActive()) {
             appUser.setState(WAIT_FOR_PASSWORD_STATE);
             appUserDAO.save(appUser);
             return "Ваш email " + appUser.getEmail() + "\n"
-                    + " введите пароль";
+                    + " введите пароль:";
         }
         appUser.setState(WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);
@@ -66,6 +81,91 @@ public class AppUserServiceImpl implements AppUserService {
                 "ВВЕДИТЕ E-MAIL: \n"
                 ;
     }
+    @Override
+    public String loginByPhone(AppUser appUser) {
+        return "Ввести номер вручную (если номер на сайте и в Телеграме не совпадают): /phoneinput  " +
+                "\n" +
+                "\n" +
+                "Поделиться контактом: /phoneshare";
+    }
+
+    @Override
+    //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
+    public String loginByPhoneManualInput(AppUser appUser) {
+        if (appUser.getIsActive()) {
+            return "Вы уже авторизованы";
+        }
+        else if (appUser.getPhoneNumber() != null && !appUser.getIsActive()) {
+            appUser.setState(WAIT_FOR_SMS_STATE);
+            appUserDAO.save(appUser);
+            return "Ваш номер " + appUser.getPhoneNumber() + "\n"
+                    + " введите код из 4 цифр:";
+        }
+        appUser.setState(WAIT_FOR_PHONE_STATE);
+        appUserDAO.save(appUser);
+        return  "ВВЕДИТЕ НОМЕР ТЕЛЕФОНА: \n";
+    }
+
+
+    @Override
+    //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
+    public String checkPhone(Long chatId, AppUser appUser, String phone) {
+        String phoneNumber;
+        phoneNumber = phoneFormatChecker.formatPhoneNumber(phone);
+        if(!phoneNumber.equals(null)){
+            appUser.setPhoneNumber(phone);
+            appUserDAO.save(appUser);
+
+            var phoneParams = RequestParams.builder()
+                    .requestType(RequestsToREST.CHECK_PHONE_REQUEST)
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .phoneNumber(appUser.getPhoneNumber())
+                    .build();
+            try {
+                rabbitTemplate.convertAndSend(registrationLoginQueue, phoneParams);
+            } catch (AmqpException e) {
+                log.error("Ошибка при отправке сообщения в очередь {}: {}", registrationLoginQueue, e.getMessage(), e);
+            }
+            return "Отправлено на проверку...";
+
+        }else{
+            return "Номер не распознан. Введите номер в формате: 7 *** *** ** **\n" +
+                    "или отмените процесс авторизации /cancel";
+        }
+    }
+
+    @Override
+    public String checkSMS(Long chatId, AppUser appUser, String sms) {
+        if(commandPatternChecker.isNotACommand(sms)){
+            var loginParams = RequestParams.builder()
+                    .requestType(RequestsToREST.CHECK_SMS_REQUEST)
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .smsCode(sms)
+                    .build();
+            try {
+                rabbitTemplate.convertAndSend(registrationLoginQueue, loginParams);
+            } catch (AmqpException e) {
+                log.error("Ошибка при отправке сообщения в очередь {}: {}", registrationLoginQueue, e.getMessage(), e);
+            }
+            return "Отправлено на проверку...";
+        }else{
+            return "Введите код подтверждения \n" +
+                    "или отмените процесс авторизации /cancel";
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
 
     @Override
     //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда

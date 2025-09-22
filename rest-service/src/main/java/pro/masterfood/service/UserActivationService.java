@@ -9,6 +9,7 @@ public interface UserActivationService {
 //    Map<String, Object> activationFromSite(String email,
 //                                           String password);
     void consumeLogin(RequestParams requestParams);
+    void consumeSMS(RequestParams requestParams);
 
     void sendAnswer(String output, Long chatId);
 }

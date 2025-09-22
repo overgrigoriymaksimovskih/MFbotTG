@@ -52,6 +52,8 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     private UserState state;
 
+    private String smsCode; // Добавленное поле
+
     public AppUser() {
     }
 
@@ -153,6 +155,15 @@ public class AppUser {
         this.state = state;
     }
 
+    // Геттер и сеттер для smsCode
+    public String getSmsCode() {
+        return smsCode;
+    }
+
+    public void setSmsCode(String smsCode) {
+        this.smsCode = smsCode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -180,6 +191,7 @@ public class AppUser {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", isActive=" + isActive +
                 ", state=" + state +
+                ", smsCode='" + smsCode + '\'' +
                 '}';
     }
 
@@ -199,6 +211,7 @@ public class AppUser {
         private String phoneNumber;
         private Boolean isActive;
         private UserState state;
+        private String smsCode; // Добавил поле smsCode в Builder
 
         private Builder() {
         }
@@ -253,6 +266,12 @@ public class AppUser {
             return this;
         }
 
+        // Добавленный метод для smsCode в Builder
+        public Builder smsCode(String smsCode) {
+            this.smsCode = smsCode;
+            return this;
+        }
+
         public AppUser build() {
             AppUser appUser = new AppUser();
             appUser.setTelegramUserId(telegramUserId);
@@ -265,6 +284,7 @@ public class AppUser {
             appUser.setPhoneNumber(phoneNumber);
             appUser.setIsActive(isActive);
             appUser.setState(state);
+            appUser.setSmsCode(smsCode); // Устанавливаем smsCode
             return appUser;
         }
     }

@@ -20,4 +20,6 @@ public class RequestParams {
     private String password;
 
     private String phoneNumber;
+
+    private String smsCode;
 }

@@ -3,6 +3,10 @@ package pro.masterfood.utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
@@ -22,10 +26,34 @@ public class SimpleHttpClient {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleHttpClient.class);
 
+    private final RestTemplate restTemplate;
+
     @Value("${server.user}")
     private String username; //  Удален static
     @Value("${server.password}")
     private String password; // Удален static
+
+
+    public String sendPostRequest(String url, String requestBody) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED); // <-- Исправлено!
+            HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return response.getBody();
+            } else {
+                // Обработка ошибок - лучше выбросить исключение
+                System.err.println("Ошибка при отправке POST запроса. Код ответа: " + response.getStatusCode());
+                return "Ошибка: " + response.getStatusCode(); // Возвращаем код ошибки
+            }
+        } catch (Exception e) {
+            System.err.println("Произошла ошибка: " + e.getMessage());
+            return "Ошибка: " + e.getMessage(); // Возвращаем сообщение об ошибке
+        }
+    }
 
     //Этот метод для получения баланса
     public String getBalance(String clientId) {

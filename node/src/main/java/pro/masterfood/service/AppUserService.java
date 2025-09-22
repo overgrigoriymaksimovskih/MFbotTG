@@ -3,7 +3,15 @@ package pro.masterfood.service;
 import pro.masterfood.entity.AppUser;
 
 public interface AppUserService {
-    String registerUser(AppUser appUser);
+    String chooseLoginType(AppUser appUser);
+    String loginByPassword(AppUser appUser);
+//-------------------------------------------------------
+    String loginByPhone(AppUser appUser);
+    String loginByPhoneManualInput(AppUser appUser);
+//-------------------------------------------------------
+    String checkPhone(Long chatId, AppUser appUser, String phone);
+    String checkSMS (Long chatId, AppUser appUser, String sms);
+
     String setEmail (AppUser appUser, String email);
     String checkPassword (Long chatId, AppUser appUser, String password);
 

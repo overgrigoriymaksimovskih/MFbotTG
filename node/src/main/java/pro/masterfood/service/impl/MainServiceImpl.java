@@ -74,9 +74,23 @@ public class MainServiceImpl implements MainService {
             //Все команды с состоянием ОЖИДАЕМ ЕМАЙЛ обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
+
             //Все команды с состоянием ОЖИДАЕМ ПАРОЛЬ обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
             output = appUserService.checkPassword(chatId, appUser, text);
+
+            //Все команды с состоянием ОЖИДАЕМ ВВОД НОМЕРА ТЕЛЕФОНА ВРУЧНУЮ ИЛИ ПОДЕЛИТЬСЯ КОНТАКТОМ обрабатываются
+            // отдельной коммандой в АппЮзерСервис
+        } else if (WAIT_FOR_PHONE_STATE.equals(userState)) {
+            output = appUserService.checkPhone(chatId, appUser, text);
+            //Все команды с состоянием ОЖИДАЕМ ВВОД SMS обрабатываются отдельной коммандой в АппЮзерСервис
+        } else if (WAIT_FOR_SMS_STATE.equals(userState)) {
+            output = appUserService.checkSMS(chatId, appUser, text);
+
+
+
+
+
             //Все команды с состоянием ОЖИДАЕМ ОТВЕТ возвращают ответ ОБОЖДИТЕ...
         } else if (WAIT_FOR_ANSWER.equals(userState)) {
             output = "Дождитесь выполнения команды... Если команда выполняется слишком долго - отмените ее... \n/cancel";
@@ -174,8 +188,20 @@ public class MainServiceImpl implements MainService {
 //----------------------------------------------------------------------------------------------------------------------
     private String processServiceCommand(Long chatId, AppUser appUser, String cmd) {
         var serviceCommand = ServiceCommand.fromValue(cmd);
+        //Варианты авторизации
+        //выбираем тип авторизации
         if (REGISTRATION.equals(serviceCommand)){
-            return appUserService.registerUser(appUser);
+            return appUserService.chooseLoginType(appUser);
+        //если тип по логину паролю
+        } else if (REGISTRATIONEMAIL.equals(serviceCommand)) {
+            return appUserService.loginByPassword(appUser);
+        //если тип по телефону но еще не выбрано как именно
+        } else if (REGISTRATIONPHONE.equals(serviceCommand)) {
+            return appUserService.loginByPhone(appUser);
+        //если тип по телефону Ручной ввод
+        } else if (REGISTRATIONPHONEINPUT.equals(serviceCommand)) {
+            return appUserService.loginByPhoneManualInput(appUser);
+        //-------------------------------------------------------------------------
 
         } else if (GET_USER_INFO.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.checkBalance(chatId, appUser);
@@ -197,14 +223,15 @@ public class MainServiceImpl implements MainService {
             return helpIsActive();
         //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
-            return "Здравствуйте, для использования бота авторизуйтесь " +
-                    "с тем же логином и паролем, " +
-                    "которые используете для входа в личный кабинет " +
-                    "на сайте master-food.pro " +
-                    "если Вы еще не зарегистрированы на сайте " +
+            return "Здравствуйте. " +
+                    "\n" +
+                    "Для использования бота Вы должны быть  " +
+                    "зарегистрированы на сайте master-food.pro " +
+                    "если Вы еще не зарегистрированы, " +
                     "пройдите регистрацию: https://m.master-food.pro/private/register_new/ " +
                     "\n" +
-                    "Авторизоваться в боте /login";
+                    "\n" +
+                    "--> Авторизоваться в боте /login";
         } else {
 //            return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
             String offerDetails = offerService.handleTextMessage(cmd, appUser.getIsActive());
@@ -230,9 +257,20 @@ public class MainServiceImpl implements MainService {
 
     private String cancelProcess(AppUser appUser) {
         if(WAIT_FOR_PASSWORD_STATE.equals(appUser.getState())
-        || WAIT_FOR_ANSWER.equals(appUser.getState())){
+                || WAIT_FOR_ANSWER.equals(appUser.getState())){
             appUser.setEmail(null);
         }
+
+        if(WAIT_FOR_PHONE_STATE.equals(appUser.getState())){
+            appUser.setPhoneNumber(null);
+        }
+
+        if(WAIT_FOR_SMS_STATE.equals(appUser.getState())){
+            appUser.setSiteUserId(null);
+            appUser.setSmsCode(null);
+            appUser.setPhoneNumber(null);
+        }
+
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
         return "Команда отменена!";
