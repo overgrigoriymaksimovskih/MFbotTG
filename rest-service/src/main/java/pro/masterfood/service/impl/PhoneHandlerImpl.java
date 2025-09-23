@@ -11,7 +11,7 @@ import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dto.RequestParams;
 import pro.masterfood.service.PhoneHandler;
 import pro.masterfood.service.ProducerService;
-import pro.masterfood.utils.SimpleHttpClient;
+import pro.masterfood.utils.CustomPostClient;
 
 import static pro.masterfood.enums.UserState.*;
 
@@ -19,12 +19,12 @@ import static pro.masterfood.enums.UserState.*;
 public class PhoneHandlerImpl implements PhoneHandler {
     private static final Logger log = LoggerFactory.getLogger(UserActivationImpl.class);
     private final AppUserDAO appUserDAO;
-    private final SimpleHttpClient simpleHttpClient;
+    private final CustomPostClient customPostClient;
     private final ProducerService producerService;
 
-    public PhoneHandlerImpl(AppUserDAO appUserDAO, SimpleHttpClient simpleHttpClient, ProducerService producerService) {
+    public PhoneHandlerImpl(AppUserDAO appUserDAO, CustomPostClient customPostClient, ProducerService producerService) {
         this.appUserDAO = appUserDAO;
-        this.simpleHttpClient = simpleHttpClient;
+        this.customPostClient = customPostClient;
         this.producerService = producerService;
     }
 
@@ -65,7 +65,7 @@ public class PhoneHandlerImpl implements PhoneHandler {
 //            map.add("sms_text", "Ваш код подтверждения " + code);
 
             // Отправляем POST-запрос
-            String response = simpleHttpClient.sendPostRequest(url, mapToFormData(map));
+            String response = customPostClient.sendPostRequest(url, mapToFormData(map));
 
             try {
                 JSONObject jsonResponse = new JSONObject(response); // Преобразуем строку в JSON объект
