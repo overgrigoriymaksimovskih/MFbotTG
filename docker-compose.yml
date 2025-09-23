@@ -104,6 +104,8 @@ services:
       RABBIT_LOGIN_QUEUE: ${RABBIT_LOGIN_QUEUE}
       RABBIT_ANSWER_MESSAGE_QUEUE: ${RABBIT_ANSWER_MESSAGE_QUEUE}
       SALT: ${SALT}
+      REST_USER: ${REST_USER}
+      REST_PASSWORD: ${REST_PASSWORD}
 
     depends_on:
       postgres-db:
