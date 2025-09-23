@@ -13,6 +13,9 @@ import pro.masterfood.service.PhoneHandler;
 import pro.masterfood.service.ProducerService;
 import pro.masterfood.utils.CustomPostClient;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static pro.masterfood.enums.UserState.*;
 
 @Component
@@ -68,6 +71,13 @@ public class PhoneHandlerImpl implements PhoneHandler {
             String response = customPostClient.sendPostRequest(url, mapToFormData(map));
 
             try {
+                // Попытка извлечь JSON с помощью регулярного выражения
+                Pattern pattern = Pattern.compile("\\{(.*)\\}");
+                Matcher matcher = pattern.matcher(response);
+                if (matcher.find()) {
+                    response = matcher.group(); // Извлекаем JSON
+                }
+
                 JSONObject jsonResponse = new JSONObject(response); // Преобразуем строку в JSON объект
                 String result = jsonResponse.getString("result"); // Получаем значение поля "result"
 
@@ -89,14 +99,23 @@ public class PhoneHandlerImpl implements PhoneHandler {
                     log.error("Ошибка: " + jsonResponse.getString("message"));
                 } else {
                     // Обработка неизвестного результата
-                    sendAnswer("Ошибка: \"неизвестный результат\": " + result, requestParams.getChatId());
+                    user.setPhoneNumber(null);
+                    user.setSiteUserId(null);
+                    user.setState(BASIC_STATE);
+                    appUserDAO.save(user);
+                    sendAnswer("Ошибка: \"неизвестный результат\": " + result + "\n" + "Повторите процесс авторизации позже...", requestParams.getChatId());
                     log.error("Ошибка: \"неизвестный результат\": " + result);
                 }
 
-            } catch (Exception e) {
-                sendAnswer("Ошибка при обработке JSON: " + e.getMessage(), requestParams.getChatId());
-                log.error("Ошибка при обработке JSON: " + e.getMessage());
+            }   catch (Exception e) {
+                user.setPhoneNumber(null);
+                user.setSiteUserId(null);
+                user.setState(BASIC_STATE);
+                appUserDAO.save(user);
+                sendAnswer("Ошибка при обработке JSON: " + response + "\n" + e.getMessage() + "\n" + "Повторите процесс авторизации позже...", requestParams.getChatId() );
+                log.error("Ошибка при обработке JSON: ", e); // Логируем исключение полностью
             }
+
 
 
         }else{
@@ -129,7 +148,7 @@ public class PhoneHandlerImpl implements PhoneHandler {
         }
         String result = formData.toString();
 
-        System.out.println("FormData: " + result); // Добавляем логирование
+//        System.out.println("FormData: " + result); // Смотрим что вернул сервис в логах контейнра
         return result;
     }
 
