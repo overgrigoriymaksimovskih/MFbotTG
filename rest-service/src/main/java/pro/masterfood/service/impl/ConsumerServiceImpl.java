@@ -25,9 +25,9 @@ public class ConsumerServiceImpl implements ConsumerService {
         try {
             if(RequestsToREST.LOGIN_REQUEST.equals(requestParams.getRequestType())){
                 userActivationService.consumeLogin(requestParams);
-
             } else if (RequestsToREST.CHECK_CONTACT_REQUEST.equals(requestParams.getRequestType())) {
-                phoneHandler.handleContact(requestParams);
+                userActivationService.consumeContact(requestParams);
+
             } else if (RequestsToREST.CHECK_PHONE_REQUEST.equals(requestParams.getRequestType())) {
                 phoneHandler.handlePhone(requestParams);
             } else if (RequestsToREST.CHECK_SMS_REQUEST.equals(requestParams.getRequestType())) {

@@ -82,6 +82,52 @@ public class UserActivationImpl implements UserActivationService {
         }
     }
 
+    @Override
+    public void consumeContact(RequestParams requestParams) {
+        var optional = appUserDAO.findById(requestParams.getId());
+
+        String phoneNumber = requestParams.getPhoneNumber();
+        var user = optional.get();
+        user.setState(WAIT_FOR_ANSWER);
+        appUserDAO.save(user);
+        String resUserSiteId = null;
+
+        try {
+            resUserSiteId = "97220";// тут потом надо обращаться к сайт апи чтобы получить реальный сайтЮзерИд
+        } catch (Exception e) {
+            user.setState(BASIC_STATE);
+            user.setPhoneNumber(null);
+            appUserDAO.save(user);
+            log.error("Error in utils -> SimpleHttpClient: " + e.getMessage(), e);
+            sendAnswer("Ошибка проверки логина/пароля на сайте с использованием SimpleHttpClient: " + e.getMessage(), requestParams.getChatId());
+        }
+
+        if(!resUserSiteId.equals(null)){
+            user.setSiteUserId(Long.valueOf(resUserSiteId));
+            user.setIsActive(true);
+            user.setState(BASIC_STATE);
+            appUserDAO.save(user);
+
+            sendAnswer("Добро пожаловать!" + "\nСписок доступных команд:\n\n"
+                            + "Накопления на подарок и бонусы: /present\n"
+                            + "Статус текущего заказа: /status\n"
+                            + "Отправить жалобу: /report\n"
+                            + "Отмена выполнения текущей команды: /cancel\n "
+                            + "\n"
+                            + "Выйти: /quit"
+                    , requestParams.getChatId())
+            ;
+
+
+        }else{
+            user.setPhoneNumber(null);
+            user.setState(WAIT_FOR_PHONE_MANUAL_INPUT_STATE);
+            appUserDAO.save(user);
+            sendAnswer("Номер на который зарегистрирован Telegram не зарегистрирован на сайте master-food.pro: \n" +
+                    "ввести номер вручную /phoneinput", requestParams.getChatId());
+        }
+    }
+
 
     @Override
     public void consumeSMS(RequestParams requestParams) {

@@ -26,6 +26,7 @@ public class HelpOrShareContactButton {
         keyboardMarkup.setResizeKeyboard(true);   // Подгоняем размер клавиатуры
         keyboardMarkup.setSelective(false);  // Показываем клавиатуру всем
         keyboardMarkup.setIsPersistent(true);   // Клавиатура всегда видима
+        keyboardMarkup.setOneTimeKeyboard(false);
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
 
