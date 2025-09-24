@@ -198,6 +198,7 @@ public class MainServiceImpl implements MainService {
         if (output.equals("ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ")) {
             System.out.println("Strings match! Sending share contact button.");
             sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId, true);
+            sendMessage.setText("Пожалуйста, поделитесь своим контактом:");
 
             // Проверка, что в sendMessage действительно содержится ReplyMarkup с кнопкой "Поделиться контактом" (для отладки)
             if (sendMessage.getReplyMarkup() != null && sendMessage.getReplyMarkup() instanceof ReplyKeyboardMarkup) {
