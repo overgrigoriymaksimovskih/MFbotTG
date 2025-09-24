@@ -19,7 +19,7 @@ public class RabbitConfiguration {
     private static final Logger log = LoggerFactory.getLogger(RabbitConfiguration.class);
 
     @Value("${spring.rabbitmq.queues.text-message-update}")
-    private String textMessageUpdateQueue;
+    private String textAndContactMessageUpdateQueue;
 
     @Value("${spring.rabbitmq.queues.photo-message-update}")
     private String photoMessageUpdateQueue;
@@ -42,7 +42,7 @@ public class RabbitConfiguration {
         // 10 сообщений просто повиснет...)
         Map<String, Object> args = new HashMap<>();
         args.put("x-message-ttl", 6000);
-        return new Queue(textMessageUpdateQueue, true, false, false, args);
+        return new Queue(textAndContactMessageUpdateQueue, true, false, false, args);
     }
 
     @Bean

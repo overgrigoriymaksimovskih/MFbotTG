@@ -33,7 +33,7 @@ public class HelpOrShareContactButton {
         if (!NeedToShareContactButton) {
             KeyboardRow firstRow = new KeyboardRow();
             KeyboardButton helpButton = new KeyboardButton();
-            helpButton.setText("/helpa");
+            helpButton.setText("/help");
             firstRow.add(helpButton);
             keyboardRows.add(firstRow);
         }
