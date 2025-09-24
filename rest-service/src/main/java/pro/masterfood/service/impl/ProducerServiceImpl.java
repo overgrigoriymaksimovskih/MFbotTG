@@ -9,6 +9,28 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import pro.masterfood.service.ProducerService;
 
+//@Component
+//public class ProducerServiceImpl implements ProducerService {
+//    private static final Logger log = LoggerFactory.getLogger(ProducerServiceImpl.class);
+//    private final RabbitTemplate rabbitTemplate;
+//
+//    @Value("${spring.rabbitmq.queues.answer-message}")
+//    private String answerMessageQueue;
+//
+//    public ProducerServiceImpl(RabbitTemplate rabbitTemplate) {
+//        this.rabbitTemplate = rabbitTemplate;
+//    }
+//
+//    @Override
+//    public void producerAnswer(SendMessage sendMessage) {
+//        try {
+//            rabbitTemplate.convertAndSend(answerMessageQueue, sendMessage);
+//        } catch (AmqpException e) {
+//            log.error("Ошибка при отправке сообщения в очередь {}: {}", answerMessageQueue, e.getMessage(), e);
+//        }
+//    }
+//}
+
 @Component
 public class ProducerServiceImpl implements ProducerService {
     private static final Logger log = LoggerFactory.getLogger(ProducerServiceImpl.class);
@@ -23,10 +45,18 @@ public class ProducerServiceImpl implements ProducerService {
 
     @Override
     public void producerAnswer(SendMessage sendMessage) {
+        System.out.println("ProducerServiceImpl.producerAnswer() called with message: " + sendMessage);
+        if (sendMessage.getReplyMarkup() != null) {
+            System.out.println("ProducerServiceImpl.producerAnswer() Keyboard: " + sendMessage.getReplyMarkup().toString());
+        } else {
+            System.out.println("ProducerServiceImpl.producerAnswer(): no keyboard in sendMessage");
+        }
         try {
             rabbitTemplate.convertAndSend(answerMessageQueue, sendMessage);
+            System.out.println("ProducerServiceImpl.producerAnswer(): Message sent to queue: " + answerMessageQueue);
         } catch (AmqpException e) {
             log.error("Ошибка при отправке сообщения в очередь {}: {}", answerMessageQueue, e.getMessage(), e);
+            System.err.println("ProducerServiceImpl.producerAnswer(): Error sending message to queue " + answerMessageQueue + ": " + e.getMessage());
         }
     }
 }
