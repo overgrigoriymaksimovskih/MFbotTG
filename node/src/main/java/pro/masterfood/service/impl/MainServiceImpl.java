@@ -2,6 +2,7 @@ package pro.masterfood.service.impl;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import pro.masterfood.dao.AppUserDAO;
@@ -14,7 +15,7 @@ import pro.masterfood.service.FileService;
 import pro.masterfood.service.MainService;
 import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.enums.ServiceCommand;
-import pro.masterfood.utils.HelpButton;
+import pro.masterfood.utils.HelpOrShareContactButton;
 import pro.masterfood.utils.OneCmessageHandler;
 import pro.masterfood.service.OfferService;
 import org.slf4j.Logger;
@@ -35,9 +36,9 @@ public class MainServiceImpl implements MainService {
     private final AppUserService appUserService;
     private final OfferService offerService;
     private final OneCmessageHandler oneCmessageHandler;
-    private final HelpButton helpButton;
+    private final HelpOrShareContactButton helpOrShareContactButton;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, OfferService offerService, OneCmessageHandler oneCmessageHandler, HelpButton helpButton) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, OfferService offerService, OneCmessageHandler oneCmessageHandler, HelpOrShareContactButton helpOrShareContactButton) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
@@ -45,7 +46,7 @@ public class MainServiceImpl implements MainService {
         this.appUserService = appUserService;
         this.offerService = offerService;
         this.oneCmessageHandler = oneCmessageHandler;
-        this.helpButton = helpButton;
+        this.helpOrShareContactButton = helpOrShareContactButton;
     }
 
     @Override
@@ -57,6 +58,13 @@ public class MainServiceImpl implements MainService {
         var output = "";
 
         var chatId = update.getMessage().getChatId();
+
+        String phoneNumber = null;
+        if (update.getMessage().hasContact()) {
+            // Пользователь поделился контактом
+            Contact contact = update.getMessage().getContact();
+            phoneNumber = contact.getPhoneNumber();
+        }
 
         var serviceCommand = ServiceCommand.fromValue(text);
         //Сюда сначала попадают все команды
@@ -79,10 +87,16 @@ public class MainServiceImpl implements MainService {
         } else if (WAIT_FOR_PASSWORD_STATE.equals(userState)) {
             output = appUserService.checkPassword(chatId, appUser, text);
 
-            //Все команды с состоянием ОЖИДАЕМ ВВОД НОМЕРА ТЕЛЕФОНА ВРУЧНУЮ ИЛИ ПОДЕЛИТЬСЯ КОНТАКТОМ обрабатываются
+            //Все команды с состоянием ОЖИДАЕМ ВВОД НОМЕРА ТЕЛЕФОНА ВРУЧНУЮ обрабатываются
             // отдельной коммандой в АппЮзерСервис
-        } else if (WAIT_FOR_PHONE_STATE.equals(userState)) {
+        } else if (WAIT_FOR_PHONE_MANUAL_INPUT_STATE.equals(userState)) {
             output = appUserService.checkPhone(chatId, appUser, text);
+
+            //Все команды с состоянием ОЖИДАЕМ СООБЩЕНИЕ ДЕЛЕЛЕНИЯ КОНТАКТОМ обрабатываются
+            // отдельной коммандой в АппЮзерСервис
+        } else if (WAIT_FOR_PHONE_SHARE_STATE.equals(userState)) {
+            output = appUserService.checkPhone(chatId, appUser, phoneNumber);
+
             //Все команды с состоянием ОЖИДАЕМ ВВОД SMS обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_SMS_STATE.equals(userState)) {
             output = appUserService.checkSMS(chatId, appUser, text);
@@ -168,16 +182,20 @@ public class MainServiceImpl implements MainService {
 
 
     private void sendAnswer(String output, Long chatId) {
-//        SendMessage sendMessage = new SendMessage();
-//        sendMessage.setChatId(chatId);
-        SendMessage sendMessage = helpButton.getHelpMessage(chatId);
-        sendMessage.setText(output);
+        SendMessage sendMessage;
+        if(output.equals("ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ")){
+            sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId, true);
+        }else{
+            sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId);
+            sendMessage.setText(output);
+        }
+
         producerService.producerAnswer(sendMessage);
-//        sendHelpButton(chatId);
+
     }
 
     private void sendHelpButton(Long chatId) {
-        SendMessage sendMessage = helpButton.getHelpMessage(chatId);
+        SendMessage sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId);
 //        sendMessage.setChatId(chatId);
 //        sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
@@ -201,6 +219,9 @@ public class MainServiceImpl implements MainService {
         //если тип по телефону Ручной ввод
         } else if (REGISTRATIONPHONEINPUT.equals(serviceCommand)) {
             return appUserService.loginByPhoneManualInput(appUser);
+        //если тип по телефону Поделиться контактом
+        } else if (REGISTRATIONPHONESHARE.equals(serviceCommand)) {
+            return appUserService.loginByPhoneShare(appUser);
         //-------------------------------------------------------------------------
 
         } else if (GET_USER_INFO.equals(serviceCommand) && appUser.getIsActive()) {
@@ -261,7 +282,7 @@ public class MainServiceImpl implements MainService {
             appUser.setEmail(null);
         }
 
-        if(WAIT_FOR_PHONE_STATE.equals(appUser.getState())){
+        if(WAIT_FOR_PHONE_MANUAL_INPUT_STATE.equals(appUser.getState())){
             appUser.setPhoneNumber(null);
         }
 

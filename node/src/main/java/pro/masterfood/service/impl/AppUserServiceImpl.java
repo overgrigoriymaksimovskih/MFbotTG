@@ -90,7 +90,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
+    //Пользователь хочет ввести номер телефона вручную
     public String loginByPhoneManualInput(AppUser appUser) {
         if (appUser.getIsActive()) {
             return "Вы уже авторизованы";
@@ -98,12 +98,32 @@ public class AppUserServiceImpl implements AppUserService {
         else if (appUser.getPhoneNumber() != null && !appUser.getIsActive()) {
             appUser.setState(WAIT_FOR_SMS_STATE);
             appUserDAO.save(appUser);
-            return "Ваш номер " + appUser.getPhoneNumber() + "\n"
-                    + " введите код из 4 цифр:";
+            return "Ваш номер " + appUser.getPhoneNumber() + "\n"+
+                    " введите код из 4 цифр:"+
+                    "или отмените процесс авторизации /cancel";
         }
-        appUser.setState(WAIT_FOR_PHONE_STATE);
+        appUser.setState(WAIT_FOR_PHONE_MANUAL_INPUT_STATE);
         appUserDAO.save(appUser);
         return  "ВВЕДИТЕ НОМЕР ТЕЛЕФОНА: \n";
+    }
+
+    @Override
+    //Пользователь хочет поделиться контактом
+    public String loginByPhoneShare(AppUser appUser) {
+        if (appUser.getIsActive()) {
+            return "Вы уже авторизованы";
+        }
+        else if (appUser.getPhoneNumber() != null && !appUser.getIsActive()) {
+            appUser.setState(WAIT_FOR_SMS_STATE);
+            appUserDAO.save(appUser);
+            return "Ваш номер " + appUser.getPhoneNumber() + "\n"+
+                    " введите код из 4 цифр:"+
+                    "или отмените процесс авторизации /cancel";
+        }
+        appUser.setState(WAIT_FOR_PHONE_SHARE_STATE);
+        appUserDAO.save(appUser);
+
+        return  "ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ";
     }
 
 

@@ -114,7 +114,7 @@ public class UserActivationImpl implements UserActivationService {
             user.setPhoneNumber(null);
             user.setSmsCode(null);
             user.setSiteUserId(null);
-            user.setState(WAIT_FOR_PHONE_STATE);
+            user.setState(WAIT_FOR_PHONE_MANUAL_INPUT_STATE);
             appUserDAO.save(user);
             sendAnswer("Неверный код подтверждения\n" +"" +
                     "Введите номер в формате: 7 *** *** ** **\n" +

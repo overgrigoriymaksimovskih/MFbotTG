@@ -120,7 +120,7 @@ public class PhoneHandlerImpl implements PhoneHandler {
 
         }else{
             user.setPhoneNumber(null);
-            user.setState(WAIT_FOR_PHONE_STATE);
+            user.setState(WAIT_FOR_PHONE_MANUAL_INPUT_STATE);
             appUserDAO.save(user);
             sendAnswer("Номер не зарегистрирован на сайте master-food.pro Введите зарегистрированный номер: \n" +
                     "или отмените процесс авторизации /cancel", requestParams.getChatId());
