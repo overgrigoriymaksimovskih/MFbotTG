@@ -5,6 +5,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dao.RawDataDAO;
 import pro.masterfood.entity.AppUser;
@@ -183,9 +186,41 @@ public class MainServiceImpl implements MainService {
 
     private void sendAnswer(String output, Long chatId) {
         SendMessage sendMessage;
-        if(output.equals("ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ")){
+//        if(output.equals("ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ")){
+//            sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId, true);
+//        }else{
+//            sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId);
+//            sendMessage.setText(output);
+//        }
+
+        System.out.println("Comparing output string: " + output); // Логируем значение output
+
+        if (output.equals("ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ")) {
+            System.out.println("Strings match! Sending share contact button.");
             sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId, true);
-        }else{
+
+            // Проверка, что в sendMessage действительно содержится ReplyMarkup с кнопкой "Поделиться контактом" (для отладки)
+            if (sendMessage.getReplyMarkup() != null && sendMessage.getReplyMarkup() instanceof ReplyKeyboardMarkup) {
+                ReplyKeyboardMarkup markup = (ReplyKeyboardMarkup) sendMessage.getReplyMarkup();
+                if (markup.getKeyboard() != null && !markup.getKeyboard().isEmpty()) {
+                    for (KeyboardRow row : markup.getKeyboard()) {
+                        for (KeyboardButton button : row) {
+                            if (button.getRequestContact()) {
+                                System.out.println("The message contains a share contact button.");
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    System.out.println("Keyboard is empty!");
+                }
+            } else {
+                System.out.println("ReplyMarkup is null or not a ReplyKeyboardMarkup.");
+            }
+
+
+        } else {
+            System.out.println("Strings do not match. Sending default message.");
             sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId);
             sendMessage.setText(output);
         }
