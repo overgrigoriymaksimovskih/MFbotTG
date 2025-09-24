@@ -95,11 +95,9 @@ public class UpdateController {
                 }
 
                 if (contentCount == 1) {
-                    if(message.hasText()){
+                    if(message.hasText() || message.hasContact()){
                         processTextAndContactMessage(update);
                     }else if (message.hasPhoto()){
-                        processPhotoMessage(update);
-                    }else if (message.hasContact()){
                         processPhotoMessage(update);
                     }else{
                         setUnsupportedMessageTypeView(update);

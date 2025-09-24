@@ -10,6 +10,7 @@ public interface AppUserService {
     String loginByPhoneManualInput(AppUser appUser);
     String loginByPhoneShare(AppUser appUser);
 //-------------------------------------------------------
+    String checkContact(Long chatId, AppUser appUser, String phone);
     String checkPhone(Long chatId, AppUser appUser, String phone);
     String checkSMS (Long chatId, AppUser appUser, String sms);
 

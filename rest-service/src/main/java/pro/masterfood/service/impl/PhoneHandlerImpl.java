@@ -32,6 +32,41 @@ public class PhoneHandlerImpl implements PhoneHandler {
     }
 
     @Override
+    public void handleContact(RequestParams requestParams){
+        var optional = appUserDAO.findById(requestParams.getId());
+
+        String phoneNumber = requestParams.getPhoneNumber();
+        var user = optional.get();
+        user.setState(WAIT_FOR_ANSWER);
+        appUserDAO.save(user);
+        String resUserSiteId = null;
+
+        try {
+            resUserSiteId = "97220";// тут потом надо обращаться к сайт апи чтобы получить реальный сайтЮзерИд
+        } catch (Exception e) {
+            user.setState(BASIC_STATE);
+            user.setPhoneNumber(null);
+            appUserDAO.save(user);
+            log.error("Error in utils -> SimpleHttpClient: " + e.getMessage(), e);
+            sendAnswer("Ошибка проверки логина/пароля на сайте с использованием SimpleHttpClient: " + e.getMessage(), requestParams.getChatId());
+        }
+
+        if(!resUserSiteId.equals(null)){
+            user.setSiteUserId(Long.valueOf(resUserSiteId));
+            user.setState(BASIC_STATE);
+            appUserDAO.save(user);
+
+        }else{
+            user.setPhoneNumber(null);
+            user.setState(WAIT_FOR_PHONE_MANUAL_INPUT_STATE);
+            appUserDAO.save(user);
+            sendAnswer("Номер не зарегистрирован на сайте master-food.pro Введите зарегистрированный номер: \n" +
+                    "или отмените процесс авторизации /cancel", requestParams.getChatId());
+        }
+
+    }
+
+    @Override
     public void handlePhone(RequestParams requestParams){
         var optional = appUserDAO.findById(requestParams.getId());
 
@@ -127,6 +162,7 @@ public class PhoneHandlerImpl implements PhoneHandler {
         }
 
     }
+
     @Override
     public void sendAnswer(String output, Long chatId){
         SendMessage sendMessage = new SendMessage();

@@ -98,7 +98,7 @@ public class MainServiceImpl implements MainService {
             //Все команды с состоянием ОЖИДАЕМ СООБЩЕНИЕ ДЕЛЕЛЕНИЯ КОНТАКТОМ обрабатываются
             // отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_PHONE_SHARE_STATE.equals(userState)) {
-            output = appUserService.checkPhone(chatId, appUser, phoneNumber);
+            output = appUserService.checkContact(chatId, appUser, phoneNumber);
 
             //Все команды с состоянием ОЖИДАЕМ ВВОД SMS обрабатываются отдельной коммандой в АппЮзерСервис
         } else if (WAIT_FOR_SMS_STATE.equals(userState)) {

@@ -126,6 +126,34 @@ public class AppUserServiceImpl implements AppUserService {
         return  "ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ";
     }
 
+    @Override
+    //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
+    public String checkContact(Long chatId, AppUser appUser, String phone) {
+        String phoneNumber;
+        phoneNumber = phoneFormatChecker.formatPhoneNumber(phone);
+        if(!phoneNumber.equals(null)){
+            appUser.setPhoneNumber(phone);
+            appUserDAO.save(appUser);
+
+            var phoneParams = RequestParams.builder()
+                    .requestType(RequestsToREST.CHECK_CONTACT_REQUEST)
+                    .id(appUser.getId())
+                    .chatId(chatId)
+                    .phoneNumber(appUser.getPhoneNumber())
+                    .build();
+            try {
+                rabbitTemplate.convertAndSend(registrationLoginQueue, phoneParams);
+            } catch (AmqpException e) {
+                log.error("Ошибка при отправке сообщения в очередь {}: {}", registrationLoginQueue, e.getMessage(), e);
+            }
+            return "Отправлено на проверку...";
+
+        }else{
+            return "Номер не распознан. Введите номер в формате: 7 *** *** ** **\n" +
+                    "или отмените процесс авторизации /cancel";
+        }
+    }
+
 
     @Override
     //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
