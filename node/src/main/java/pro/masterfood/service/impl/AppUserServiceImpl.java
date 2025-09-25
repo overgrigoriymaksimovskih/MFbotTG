@@ -154,9 +154,7 @@ public class AppUserServiceImpl implements AppUserService {
             return "Отправлено на проверку...";
 
         }else{
-            return "ЧТОБЫ АВТОРИЗОВАТЬСЯ, НАЖМИТЕ КНОПКУ: \"ПОДЕЛИТЬСЯ КОНТАКТОМ\" ВНИЗУ ЭКРАНА" +
-                    "\n" +
-                    "или отмените процесс авторизации /cancel";
+            return "ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ";
         }
     }
 
