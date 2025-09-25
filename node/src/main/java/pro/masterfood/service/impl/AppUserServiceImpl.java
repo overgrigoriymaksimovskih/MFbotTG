@@ -58,9 +58,11 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
     public String chooseLoginType(AppUser appUser) {
-        return "Войти используя логин-пароль: /email  " +
+        return "Логин-пароль: /email  " +
                 "\n" +
-                "Войти по номеру телефона: /phone";
+                "Код подтверждения: /phoneinput" +
+                "\n" +
+                "Поделиться контактом: /phoneshare";
     }
     @Override
     public String loginByPassword(AppUser appUser) {

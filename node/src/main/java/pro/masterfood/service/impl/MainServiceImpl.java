@@ -196,12 +196,11 @@ public class MainServiceImpl implements MainService {
                     "пройдите регистрацию: https://m.master-food.pro/private/register_new/ " +
                     "\n" +
                     "\n" +
-                    "ЧТОБЫ АВТОРИЗОВАТЬСЯ, НАЖМИТЕ КНОПКУ: \"Поделиться контактом\" внизу экрана" +
+                    "ЧТОБЫ АВТОРИЗОВАТЬСЯ, НАЖМИТЕ КНОПКУ: \"ПОДЕЛИТЬСЯ КОНТАКТОМ\" ВНИЗУ ЭКРАНА" +
                     "\n" +
                     "\n" +
-                    "либо войдите с паролем /login" +
-                    "\n" +
-                    "\"либо подтвердите номер кодом /phoneinput");
+                    "другие способы авторизации: /login" +
+                    "\n");
         }else{
             sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId);
             sendMessage.setText(output);
@@ -239,8 +238,8 @@ public class MainServiceImpl implements MainService {
         } else if (REGISTRATIONPHONEINPUT.equals(serviceCommand)) {
             return appUserService.loginByPhoneManualInput(appUser);
         //если тип по телефону Поделиться контактом
-//        } else if (REGISTRATIONPHONESHARE.equals(serviceCommand)) {
-//            return appUserService.loginByPhoneShare(appUser);
+        } else if (REGISTRATIONPHONESHARE.equals(serviceCommand)) {
+            return appUserService.loginByPhoneShare(appUser);
         //-------------------------------------------------------------------------
 
         } else if (GET_USER_INFO.equals(serviceCommand) && appUser.getIsActive()) {
