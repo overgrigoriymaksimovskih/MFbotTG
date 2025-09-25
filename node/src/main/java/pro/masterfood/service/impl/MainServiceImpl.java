@@ -188,7 +188,20 @@ public class MainServiceImpl implements MainService {
         SendMessage sendMessage;
         if(output.equals("ВМЕСТО ЭТОГО СООБЩЕНИЯ HelpOrShareContactButton ОТПРАВИТ КНОПКУ ДЕЛЕНИЯ КОНТАКТОМ")){
             sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId, true);
-            sendMessage.setText("Пожалуйста, поделитесь контактом (кнопка внизу экрана)");
+            sendMessage.setText("Здравствуйте. " +
+                    "\n" +
+                    "Для использования бота Вы должны быть  " +
+                    "зарегистрированы на сайте master-food.pro " +
+                    "если Вы еще не зарегистрированы, " +
+                    "пройдите регистрацию: https://m.master-food.pro/private/register_new/ " +
+                    "\n" +
+                    "\n" +
+                    "ЧТОБЫ АВТОРИЗОВАТЬСЯ, НАЖМИТЕ КНОПКУ: \"Поделиться контактом\" внизу экрана" +
+                    "\n" +
+                    "\n" +
+                    "либо войдите с паролем /login" +
+                    "\n" +
+                    "\"либо подтвердите номер кодом /phoneinput");
         }else{
             sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId);
             sendMessage.setText(output);
@@ -226,8 +239,8 @@ public class MainServiceImpl implements MainService {
         } else if (REGISTRATIONPHONEINPUT.equals(serviceCommand)) {
             return appUserService.loginByPhoneManualInput(appUser);
         //если тип по телефону Поделиться контактом
-        } else if (REGISTRATIONPHONESHARE.equals(serviceCommand)) {
-            return appUserService.loginByPhoneShare(appUser);
+//        } else if (REGISTRATIONPHONESHARE.equals(serviceCommand)) {
+//            return appUserService.loginByPhoneShare(appUser);
         //-------------------------------------------------------------------------
 
         } else if (GET_USER_INFO.equals(serviceCommand) && appUser.getIsActive()) {
@@ -250,15 +263,17 @@ public class MainServiceImpl implements MainService {
             return helpIsActive();
         //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
-            return "Здравствуйте. " +
-                    "\n" +
-                    "Для использования бота Вы должны быть  " +
-                    "зарегистрированы на сайте master-food.pro " +
-                    "если Вы еще не зарегистрированы, " +
-                    "пройдите регистрацию: https://m.master-food.pro/private/register_new/ " +
-                    "\n" +
-                    "\n" +
-                    "--> Авторизоваться в боте /login";
+//            return "Здравствуйте. " +
+//                    "\n" +
+//                    "Для использования бота Вы должны быть  " +
+//                    "зарегистрированы на сайте master-food.pro " +
+//                    "если Вы еще не зарегистрированы, " +
+//                    "пройдите регистрацию: https://m.master-food.pro/private/register_new/ " +
+//                    "\n" +
+//                    "\n" +
+//                    "--> Авторизоваться в боте /login";
+            return appUserService.loginByPhoneShare(appUser);
+
         } else {
 //            return "Неизвестная команда, чтобы посмотреть список доступных команд введите /help";
             String offerDetails = offerService.handleTextMessage(cmd, appUser.getIsActive());
