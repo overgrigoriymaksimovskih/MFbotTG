@@ -199,8 +199,10 @@ public class MainServiceImpl implements MainService {
                     "ЧТОБЫ АВТОРИЗОВАТЬСЯ, НАЖМИТЕ КНОПКУ: \"ПОДЕЛИТЬСЯ КОНТАКТОМ\" ВНИЗУ ЭКРАНА" +
                     "\n" +
                     "\n" +
-                    "другие способы авторизации: /login" +
-                    "\n");
+                    "другие способы авторизации:" +
+                    "\n" +
+                    "/cancel")
+            ;
         }else{
             sendMessage = helpOrShareContactButton.getHelpOrShareContactMessage(chatId);
             sendMessage.setText(output);
@@ -262,15 +264,6 @@ public class MainServiceImpl implements MainService {
             return helpIsActive();
         //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
-//            return "Здравствуйте. " +
-//                    "\n" +
-//                    "Для использования бота Вы должны быть  " +
-//                    "зарегистрированы на сайте master-food.pro " +
-//                    "если Вы еще не зарегистрированы, " +
-//                    "пройдите регистрацию: https://m.master-food.pro/private/register_new/ " +
-//                    "\n" +
-//                    "\n" +
-//                    "--> Авторизоваться в боте /login";
             return appUserService.loginByPhoneShare(appUser);
 
         } else {
@@ -297,6 +290,18 @@ public class MainServiceImpl implements MainService {
     }
 
     private String cancelProcess(AppUser appUser) {
+        if(WAIT_FOR_PHONE_SHARE_STATE.equals(appUser.getState())){
+            appUser.setState(BASIC_STATE);
+            appUserDAO.save(appUser);
+            return "Логин-пароль: /email  " +
+                    "\n" +
+                    "\n" +
+                    "Код подтверждения: /phoneinput" +
+                    "\n" +
+                    "\n" +
+                    "Поделиться: /phoneshare";
+        }
+
         if(WAIT_FOR_PASSWORD_STATE.equals(appUser.getState())
                 || WAIT_FOR_ANSWER.equals(appUser.getState())){
             appUser.setEmail(null);

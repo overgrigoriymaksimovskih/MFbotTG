@@ -21,7 +21,7 @@ public class MessageRateLimiter {
         Instant now = Instant.now();
         Instant lastRequest = lastRequestTimes.getIfPresent(userId);
 
-        if (lastRequest == null || now.isAfter(lastRequest.plusSeconds(2))) {
+        if (lastRequest == null || now.isAfter(lastRequest.plusSeconds(1))) {
             lastRequestTimes.put(userId, now);
             return true;
         } else {

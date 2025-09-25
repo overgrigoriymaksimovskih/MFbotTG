@@ -57,12 +57,15 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
+    //вроде больше не использую
     public String chooseLoginType(AppUser appUser) {
         return "Логин-пароль: /email  " +
                 "\n" +
+                "\n" +
                 "Код подтверждения: /phoneinput" +
                 "\n" +
-                "Поделиться контактом: /phoneshare";
+                "\n" +
+                "Поделиться: /phoneshare";
     }
     @Override
     public String loginByPassword(AppUser appUser) {
@@ -151,7 +154,8 @@ public class AppUserServiceImpl implements AppUserService {
             return "Отправлено на проверку...";
 
         }else{
-            return "Номер не распознан. Введите номер в формате: 7 *** *** ** **\n" +
+            return "ЧТОБЫ АВТОРИЗОВАТЬСЯ, НАЖМИТЕ КНОПКУ: \"ПОДЕЛИТЬСЯ КОНТАКТОМ\" ВНИЗУ ЭКРАНА" +
+                    "\n" +
                     "или отмените процесс авторизации /cancel";
         }
     }
@@ -162,7 +166,7 @@ public class AppUserServiceImpl implements AppUserService {
     public String checkPhone(Long chatId, AppUser appUser, String phone) {
         String phoneNumber;
         phoneNumber = phoneFormatChecker.formatPhoneNumber(phone);
-        if(!phoneNumber.equals(null)){
+        if(!phoneNumber.equals("phoneIsNotCorrect")){
             appUser.setPhoneNumber(phone);
             appUserDAO.save(appUser);
 
@@ -371,7 +375,7 @@ public class AppUserServiceImpl implements AppUserService {
         appUser.setIsActive(false);
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
-        return "Вы успешно вышли из аккаунта. Для входа в аккаунт пройдете авторизацию /login";
+        return "Вы успешно вышли из аккаунта. Для входа в аккаунт пройдете авторизацию /start";
     }
 
 }
