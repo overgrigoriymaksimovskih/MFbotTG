@@ -136,7 +136,7 @@ public class AppUserServiceImpl implements AppUserService {
     public String checkContact(Long chatId, AppUser appUser, String phone) {
         String phoneNumber;
         phoneNumber = phoneFormatChecker.formatPhoneNumber(phone);
-        if(!phoneNumber.equals(null)){
+        if(!phoneNumber.equals("phoneIsNotCorrect") && !phoneNumber.equals("notIsPhone")){
             appUser.setPhoneNumber(phone);
             appUserDAO.save(appUser);
 
