@@ -106,6 +106,8 @@ services:
       SALT: ${SALT}
       REST_USER: ${REST_USER}
       REST_PASSWORD: ${REST_PASSWORD}
+      STREAMTELECOM_USER: ${STREAMTELECOM_USER}
+      STREAMTELECOM_PASSWORD: ${STREAMTELECOM_PASSWORD}
 
     depends_on:
       postgres-db:
