@@ -3,6 +3,7 @@ package pro.masterfood.service.impl;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -24,6 +25,11 @@ public class PhoneHandlerImpl implements PhoneHandler {
     private final AppUserDAO appUserDAO;
     private final CustomPostClient customPostClient;
     private final ProducerService producerService;
+
+    @Value("${streamtelecom.user}")
+    private String streamTelecomUserName;
+    @Value("${streamtelecom.password}")
+    private String streamTelecomPassword;
 
     public PhoneHandlerImpl(AppUserDAO appUserDAO, CustomPostClient customPostClient, ProducerService producerService) {
         this.appUserDAO = appUserDAO;
@@ -58,8 +64,8 @@ public class PhoneHandlerImpl implements PhoneHandler {
             String url = "http://gateway.api.sc/telegram-code/";
             // Создаем тело запроса application/x-www-form-urlencoded
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-            map.add("login", "***");       // используем значения из application.properties
-            map.add("pass", "***");     // используем значения из application.properties
+            map.add("login", streamTelecomUserName);       // используем значения из application.properties
+            map.add("pass", streamTelecomPassword);     // используем значения из application.properties
             map.add("code-gen", "4");
 //        map.add("code", code);              // используем параметр из GET-запроса
             map.add("phone", phoneNumber);     // используем параметр из GET-запроса

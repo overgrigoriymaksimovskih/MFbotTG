@@ -134,10 +134,9 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     //Не использую транзакции потому что после метода сейв ничего не делаем ничего не произойдет что откатит сейв никогда
     public String checkContact(Long chatId, AppUser appUser, String phone) {
-        String phoneNumber;
-        phoneNumber = phoneFormatChecker.formatPhoneNumber(phone);
-        if(!phoneNumber.equals("phoneIsNotCorrect") && !phoneNumber.equals("notIsPhone")){
-            appUser.setPhoneNumber(phone);
+        String formattedPhone = phoneFormatChecker.formatPhoneNumber(phone);
+        if(!formattedPhone.equals("phoneIsNotCorrect") && !formattedPhone.equals("notIsPhone")){
+            appUser.setPhoneNumber(formattedPhone);
             appUserDAO.save(appUser);
 
             var phoneParams = RequestParams.builder()
