@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
-@RequestMapping("/web-app")
+@RequestMapping("/api")
 @RestController
 public class OauthUserController {
 
