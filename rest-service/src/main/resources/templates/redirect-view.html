@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Информация о пользователе</title>
+    <!-- Подключаем Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 <div th:if="${error}">
@@ -14,5 +16,23 @@
         <li th:each="entry : ${userData}" th:text="${entry.key} + ': ' + ${entry.value}"></li>
     </ul>
 </div>
+
+<!-- JavaScript для обработки initData -->
+<script>
+    // Проверяем, загружается ли страница в Telegram Web App
+    if (window.Telegram && window.Telegram.WebApp) {
+        const initData = window.Telegram.WebApp.initData;
+        if (initData) {
+            // Отправляем initData на сервер через редирект с query-параметром
+            window.location.href = '/api/redirect?initData=' + encodeURIComponent(initData);
+        } else {
+            // Если initData нет, показываем ошибку
+            document.body.innerHTML = '<p style="color: red;">initData не найден. Откройте приложение в Telegram.</p>';
+        }
+    } else {
+        // Если не в Telegram, показываем ошибку
+        document.body.innerHTML = '<p style="color: red;">Откройте приложение в Telegram.</p>';
+    }
+</script>
 </body>
 </html>
