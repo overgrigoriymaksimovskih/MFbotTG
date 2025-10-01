@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Информация о пользователе</title>
+</head>
+<body>
+<div th:if="${error}">
+    <p style="color: red;" th:text="${error}"></p>
+</div>
+<div th:if="${userData}">
+    <h2>Информация о пользователе:</h2>
+    <ul>
+        <li th:each="entry : ${userData}" th:text="${entry.key} + ': ' + ${entry.value}"></li>
+    </ul>
+</div>
+</body>
+</html>
