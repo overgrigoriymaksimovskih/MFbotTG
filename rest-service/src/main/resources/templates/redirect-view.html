@@ -19,18 +19,29 @@
 
 <!-- JavaScript для обработки initData -->
 <script>
-    // Проверяем, загружается ли страница в Telegram Web App
-    if (window.Telegram && window.Telegram.WebApp) {
-        const initData = window.Telegram.WebApp.initData;
-        // Редирект ТОЛЬКО если userData НЕ загружено и initData есть
-        if (initData && ![[${userData}]]) {
-            // Отправляем initData на сервер через редирект с query-параметром
-            window.location.href = '/api/redirect?initData=' + encodeURIComponent(initData);
+    // Ждём загрузки DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM загружен. Проверяем Telegram Web App...');
+
+        // Проверяем, загружается ли страница в Telegram Web App
+        if (window.Telegram && window.Telegram.WebApp) {
+            console.log('Telegram Web App доступен.');
+            const initData = window.Telegram.WebApp.initData;
+            console.log('initData:', initData);  // Отладка: покажет, что в initData
+
+            // Редирект ТОЛЬКО если userData НЕ загружено и initData есть
+            if (initData && ![[${userData}]]) {
+                console.log('userData нет, и initData есть — делаем редирект.');
+                // Отправляем initData на сервер через редирект с query-параметром
+                window.location.href = '/api/redirect?initData=' + encodeURIComponent(initData);
+            } else {
+                console.log('Редирект не нужен: initData пустой или userData уже есть.');
+            }
+        } else {
+            console.log('Telegram Web App НЕ доступен (возможно, открыто не из Telegram).');
+            // Если не в Telegram, ничего не делаем — ошибка рендерится через Thymeleaf
         }
-        // Если initData нет, ничего не делаем — ошибка рендерится через Thymeleaf
-    } else {
-        // Если не в Telegram, ничего не делаем — ошибка рендерится через Thymeleaf
-    }
+    });
 </script>
 </body>
 </html>
