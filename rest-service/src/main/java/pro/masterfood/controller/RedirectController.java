@@ -22,6 +22,8 @@ package pro.masterfood.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;  // Замени System.out на logger
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,15 +43,16 @@ import java.util.Map;
 @RequestMapping("/api")
 public class RedirectController {
 
+    private static final Logger logger = LoggerFactory.getLogger(RedirectController.class);  // Логгер
+
     @Value("${telegram.bot.token}")
     private String botToken;
 
-    private final Gson gson = new Gson();  // Для парсинга JSON
+    private final Gson gson = new Gson();
 
     @GetMapping("/redirect")
     public String handleRedirect(@RequestParam(required = false) String initData, Model model) {
-        // Логи для отладки (замени на logger если нужно, например, SLF4J)
-        System.out.println("Получен initData: " + initData);
+        logger.info("Получен initData: {}", initData);  // Лог initData
 
         if (initData == null || initData.isEmpty()) {
             model.addAttribute("error", "initData не найден. Откройте приложение в Telegram.");
@@ -58,7 +61,9 @@ public class RedirectController {
 
         try {
             // Верификация initData
-            if (!verifyInitData(initData, botToken)) {
+            boolean isValid = verifyInitData(initData, botToken);
+            logger.info("Верификация initData: {}", isValid);  // Лог результата верификации
+            if (!isValid) {
                 model.addAttribute("error", "Неверные данные. Попробуйте снова.");
                 return "redirect-view";
             }
@@ -68,23 +73,24 @@ public class RedirectController {
             String userJson = params.get("user");
 
             if (userJson != null) {
-                // Парсим user JSON в Map
                 Map<String, Object> userData = gson.fromJson(userJson, new TypeToken<Map<String, Object>>(){}.getType());
                 model.addAttribute("userData", userData);
+                logger.info("Успешно распарсен userData: {}", userData);  // Лог данных пользователя
             } else {
                 model.addAttribute("error", "Информация о пользователе не найдена.");
             }
         } catch (Exception e) {
+            logger.error("Ошибка обработки initData: {}", e.getMessage(), e);  // Лог ошибки
             model.addAttribute("error", "Ошибка обработки: " + e.getMessage());
         }
 
         return "redirect-view";
     }
 
-    // Метод верификации initData (исправленный: используем SHA256-хэш токена как секрет)
     private boolean verifyInitData(String initData, String botToken) throws Exception {
         // Получаем секрет: SHA256-хэш бот-токена
         String secretKeyHex = getSecretKey(botToken);
+        logger.debug("Секретный ключ (SHA256 токена): {}", secretKeyHex);  // Лог секрета (убери в продакшене)
 
         String[] parts = initData.split("&");
         Map<String, String> params = new HashMap<>();
@@ -103,7 +109,10 @@ public class RedirectController {
             }
         }
 
-        if (hash == null) return false;
+        if (hash == null) {
+            logger.warn("Хэш не найден в initData");
+            return false;
+        }
 
         // Создаем строку для хэширования
         StringBuilder dataCheckString = new StringBuilder();
@@ -114,24 +123,26 @@ public class RedirectController {
             dataCheckString.setLength(dataCheckString.length() - 1);  // Убираем последний \n
         }
 
-        // Хэшируем с HMAC-SHA256, используя SHA256-хэш токена как секрет
+        logger.debug("Строка для хэширования: {}", dataCheckString.toString());  // Лог строки
+
+        // Хэшируем с HMAC-SHA256
         Mac mac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKey = new SecretKeySpec(hexStringToByteArray(secretKeyHex), "HmacSHA256");
         mac.init(secretKey);
         byte[] computedHash = mac.doFinal(dataCheckString.toString().getBytes(StandardCharsets.UTF_8));
         String computedHashHex = bytesToHex(computedHash);
 
+        logger.debug("Вычисленный хэш: {}, Ожидаемый: {}", computedHashHex, hash);  // Лог хэшей
+
         return computedHashHex.equals(hash);
     }
 
-    // Метод для получения секрета (SHA256-хэш бот-токена)
     private String getSecretKey(String botToken) throws Exception {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(botToken.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(hash);
     }
 
-    // Вспомогательный метод для конвертации hex-строки в byte[]
     private byte[] hexStringToByteArray(String hex) {
         int len = hex.length();
         byte[] data = new byte[len / 2];
@@ -141,7 +152,6 @@ public class RedirectController {
         return data;
     }
 
-    // Метод для конвертации byte[] в hex-строку
     private String bytesToHex(byte[] bytes) {
         StringBuilder result = new StringBuilder();
         for (byte b : bytes) {
@@ -150,7 +160,6 @@ public class RedirectController {
         return result.toString();
     }
 
-    // Метод парсинга initData в Map
     private Map<String, String> parseInitData(String initData) {
         Map<String, String> params = new HashMap<>();
         String[] parts = initData.split("&");
@@ -163,6 +172,3 @@ public class RedirectController {
         return params;
     }
 }
-
-
-

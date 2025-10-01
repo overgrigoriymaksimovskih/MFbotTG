@@ -22,16 +22,14 @@
     // Проверяем, загружается ли страница в Telegram Web App
     if (window.Telegram && window.Telegram.WebApp) {
         const initData = window.Telegram.WebApp.initData;
-        if (initData) {
+        // Редирект ТОЛЬКО если userData НЕ загружено и initData есть
+        if (initData && ![[${userData}]]) {
             // Отправляем initData на сервер через редирект с query-параметром
             window.location.href = '/api/redirect?initData=' + encodeURIComponent(initData);
-        } else {
-            // Если initData нет, показываем ошибку
-            document.body.innerHTML = '<p style="color: red;">initData не найден. Откройте приложение в Telegram.</p>';
         }
+        // Если initData нет, ничего не делаем — ошибка рендерится через Thymeleaf
     } else {
-        // Если не в Telegram, показываем ошибку
-        document.body.innerHTML = '<p style="color: red;">Откройте приложение в Telegram.</p>';
+        // Если не в Telegram, ничего не делаем — ошибка рендерится через Thymeleaf
     }
 </script>
 </body>
