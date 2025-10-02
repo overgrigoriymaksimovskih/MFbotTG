@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Telegram Web App Redirect</title>
+    <!-- Подключаем Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<h1>Обработка данных...</h1>
+<p id="status">Пожалуйста, подождите.</p>
+
+<script>
+    // Ждём, пока SDK загрузится, и получаем initData
+    window.addEventListener('load', function() {
+        const initData = Telegram.WebApp.initData;  // Получаем initData через SDK
+
+        if (initData) {
+            // Отправляем на ваш эндпоинт
+            fetch('/api/initdatahandler', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ initData: initData })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Обработка ответа (например, перенаправление или сообщение)
+                    document.getElementById('status').innerText = 'Данные обработаны! Перенаправляем...';
+                    // Пример: перенаправление на главную страницу или что-то ещё
+                    setTimeout(() => window.location.href = '/main', 2000);  // Замените на ваш URL
+                })
+                .catch(error => {
+                    document.getElementById('status').innerText = 'Ошибка обработки данных.';
+                    console.error('Error:', error);
+                });
+        } else {
+            document.getElementById('status').innerText = 'InitData не найдены. Проверьте подключение к Telegram.';
+        }
+    });
+</script>
+</body>
+</html>
