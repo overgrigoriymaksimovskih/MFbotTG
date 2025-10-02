@@ -33,7 +33,6 @@ package pro.masterfood.controller.autentification;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,75 +45,65 @@ import java.util.Map;
 @RestController
 public class InitDataHandler {
 
-    @GetMapping("/api/initdatahandler")
-    public String testEndpoint() {
-        StringBuilder log = new StringBuilder();
-        log.append("GET /api/initdatahandler\n");
-        log.append("Endpoint is accessible!\n");
-        log.append("Server time: ").append(new java.util.Date()).append("\n");
-        return log.toString();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PostMapping("/api/initdatahandler")
+    public String handleInitData(@RequestBody Map<String, String> payload) {
+        System.out.println("handleInitData called");
+        String initData = payload.get("initData");
+        System.out.println("Received initData: " + initData);
+
+        if (initData == null || initData.isEmpty()) {
+            System.out.println("initData is empty");
+            return "{\"status\": \"error\", \"message\": \"initData is empty\"}";
+        }
+
+        // Парсим initData как query string
+        Map<String, String> params = parseQueryString(initData);
+        System.out.println("Parsed initData params: " + params);
+
+        String userJsonEncoded = params.get("user");
+        if (userJsonEncoded == null) {
+            System.out.println("No user parameter found in initData");
+            return "{\"status\": \"error\", \"message\": \"No user data\"}";
+        }
+
+        try {
+            // Декодируем user JSON
+            String userJson = URLDecoder.decode(userJsonEncoded, StandardCharsets.UTF_8);
+            System.out.println("Decoded user JSON: " + userJson);
+
+            // Парсим JSON, чтобы получить user id
+            JsonNode userNode = objectMapper.readTree(userJson);
+            long userId = userNode.get("id").asLong();
+            System.out.println("Extracted userId: " + userId);
+
+            // Здесь можно добавить логику логина пользователя по userId
+            // Пока просто логируем и возвращаем success
+            return "{\"status\": \"success\", \"userId\": " + userId + "}";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"status\": \"error\", \"message\": \"Failed to parse user data\"}";
+        }
     }
 
+    private Map<String, String> parseQueryString(String query) {
+        Map<String, String> map = new HashMap<>();
+        String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            int idx = pair.indexOf('=');
+            if (idx > 0 && idx < pair.length() - 1) {
+                String key = pair.substring(0, idx);
+                String value = pair.substring(idx + 1);
+                map.put(key, value);
+            }
+        }
+        return map;
+    }
 
-//    private final ObjectMapper objectMapper = new ObjectMapper();
-//
-//    @PostMapping("/api/initdatahandler")
-//    public String handleInitData(@RequestBody Map<String, String> payload) {
-//        System.out.println("handleInitData called");
-//        String initData = payload.get("initData");
-//        System.out.println("Received initData: " + initData);
-//
-//        if (initData == null || initData.isEmpty()) {
-//            System.out.println("initData is empty");
-//            return "{\"status\": \"error\", \"message\": \"initData is empty\"}";
-//        }
-//
-//        // Парсим initData как query string
-//        Map<String, String> params = parseQueryString(initData);
-//        System.out.println("Parsed initData params: " + params);
-//
-//        String userJsonEncoded = params.get("user");
-//        if (userJsonEncoded == null) {
-//            System.out.println("No user parameter found in initData");
-//            return "{\"status\": \"error\", \"message\": \"No user data\"}";
-//        }
-//
-//        try {
-//            // Декодируем user JSON
-//            String userJson = URLDecoder.decode(userJsonEncoded, StandardCharsets.UTF_8);
-//            System.out.println("Decoded user JSON: " + userJson);
-//
-//            // Парсим JSON, чтобы получить user id
-//            JsonNode userNode = objectMapper.readTree(userJson);
-//            long userId = userNode.get("id").asLong();
-//            System.out.println("Extracted userId: " + userId);
-//
-//            // Здесь можно добавить логику логина пользователя по userId
-//            // Пока просто логируем и возвращаем success
-//            return "{\"status\": \"success\", \"userId\": " + userId + "}";
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return "{\"status\": \"error\", \"message\": \"Failed to parse user data\"}";
-//        }
-//    }
-//
-//    private Map<String, String> parseQueryString(String query) {
-//        Map<String, String> map = new HashMap<>();
-//        String[] pairs = query.split("&");
-//        for (String pair : pairs) {
-//            int idx = pair.indexOf('=');
-//            if (idx > 0 && idx < pair.length() - 1) {
-//                String key = pair.substring(0, idx);
-//                String value = pair.substring(idx + 1);
-//                map.put(key, value);
-//            }
-//        }
-//        return map;
-//    }
-//
-//    private boolean isValidInitData(String initData) {
-//        // Пока заглушка
-//        return true;
-//    }
+    private boolean isValidInitData(String initData) {
+        // Пока заглушка
+        return true;
+    }
 }
