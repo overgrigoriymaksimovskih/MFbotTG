@@ -1,44 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Telegram Web App Redirect</title>
-    <!-- Подключаем Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web App Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #status {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            white-space: pre-wrap; /* Для отображения логов с переносами строк */
+        }
+    </style>
 </head>
 <body>
-<h1>Обработка данных...</h1>
-<p id="status">Пожалуйста, подождите.</p>
+<h1>Testing Telegram Web App Integration</h1>
+<p>Status:</p>
+<div id="status">Loading...</div>
 
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-    // Ждём, пока SDK загрузится, и получаем initData
-    window.addEventListener('load', function() {
-        const initData = Telegram.WebApp.initData;  // Получаем initData через SDK
+    // Инициализация Telegram WebApp
+    const tg = window.Telegram.WebApp;
+    tg.ready(); // Подготовка WebApp
 
-        if (initData) {
-            // Отправляем на ваш эндпоинт
-            fetch('/api/initdatahandler', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ initData: initData })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Обработка ответа (например, перенаправление или сообщение)
-                    document.getElementById('status').innerText = 'Данные обработаны! Перенаправляем...';
-                    // Пример: перенаправление на главную страницу или что-то ещё
-                    setTimeout(() => window.location.href = '/main', 2000);  // Замените на ваш URL
-                })
-                .catch(error => {
-                    document.getElementById('status').innerText = 'Ошибка обработки данных.';
-                    console.error('Error:', error);
-                });
-        } else {
-            document.getElementById('status').innerText = 'InitData не найдены. Проверьте подключение к Telegram.';
-        }
-    });
+    // Получаем initData (для будущего использования, сейчас не отправляем)
+    const initData = tg.initData;
+
+    // Элементарный POST для теста доступности эндпоинта
+    fetch('/api/initdatahandler', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ test: 'hello' })  // Простой тестовый объект
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Server error: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(data => {
+            // Выводим полный ответ от сервера (с логами)
+            document.getElementById('status').innerText = data;
+        })
+        .catch(error => {
+            // Если ошибка fetch
+            document.getElementById('status').innerText = 'Fetch error: ' + error.message;
+        });
 </script>
 </body>
 </html>
