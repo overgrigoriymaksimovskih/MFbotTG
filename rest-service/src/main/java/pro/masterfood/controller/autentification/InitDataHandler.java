@@ -33,6 +33,7 @@ package pro.masterfood.controller.autentification;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,35 +46,13 @@ import java.util.Map;
 @RestController
 public class InitDataHandler {
 
-    @PostMapping("/api/initdatahandler")
-    public String handleInitData(@RequestBody Map<String, String> payload) {
+    @GetMapping("/api/initdatahandler")
+    public String testEndpoint() {
         StringBuilder log = new StringBuilder();
-        log.append("handleInitData called\n");
-
-        // Проверяем, тестовый ли запрос
-        if (payload.containsKey("test")) {
-            log.append("Test request received: ").append(payload.get("test")).append("\n");
-            log.append("Endpoint is accessible!\n");
-            return log.toString();
-        }
-
-        // Обычная логика для initData
-        String initData = payload.get("initData");
-        log.append("Received initData: ").append(initData != null ? initData : "null").append("\n");
-
-        if (initData == null || initData.isEmpty()) {
-            log.append("Error: initData is empty or null\n");
-            return log.toString();
-        }
-
-        try {
-            log.append("Processing initData...\n");
-            log.append("Success: Data processed!\n");
-            return log.toString();
-        } catch (Exception e) {
-            log.append("Error during processing: ").append(e.getMessage()).append("\n");
-            return log.toString();
-        }
+        log.append("GET /api/initdatahandler\n");
+        log.append("Endpoint is accessible!\n");
+        log.append("Server time: ").append(new java.util.Date()).append("\n");
+        return log.toString();
     }
 
 
