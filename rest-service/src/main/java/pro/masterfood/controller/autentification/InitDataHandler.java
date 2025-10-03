@@ -274,18 +274,18 @@ public class InitDataHandler {
         return map;
     }
 
-    // Метод для верификации initData
+    // Метод для верификации initData (исправленный: исключаем "signature", правильный порядок HMAC)
     private boolean isValidInitData(Map<String, String> params, String botToken) {
         try {
-            // Вычисляем секретный ключ: HMAC-SHA256(botToken, "WebAppData")
-            HmacUtils hmacForSecret = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, botToken.getBytes(StandardCharsets.UTF_8));
-            byte[] secretKey = hmacForSecret.hmac("WebAppData".getBytes(StandardCharsets.UTF_8));
+            // Вычисляем секретный ключ: HMAC-SHA256("WebAppData", botToken) — порядок key="WebAppData", data=botToken
+            byte[] secretKey = HmacUtils.hmacSha256("WebAppData".getBytes(StandardCharsets.UTF_8), botToken.getBytes(StandardCharsets.UTF_8));
 
-            // Создаём копию параметров и исключаем только "hash"
+            // Создаём копию параметров и исключаем "hash" и "signature"
             Map<String, String> paramsCopy = new HashMap<>(params);
             paramsCopy.remove("hash");
+            paramsCopy.remove("signature");  // Добавлено: исключаем "signature", так как оно не участвует в data-check-string
 
-            // Для параметра "user" выполняем дополнительное URL-декодирование
+            // Для параметра "user" выполняем дополнительное URL-декодирование (двойное для JSON)
             if (paramsCopy.containsKey("user")) {
                 String userValue = paramsCopy.get("user");
                 try {
@@ -324,3 +324,4 @@ public class InitDataHandler {
         }
     }
 }
+
