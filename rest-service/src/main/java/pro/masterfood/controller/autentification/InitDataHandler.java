@@ -122,9 +122,10 @@ public class InitDataHandler {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] secretKey = digest.digest(botToken.getBytes(StandardCharsets.UTF_8));
 
-            // Собираем строку для подписи: сортируем ключи кроме hash, и соединяем key=value\n
+            // Собираем строку для подписи: сортируем ключи кроме hash и signature, и соединяем key=value\n
             List<String> keys = new ArrayList<>(params.keySet());
             keys.remove("hash");
+            keys.remove("signature");  // <-- ДОБАВЬТЕ ЭТУ СТРОКУ: исключаем signature, так как он не часть стандартной initData
             Collections.sort(keys);
 
             StringBuilder dataCheckString = new StringBuilder();
@@ -136,9 +137,12 @@ public class InitDataHandler {
                 dataCheckString.setLength(dataCheckString.length() - 1);
             }
 
-            // Вычисляем HMAC-SHA256
+            // Для отладки: выведите dataCheckString и calculatedHash
+            System.out.println("Data check string: " + dataCheckString.toString());
             HmacUtils hmac = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, secretKey);
             String calculatedHash = Hex.encodeHexString(hmac.hmac(dataCheckString.toString().getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Calculated hash: " + calculatedHash);
+            System.out.println("Received hash: " + params.get("hash"));
 
             // Сравниваем с полученным hash
             return calculatedHash.equals(params.get("hash"));
