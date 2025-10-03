@@ -122,15 +122,18 @@ public class InitDataHandler {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] secretKey = digest.digest(botToken.getBytes(StandardCharsets.UTF_8));
 
-            // Собираем строку для подписи: сортируем ключи кроме hash и signature, и соединяем key=value\n
+            // Собираем строку для подписи: сортируем ключи кроме hash и signature, декодируем значения, и соединяем key=value\n
             List<String> keys = new ArrayList<>(params.keySet());
             keys.remove("hash");
-            keys.remove("signature");  // <-- ДОБАВЬТЕ ЭТУ СТРОКУ: исключаем signature, так как он не часть стандартной initData
+            keys.remove("signature");
             Collections.sort(keys);
 
             StringBuilder dataCheckString = new StringBuilder();
             for (String key : keys) {
-                dataCheckString.append(key).append("=").append(params.get(key)).append("\n");
+                String value = params.get(key);
+                // URL-декодируем значение
+                value = java.net.URLDecoder.decode(value, StandardCharsets.UTF_8);
+                dataCheckString.append(key).append("=").append(value).append("\n");
             }
             // Убираем последний \n
             if (dataCheckString.length() > 0) {
@@ -138,7 +141,7 @@ public class InitDataHandler {
             }
 
             // Для отладки: выведите dataCheckString и calculatedHash
-            System.out.println("Data check string: " + dataCheckString.toString());
+            System.out.println("Data check string (decoded): " + dataCheckString.toString());
             HmacUtils hmac = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, secretKey);
             String calculatedHash = Hex.encodeHexString(hmac.hmac(dataCheckString.toString().getBytes(StandardCharsets.UTF_8)));
             System.out.println("Calculated hash: " + calculatedHash);
