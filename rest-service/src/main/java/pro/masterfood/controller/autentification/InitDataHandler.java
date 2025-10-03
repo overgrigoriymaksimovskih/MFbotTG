@@ -1,51 +1,39 @@
-//package pro.masterfood.controller.autentification;
-//
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.RestController;
-//
-//import java.util.Map;
-//
-//@RestController
-//public class InitDataHandler {
-//
-//    @PostMapping("/api/initdatahandler")
-//    public String handleInitData(@RequestBody Map<String, String> payload) {
-//        String initData = payload.get("initData");
-//        // Здесь валидируйте initData (например, проверьте хэш с помощью Telegram Bot API)
-//        // Пример: логика валидации
-//        if (isValidInitData(initData)) {
-//            // Сохраните данные, обработайте пользователя и т.д.
-//            return "{\"status\": \"success\"}";
-//        } else {
-//            return "{\"status\": \"error\", \"message\": \"Invalid initData\"}";
-//        }
-//    }
-//
-//    private boolean isValidInitData(String initData) {
-//        // Реализуйте валидацию по документации Telegram: https://core.telegram.org/bots/webapps#validating-data-received-via-the-web-app
-//        // Например, проверьте подпись с вашим bot_token
-//        return true;  // Заглушка, замените на реальную логику
-//    }
-//}
-
 package pro.masterfood.controller.autentification;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.codec.digest.HmacUtils;
+
+import pro.masterfood.service.RedirectService;
+
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @RestController
 public class InitDataHandler {
 
+    private final RedirectService redirectService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public InitDataHandler(RedirectService redirectService) {
+        this.redirectService = redirectService;
+    }
+
+    @Value("${telegram.bot.token}")
+    private String BOT_TOKEN;
 
     @PostMapping("/api/initdatahandler")
     public String handleInitData(@RequestBody Map<String, String> payload) {
@@ -62,10 +50,34 @@ public class InitDataHandler {
         Map<String, String> params = parseQueryString(initData);
         System.out.println("Parsed initData params: " + params);
 
+        // Проверяем, есть ли hash и user
+        String hash = params.get("hash");
         String userJsonEncoded = params.get("user");
-        if (userJsonEncoded == null) {
-            System.out.println("No user parameter found in initData");
-            return "{\"status\": \"error\", \"message\": \"No user data\"}";
+        if (hash == null || userJsonEncoded == null) {
+            System.out.println("Missing hash or user in initData");
+            return "{\"status\": \"error\", \"message\": \"Invalid initData: missing hash or user\"}";
+        }
+
+        // Верифицируем hash
+        if (!isValidInitData(params, BOT_TOKEN)) {
+            System.out.println("Invalid hash: initData not from this bot");
+            return "{\"status\": \"error\", \"message\": \"Invalid initData: not from this bot\"}";
+        }
+
+        // Опционально: проверьте auth_date (не старше 24 часов)
+        String authDateStr = params.get("auth_date");
+        if (authDateStr != null) {
+            try {
+                long authDate = Long.parseLong(authDateStr);
+                long currentTime = System.currentTimeMillis() / 1000;
+                if (currentTime - authDate > 86400) { // 24 часа
+                    System.out.println("auth_date is too old");
+                    return "{\"status\": \"error\", \"message\": \"initData is expired\"}";
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid auth_date format");
+                return "{\"status\": \"error\", \"message\": \"Invalid auth_date\"}";
+            }
         }
 
         try {
@@ -73,14 +85,15 @@ public class InitDataHandler {
             String userJson = URLDecoder.decode(userJsonEncoded, StandardCharsets.UTF_8);
             System.out.println("Decoded user JSON: " + userJson);
 
-            // Парсим JSON, чтобы получить user id
+            // Парсим JSON, чтобы получить user id как long
             JsonNode userNode = objectMapper.readTree(userJson);
-            long userId = userNode.get("id").asLong();
+            long userId = userNode.get("id").asLong(); // Уже long, как вы хотели
             System.out.println("Extracted userId: " + userId);
 
             // Здесь можно добавить логику логина пользователя по userId
             // Пока просто логируем и возвращаем success
-            return "{\"status\": \"success\", \"userId\": " + userId + "}";
+//            return "{\"status\": \"success\", \"userId\": " + userId + "}";
+            return redirectService.producerAnswer(userId);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,8 +115,36 @@ public class InitDataHandler {
         return map;
     }
 
-    private boolean isValidInitData(String initData) {
-        // Пока заглушка
-        return true;
+    // Метод для верификации initData
+    private boolean isValidInitData(Map<String, String> params, String botToken) {
+        try {
+            // Вычисляем секретный ключ: SHA256 от botToken
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] secretKey = digest.digest(botToken.getBytes(StandardCharsets.UTF_8));
+
+            // Собираем строку для подписи: сортируем ключи кроме hash, и соединяем key=value\n
+            List<String> keys = new ArrayList<>(params.keySet());
+            keys.remove("hash");
+            Collections.sort(keys);
+
+            StringBuilder dataCheckString = new StringBuilder();
+            for (String key : keys) {
+                dataCheckString.append(key).append("=").append(params.get(key)).append("\n");
+            }
+            // Убираем последний \n
+            if (dataCheckString.length() > 0) {
+                dataCheckString.setLength(dataCheckString.length() - 1);
+            }
+
+            // Вычисляем HMAC-SHA256
+            HmacUtils hmac = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, secretKey);
+            String calculatedHash = Hex.encodeHexString(hmac.hmac(dataCheckString.toString().getBytes(StandardCharsets.UTF_8)));
+
+            // Сравниваем с полученным hash
+            return calculatedHash.equals(params.get("hash"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
