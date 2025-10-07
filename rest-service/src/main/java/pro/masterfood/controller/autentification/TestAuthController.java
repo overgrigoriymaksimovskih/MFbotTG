@@ -19,7 +19,7 @@ public class TestAuthController {
     }
 
     // Эндпоинт, который имитирует сайт: принимает токен из URL и проверяет его
-    @GetMapping("/test-verify")  // Например, http://localhost:8080/test-verify?token=jwt-token
+    @GetMapping("/api/test-verify")  // Например, http://localhost:8080/test-verify?token=jwt-token
     public String testVerify(@RequestParam(required = false) String token, Model model) {
         if (token == null || token.isEmpty()) {
             model.addAttribute("status", "failure");

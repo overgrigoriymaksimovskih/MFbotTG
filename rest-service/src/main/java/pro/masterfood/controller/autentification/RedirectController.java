@@ -40,7 +40,7 @@ public class RedirectController {
         }
 
         // Предполагаем, что ваш сайт — это, например, https://your-site.com
-        String redirectUrl = "https://smakmart.ru/test-verify?token=" + token;
+        String redirectUrl = "https://smakmart.ru/api/test-verify?token=" + token;
 //        return "{\"status\": \"success\", \"redirectUrl\":" + redirectUrl + "}";
         return "{\"status\": \"success\", \"redirectUrl\": \"" + redirectUrl + "\"}";
     }
