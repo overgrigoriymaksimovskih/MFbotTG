@@ -11,12 +11,10 @@
 <p id="status">Пожалуйста, подождите.</p>
 
 <script>
-    // Ждём, пока SDK загрузится, и получаем initData
     window.addEventListener('load', function() {
-        const initData = Telegram.WebApp.initData;  // Получаем initData через SDK
+        const initData = Telegram.WebApp.initData;
 
         if (initData) {
-            // Отправляем на ваш эндпоинт
             fetch('/api/initdatahandler', {
                 method: 'POST',
                 headers: {
@@ -26,10 +24,14 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    // Обработка ответа (например, перенаправление или сообщение)
-                    document.getElementById('status').innerText = 'Данные обработаны! Перенаправляем...';
-                    // Пример: перенаправление на главную страницу или что-то ещё
-                    setTimeout(() => window.location.href = '/main', 2000);  // Замените на ваш URL
+                    if (data.status === 'success') {
+                        document.getElementById('status').innerText = 'Данные обработаны! Перенаправляем на сайт...';
+                        // Редирект на URL из ответа (например, https://smakmart.ru/api/test-verify?token=...)
+                        setTimeout(() => window.location.href = data.redirectUrl, 1000);
+                    } else {
+                        // Ошибка: отображаем сообщение без редиректа
+                        document.getElementById('status').innerText = 'Ошибка: ' + data.message;
+                    }
                 })
                 .catch(error => {
                     document.getElementById('status').innerText = 'Ошибка обработки данных.';
