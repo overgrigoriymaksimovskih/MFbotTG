@@ -1,5 +1,7 @@
 package pro.masterfood.controller.autentification;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,7 @@ import java.util.Optional;
 public class AuthController {
 
     private final AuthService authService;
+    private final ObjectMapper objectMapper = new ObjectMapper();  // Для JSON сериализации/десериализации только для логгирования
 
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -23,20 +26,47 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> verifyToken(@RequestBody Map<String, String> payload) {
         String token = payload.get("token");
         if (token == null || token.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Token is required"));
+            Map<String, Object> errorResponse = Map.of("status", "error", "message", "Token is required");
+            // Логируем тело ответа-------------------------------------------------------------------------------------
+            try {
+                String responseJson = objectMapper.writeValueAsString(errorResponse);
+                System.out.println("Сервис проверки токена возвращает строку ответа (JSON): " + responseJson);
+            } catch (JsonProcessingException e) {
+                System.out.println("Ошибка сериализации ответа в JSON: " + e.getMessage());
+            }
+            //----------------------------------------------------------------------------------------------------------
+            return ResponseEntity.badRequest().body(errorResponse);
         }
 
         Optional<AuthResponse> authData = authService.validateAndGetUser(token);
         if (authData.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Invalid or expired token"));
+            Map<String, Object> errorResponse = Map.of("status", "error", "message", "Invalid or expired token");
+            // Логируем тело ответа-------------------------------------------------------------------------------------
+            try {
+                String responseJson = objectMapper.writeValueAsString(errorResponse);
+                System.out.println("Сервис проверки токена возвращает строку ответа (JSON): " + responseJson);
+            } catch (JsonProcessingException e) {
+                System.out.println("Ошибка сериализации ответа в JSON: " + e.getMessage());
+            }
+            //----------------------------------------------------------------------------------------------------------
+            return ResponseEntity.badRequest().body(errorResponse);
         }
 
         AuthResponse response = authData.get();
-        return ResponseEntity.ok(Map.of(
+        Map<String, Object> successResponse = Map.of(
                 "status", "success",
                 "authorized", true,  // Флаг авторизации
                 "userId", response.getUserId(),
                 "phone", response.getPhone()  // Номер телефона
-        ));
+        );
+        // Логируем тело ответа-----------------------------------------------------------------------------------------
+        try {
+            String responseJson = objectMapper.writeValueAsString(successResponse);
+            System.out.println("Сервис проверки токена возвращает строку ответа (JSON): " + responseJson);
+        } catch (JsonProcessingException e) {
+            System.out.println("Ошибка сериализации ответа в JSON: " + e.getMessage());
+        }
+        //--------------------------------------------------------------------------------------------------------------
+        return ResponseEntity.ok(successResponse);
     }
 }

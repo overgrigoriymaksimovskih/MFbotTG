@@ -39,7 +39,7 @@ public class RedirectController {
             return "{\"status\": \"error\", \"message\": \"" + token + "\"}";
         }
 
-        // Предполагаем, что ваш сайт — это, например, https://your-site.com
+        // Сейчас тут наш тестовый ендпоинт и сервис, потом заменим на реалный эндпоинт сайта
         String redirectUrl = "https://smakmart.ru/api/test-verify?token=" + token;
 //        return "{\"status\": \"success\", \"redirectUrl\":" + redirectUrl + "}";
         return "{\"status\": \"success\", \"redirectUrl\": \"" + redirectUrl + "\"}";
