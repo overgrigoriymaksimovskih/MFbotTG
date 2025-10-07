@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Тестирование авторизации</title>
+</head>
+<body>
+<h2>Результат авторизации:</h2>
+<div th:if="${status == 'success'}">
+    <p style="color: green;" th:text="'Авторизация успешна!'"></p>
+    <p th:text="'User ID: ' + ${userId}"></p>
+    <p th:text="'Phone: ' + ${phone}"></p>
+</div>
+<div th:if="${status == 'failure'}">
+    <p style="color: red;" th:text="'Авторизация провалена. ' + ${message}"></p>
+</div>
+<br>
+<a href="/">Вернуться на главную</a>  <!-- Или ссылка на старт процесса -->
+</body>
+</html>
