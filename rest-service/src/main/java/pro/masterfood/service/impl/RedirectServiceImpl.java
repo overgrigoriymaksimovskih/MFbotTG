@@ -82,7 +82,12 @@ import pro.masterfood.entity.AppUser;
 import pro.masterfood.service.RedirectService;
 import pro.masterfood.utils.InitDataChecker;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -108,20 +113,34 @@ public class RedirectServiceImpl implements RedirectService {
     public String generateToken(String initData) {
         long telegramUserID;
         try {
-            JsonNode rootNode = objectMapper.readTree(initData);
-            JsonNode userNode = rootNode.path("user");
-            if (userNode.isMissingNode()) {
-                return null;  // Ошибка: пользователь не указан в initData
+            // Шаг 1: URL-decode всей строки
+            String decodedInitData = URLDecoder.decode(initData, StandardCharsets.UTF_8);
+
+            // Шаг 2: Разбить на пары по '&'
+            Map<String, String> params = new HashMap<>();
+            for (String pair : decodedInitData.split("&")) {
+                String[] keyValue = pair.split("=", 2);
+                if (keyValue.length == 2) {
+                    params.put(keyValue[0], keyValue[1]);
+                }
             }
+
+            // Шаг 3: Получить user как JSON строку и парсить
+            String userJson = params.get("user");
+            if (userJson == null || userJson.isEmpty()) {
+                return "Ошибка: Пользователь в InitData не найден";  // Ошибка: пользователь не указан в initData
+            }
+            JsonNode userNode = objectMapper.readTree(userJson);  // Теперь это {"id":610200129,...}
+
             telegramUserID = userNode.path("id").asLong();
         } catch (Exception e) {
-            return null;
+            return "Ошибка в RedirectServiceImpl: " + e.getMessage();
         }
 
         // Ищем пользователя в БД
         Optional<AppUser> optionalUser = appUserDAO.findByTelegramUserId(telegramUserID);
         if (optionalUser.isEmpty()) {
-            return null;  // Пользователь не найден — фронтенд должен обработать ошибку
+            return "Ошибка: Пользователь не найден в DB";  // Пользователь не найден — фронтенд должен обработать ошибку
         }
         AppUser user = optionalUser.get();
 
@@ -132,4 +151,5 @@ public class RedirectServiceImpl implements RedirectService {
                 .signWith(SignatureAlgorithm.HS256, JWT_SECRET)
                 .compact();
     }
+
 }

@@ -35,8 +35,8 @@ public class RedirectController {
 
         // Генерируем токен и редирект-URL
         String token = redirectService.generateToken(initData);
-        if (token == null) {
-            return "{\"status\": \"error\", \"message\": \"User not found in database\"}";
+        if (token.contains("Ошибка")) {
+            return "{\"status\": \"error\", \"message\": \"" + token + "\"}";
         }
 
         // Предполагаем, что ваш сайт — это, например, https://your-site.com
