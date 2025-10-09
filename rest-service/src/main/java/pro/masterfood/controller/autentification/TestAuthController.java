@@ -48,6 +48,7 @@ package pro.masterfood.controller.autentification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,7 +64,9 @@ public class TestAuthController {
     @Autowired
     private CustomPostClient customPostClient;  // Инжектим ваш компонент
     private final ObjectMapper objectMapper = new ObjectMapper();  // Для JSON сериализации/десериализации только для логгирования
-
+    // Читаем API-ключ из application.properties
+    @Value("${app.api.key}")
+    private String apiKey;
     @GetMapping("/api/test-verify")
     public String testVerify(@RequestParam(required = false) String token, Model model) {
         if (token == null || token.isEmpty()) {
@@ -74,6 +77,9 @@ public class TestAuthController {
 
         // Подготавливаем тело POST: {"token": "значение"}
         Map<String, String> postBody = Map.of("token", token);
+
+        // Подготавливаем заголовки, включая X-API-Key
+        Map<String, String> headers = Map.of("X-API-Key", apiKey, "Content-Type", "application/json");
 
         // Логируем тело запроса----------------------------------------------------------------------------------------
         try {
@@ -87,7 +93,9 @@ public class TestAuthController {
         String authUrl = "https://smakmart.ru/api/verify-token";  // Продакшен: ваш внешний URL
 
         // Вызываем ваш CustomPostClient для POST с JSON
-        ResponseEntity<Map<String, Object>> response = customPostClient.sendTestPostRequest(authUrl, postBody);
+//        ResponseEntity<Map<String, Object>> response = customPostClient.sendTestPostRequest(authUrl, postBody);
+        // Передаем headers в customPostClient
+        ResponseEntity<Map<String, Object>> response = customPostClient.sendTestPostRequest(authUrl, postBody, headers);
 
 
         // Логируем тело ответа, если есть------------------------------------------------------------------------------

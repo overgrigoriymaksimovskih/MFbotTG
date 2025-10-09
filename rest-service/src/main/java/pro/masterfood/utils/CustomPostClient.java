@@ -46,13 +46,24 @@ public class CustomPostClient {
     }
 
     // Метод специально для тестового POST с JSON, возвращает Map
-    public ResponseEntity<Map<String, Object>> sendTestPostRequest(String url, Map<String, String> postBody) {
+    public ResponseEntity<Map<String, Object>> sendTestPostRequest(String url, Map<String, String> postBody, Map<String, String> headers) {
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);  // Устанавливаем по умолчанию
+
+            // Добавляем переданные headers (это перезапишет Content-Type, если он передан)
+            if (headers != null) {
+                headers.forEach(httpHeaders::set);
+            }
 
             String jsonBody = objectMapper.writeValueAsString(postBody);
-            HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
+            HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, httpHeaders);
+
+            // Добавлено: выводим итоговый запрос на консоль
+            System.out.println("Итоговый запрос:");
+            System.out.println("URL: " + url);
+            System.out.println("Headers: " + httpHeaders.toString());
+            System.out.println("Body: " + jsonBody);
 
             // Используем exchange вместо postForEntity для корректной обработки Map<String, Object>
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
