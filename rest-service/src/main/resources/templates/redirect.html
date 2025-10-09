@@ -1,3 +1,50 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Telegram Web App Redirect</title>-->
+<!--    &lt;!&ndash; Подключаем Telegram Web App SDK &ndash;&gt;-->
+<!--    <script src="https://telegram.org/js/telegram-web-app.js"></script>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Обработка данных...</h1>-->
+<!--<p id="status">Пожалуйста, подождите.</p>-->
+
+<!--<script>-->
+<!--    window.addEventListener('load', function() {-->
+<!--        const initData = Telegram.WebApp.initData;-->
+
+<!--        if (initData) {-->
+<!--            fetch('/api/initdatahandler', {-->
+<!--                method: 'POST',-->
+<!--                headers: {-->
+<!--                    'Content-Type': 'application/json',-->
+<!--                },-->
+<!--                body: JSON.stringify({ initData: initData })-->
+<!--            })-->
+<!--                .then(response => response.json())-->
+<!--                .then(data => {-->
+<!--                    if (data.status === 'success') {-->
+<!--                        document.getElementById('status').innerText = 'Данные обработаны! Перенаправляем на сайт...';-->
+<!--                        // Редирект на URL из ответа (например, https://smakmart.ru/api/test-verify?token=...)-->
+<!--                        setTimeout(() => window.location.href = data.redirectUrl, 1000);-->
+<!--                    } else {-->
+<!--                        // Ошибка: отображаем сообщение без редиректа-->
+<!--                        document.getElementById('status').innerText = 'Ошибка: ' + data.message;-->
+<!--                    }-->
+<!--                })-->
+<!--                .catch(error => {-->
+<!--                    document.getElementById('status').innerText = 'Ошибка обработки данных.';-->
+<!--                    console.error('Error:', error);-->
+<!--                });-->
+<!--        } else {-->
+<!--            document.getElementById('status').innerText = 'InitData не найдены. Проверьте подключение к Telegram.';-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -5,9 +52,31 @@
     <title>Telegram Web App Redirect</title>
     <!-- Подключаем Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Легкий фон для красоты */
+            flex-direction: column;
+        }
+        img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        p {
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-<h1>Обработка данных...</h1>
+<img src="logo.png" alt="Logo"> <!-- Замените на путь к вашему логотипу -->
 <p id="status">Пожалуйста, подождите.</p>
 
 <script>

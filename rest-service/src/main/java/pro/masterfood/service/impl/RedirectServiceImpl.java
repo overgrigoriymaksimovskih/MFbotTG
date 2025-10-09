@@ -140,16 +140,24 @@ public class RedirectServiceImpl implements RedirectService {
         // Ищем пользователя в БД
         Optional<AppUser> optionalUser = appUserDAO.findByTelegramUserId(telegramUserID);
         if (optionalUser.isEmpty()) {
-            return "Ошибка: Пользователь не найден в DB";  // Пользователь не найден — фронтенд должен обработать ошибку
+            return "Авторизуйтесь в боте, для использования сервиса+\n" +
+                    "https://t.me/MasterFoodBot";  // Пользователь не найден — фронтенд должен обработать ошибку
         }
         AppUser user = optionalUser.get();
 
-        // Генерируем JWT с userId (не с phone!)
-        return Jwts.builder()
-                .setSubject(String.valueOf(user.getId()))  // userId из БД
-                .setExpiration(new Date(System.currentTimeMillis() + 2 * 60 * 1000))  // 2 минуты
-                .signWith(SignatureAlgorithm.HS256, JWT_SECRET)
-                .compact();
+        if(user.getPhoneNumber() != null && user.getSiteUserId() != null){
+            // Генерируем JWT с userId (не с phone!)
+            return Jwts.builder()
+                    .setSubject(String.valueOf(user.getId()))  // userId из БД
+                    .setExpiration(new Date(System.currentTimeMillis() + 2 * 60 * 1000))  // 2 минуты
+                    .signWith(SignatureAlgorithm.HS256, JWT_SECRET)
+                    .compact();
+        }else{
+            return "Авторизуйтесь в боте, для использования сервиса+\n" +
+            "https://t.me/MasterFoodBot"; // Пользователь не авторизован — фронтенд должен обработать ошибку
+        }
+
+
     }
 
 }

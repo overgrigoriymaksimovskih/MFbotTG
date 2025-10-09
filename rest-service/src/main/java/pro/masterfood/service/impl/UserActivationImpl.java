@@ -128,7 +128,7 @@ public class UserActivationImpl implements UserActivationService {
             user.setState(BASIC_STATE);
             appUserDAO.save(user);
             sendAnswer("Номер на который зарегистрирован Telegram не зарегистрирован на сайте master-food.pro: \n" +
-                    "ввести номер вручную /phoneinput" +
+                    "ввести номер вручную /phoneinput \n" +
                     "список доступных момманд: /help",requestParams.getChatId());
         }else{
             user.setPhoneNumber(null);
