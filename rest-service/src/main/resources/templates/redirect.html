@@ -76,7 +76,7 @@
     </style>
 </head>
 <body>
-<img src="logo.png" alt="Logo"> <!-- Замените на путь к вашему логотипу -->
+<img th:src="@{/logo.png}" alt="Logo" width="100" height="100" />
 <p id="status">Пожалуйста, подождите.</p>
 
 <script>
@@ -94,7 +94,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        document.getElementById('status').innerText = 'Данные обработаны! Перенаправляем на сайт...';
+                        document.getElementById('status').innerText = 'Данные обработаны!\n Перенаправляем на сайт...';
                         // Редирект на URL из ответа (например, https://smakmart.ru/api/test-verify?token=...)
                         setTimeout(() => window.location.href = data.redirectUrl, 1000);
                     } else {

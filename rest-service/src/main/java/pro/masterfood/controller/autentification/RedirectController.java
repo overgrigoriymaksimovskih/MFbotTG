@@ -35,7 +35,7 @@ public class RedirectController {
 
         // Генерируем токен и редирект-URL
         String token = redirectService.generateToken(initData);
-        if (token.contains("Ошибка")) {
+        if (token.contains("Авторизуйтесь")) {
             return "{\"status\": \"error\", \"message\": \"" + token + "\"}";
         }
 
