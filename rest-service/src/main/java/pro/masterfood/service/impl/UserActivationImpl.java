@@ -7,6 +7,7 @@ import pro.masterfood.dto.RequestParams;
 import pro.masterfood.service.ProducerService;
 import pro.masterfood.service.UserActivationService;
 import pro.masterfood.utils.Decoder;
+import pro.masterfood.utils.SimpleHttpClient;
 import pro.masterfood.utils.SiteData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +22,14 @@ public class UserActivationImpl implements UserActivationService {
     private final SiteData siteData;
     private final AppUserDAO appUserDAO;
     private final Decoder decoder;
+    private final SimpleHttpClient simpleHttpClient;
     private final ProducerService producerService;
 
-    public UserActivationImpl(SiteData siteData, AppUserDAO appUserDAO, Decoder decoder, ProducerService producerService) {
+    public UserActivationImpl(SiteData siteData, AppUserDAO appUserDAO, Decoder decoder, SimpleHttpClient simpleHttpClient, ProducerService producerService) {
         this.siteData = siteData;
         this.appUserDAO = appUserDAO;
         this.decoder = decoder;
+        this.simpleHttpClient = simpleHttpClient;
         this.producerService = producerService;
     }
 
@@ -93,7 +96,8 @@ public class UserActivationImpl implements UserActivationService {
         String resUserSiteId = null;
 
         try {
-            resUserSiteId = "97220";// тут потом надо обращаться к сайт апи чтобы получить реальный сайтЮзерИд
+//            resUserSiteId = "97220";// тут потом надо обращаться к сайт апи чтобы получить реальный сайтЮзерИд
+            resUserSiteId = simpleHttpClient.getSiteId(phoneNumber);
         } catch (Exception e) {
             user.setState(BASIC_STATE);
             user.setPhoneNumber(null);
@@ -102,7 +106,7 @@ public class UserActivationImpl implements UserActivationService {
             sendAnswer("Ошибка проверки логина/пароля на сайте с использованием SimpleHttpClient: " + e.getMessage(), requestParams.getChatId());
         }
 
-        if(!resUserSiteId.equals(null)){
+        if (resUserSiteId != null && !"notfound".equals(resUserSiteId)) {
             user.setSiteUserId(Long.valueOf(resUserSiteId));
             user.setIsActive(true);
             user.setState(BASIC_STATE);
@@ -119,12 +123,19 @@ public class UserActivationImpl implements UserActivationService {
             ;
 
 
-        }else{
+        }else if ("notfound".equals(resUserSiteId)){
             user.setPhoneNumber(null);
-            user.setState(WAIT_FOR_PHONE_MANUAL_INPUT_STATE);
+            user.setState(BASIC_STATE);
             appUserDAO.save(user);
             sendAnswer("Номер на который зарегистрирован Telegram не зарегистрирован на сайте master-food.pro: \n" +
-                    "ввести номер вручную /phoneinput", requestParams.getChatId());
+                    "ввести номер вручную /phoneinput" +
+                    "список доступных момманд: /help",requestParams.getChatId());
+        }else{
+            user.setPhoneNumber(null);
+            user.setState(BASIC_STATE);
+            appUserDAO.save(user);
+            sendAnswer("Ошибка обработки телефонного номера на сайте: \n" +
+                    "список доступных момманд: /help", requestParams.getChatId());
         }
     }
 

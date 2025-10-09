@@ -13,6 +13,7 @@ import pro.masterfood.dto.RequestParams;
 import pro.masterfood.service.PhoneHandler;
 import pro.masterfood.service.ProducerService;
 import pro.masterfood.utils.CustomPostClient;
+import pro.masterfood.utils.SimpleHttpClient;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +25,7 @@ public class PhoneHandlerImpl implements PhoneHandler {
     private static final Logger log = LoggerFactory.getLogger(UserActivationImpl.class);
     private final AppUserDAO appUserDAO;
     private final CustomPostClient customPostClient;
+    private final SimpleHttpClient simpleHttpClient;
     private final ProducerService producerService;
 
     @Value("${streamtelecom.user}")
@@ -31,9 +33,11 @@ public class PhoneHandlerImpl implements PhoneHandler {
     @Value("${streamtelecom.password}")
     private String streamTelecomPassword;
 
-    public PhoneHandlerImpl(AppUserDAO appUserDAO, CustomPostClient customPostClient, ProducerService producerService) {
+
+    public PhoneHandlerImpl(AppUserDAO appUserDAO, CustomPostClient customPostClient, SimpleHttpClient simpleHttpClient, ProducerService producerService) {
         this.appUserDAO = appUserDAO;
         this.customPostClient = customPostClient;
+        this.simpleHttpClient = simpleHttpClient;
         this.producerService = producerService;
     }
 
@@ -48,7 +52,8 @@ public class PhoneHandlerImpl implements PhoneHandler {
         String resUserSiteId = null;
 
         try {
-            resUserSiteId = "97220";// тут потом надо обращаться к сайт апи чтобы получить реальный сайтЮзерИд
+//            resUserSiteId = "97220";// тут потом надо обращаться к сайт апи чтобы получить реальный сайтЮзерИд
+            resUserSiteId = simpleHttpClient.getSiteId(phoneNumber);
         } catch (Exception e) {
             user.setState(BASIC_STATE);
             user.setPhoneNumber(null);
@@ -57,7 +62,7 @@ public class PhoneHandlerImpl implements PhoneHandler {
             sendAnswer("Ошибка проверки логина/пароля на сайте с использованием SimpleHttpClient: " + e.getMessage(), requestParams.getChatId());
         }
 
-        if(!resUserSiteId.equals(null)){
+        if (resUserSiteId != null && !"notfound".equals(resUserSiteId)) {
 
             user.setSiteUserId(Long.valueOf(resUserSiteId));
 
@@ -124,12 +129,18 @@ public class PhoneHandlerImpl implements PhoneHandler {
 
 
 
-        }else{
+        }else if ("notfound".equals(resUserSiteId)){
             user.setPhoneNumber(null);
             user.setState(WAIT_FOR_PHONE_MANUAL_INPUT_STATE);
             appUserDAO.save(user);
             sendAnswer("Номер не зарегистрирован на сайте master-food.pro Введите зарегистрированный номер: \n" +
                     "или отмените процесс авторизации /cancel", requestParams.getChatId());
+        }else{
+            user.setPhoneNumber(null);
+            user.setState(BASIC_STATE);
+            appUserDAO.save(user);
+            sendAnswer("Ошибка обработки телефонного номера на сайте: \n" +
+                    "список доступных момманд: /help", requestParams.getChatId());
         }
 
     }

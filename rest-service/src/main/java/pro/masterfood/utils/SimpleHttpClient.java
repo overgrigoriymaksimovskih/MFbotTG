@@ -1,6 +1,7 @@
 package pro.masterfood.utils;
 
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -33,8 +34,13 @@ public class SimpleHttpClient {
     @Value("${server.password}")
     private String password;
 
+    @Value("${site.login}")
+    private String siteLogin;
+    @Value("${site.password}")
+    private String sitePassword;
+
     //Этот метод для получения баланса
-    public String getBalance(String clientId) {
+    public String getBalance (String clientId) {
         HttpURLConnection con = null;
         String url = "http://78.29.24.26:54321/sushi2/hs/PC//GetBalance/" + clientId + "/";
 
@@ -102,7 +108,7 @@ public class SimpleHttpClient {
     }
 
     //Этот метод для получения статуса заказа
-    public String getOrderStatus(String phone) {
+    public String getOrderStatus (String phone) {
         HttpURLConnection con = null;
         String url = "http://78.29.24.26:54321/sushi2/hs/PC/GetStatusByPhone/" + phone.replace("+", "") + "/";
 
@@ -183,6 +189,60 @@ public class SimpleHttpClient {
                     log.error("IOException during server response for phone " + phone, e);
                     return null;
                 }
+            } else {
+                String errorMessage = "GET request failed. Response code: " + responseCode + ", Message: " + con.getResponseMessage();
+                log.error("HTTP request failed for phone " + phone + ", " + errorMessage);
+                return null;
+            }
+
+        } catch (IOException e) {
+            log.error("-=РЕСТ СЕРВИС -ГЕТ СТАТУС- НЕ ОТВЕЧАЕТ=-: IOException during connection for phone " + phone, e);
+            return null;
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
+        }
+    }
+
+    //Этот метод для получения siteId по номеру телефона, (для авторизации)
+    public String getSiteId (String phone) {
+        HttpURLConnection con = null;
+        String fullUrl = "https://master-food.pro/checkphone.php?phoneNumber=+" + phone + "/";
+
+        try {
+            // Создаем URL объект
+            URL url = new URL(fullUrl);
+
+            // Открываем соединение
+            con = (HttpURLConnection) url.openConnection();
+
+            // Устанавливаем метод GET
+            con.setRequestMethod("GET");
+
+            // Настраиваем базовую авторизацию
+            String authString = siteLogin + ":" + sitePassword;
+            String encodedAuth = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8)); // Указана кодировка
+            con.setRequestProperty("Authorization", "Basic " + encodedAuth);
+
+            // Получаем код ответа
+            int responseCode = con.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Читаем ответ
+                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                // Парсим JSON
+                JSONObject jsonObject = new JSONObject(response.toString());
+                String result = jsonObject.getString("result");
+                return result;
+
             } else {
                 String errorMessage = "GET request failed. Response code: " + responseCode + ", Message: " + con.getResponseMessage();
                 log.error("HTTP request failed for phone " + phone + ", " + errorMessage);
