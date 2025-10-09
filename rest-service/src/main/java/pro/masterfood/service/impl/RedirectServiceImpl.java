@@ -140,7 +140,7 @@ public class RedirectServiceImpl implements RedirectService {
         // Ищем пользователя в БД
         Optional<AppUser> optionalUser = appUserDAO.findByTelegramUserId(telegramUserID);
         if (optionalUser.isEmpty()) {
-            return "Ошибка: https://t.me/MasterFoodBot";  // Пользователь не найден — фронтенд должен обработать ошибку
+            return "Ошибка. Авторизуйтесь в боте: <a href=\"/\">https://t.me/MasterFoodBot</a>";  // Пользователь не найден — фронтенд должен обработать ошибку
         }
         AppUser user = optionalUser.get();
 
@@ -152,7 +152,7 @@ public class RedirectServiceImpl implements RedirectService {
                     .signWith(SignatureAlgorithm.HS256, JWT_SECRET)
                     .compact();
         }else{
-            return "Ошибка: https://t.me/MasterFoodBot";
+            return "Ошибка.  Авторизуйтесь в боте: <a href=\"/\">https://t.me/MasterFoodBot</a>";
         }
 
 

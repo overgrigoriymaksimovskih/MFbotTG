@@ -99,7 +99,8 @@
                         setTimeout(() => window.location.href = data.redirectUrl, 1000);
                     } else {
                         // Ошибка: отображаем сообщение без редиректа
-                        document.getElementById('status').innerText = 'Ошибка: ' + data.message;
+                        // document.getElementById('status').innerText = 'Ошибка: ' + data.message;
+                        document.getElementById('status').innerText = data.message;
                     }
                 })
                 .catch(error => {
