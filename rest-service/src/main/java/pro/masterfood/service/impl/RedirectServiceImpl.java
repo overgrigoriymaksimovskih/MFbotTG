@@ -148,7 +148,7 @@ public class RedirectServiceImpl implements RedirectService {
             // Генерируем JWT с userId (не с phone!)
             return Jwts.builder()
                     .setSubject(String.valueOf(user.getId()))  // userId из БД
-                    .setExpiration(new Date(System.currentTimeMillis() + 2 * 60 * 1000))  // 2 минуты
+//                    .setExpiration(new Date(System.currentTimeMillis() + 2 * 60 * 1000))  // 2 минуты
                     .signWith(SignatureAlgorithm.HS256, JWT_SECRET)
                     .compact();
         }else{

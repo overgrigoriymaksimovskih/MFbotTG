@@ -113,6 +113,7 @@ services:
       TG_BOT_TOKEN: ${TG_BOT_TOKEN}
       REDIRECT_LINK: ${REDIRECT_LINK}
       JWT_SECRET: ${JWT_SECRET}
+      APP_API_KEY: ${APP_API_KEY}
 
     depends_on:
       postgres-db:
