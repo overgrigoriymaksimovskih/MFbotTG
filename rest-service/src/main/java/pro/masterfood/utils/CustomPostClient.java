@@ -45,7 +45,7 @@ public class CustomPostClient {
         }
     }
 
-    // Метод специально для тестового POST с JSON, возвращает Map
+    // Метод специально для ТЕСТОВОГО POST с JSON, возвращает Map
     public ResponseEntity<Map<String, Object>> sendTestPostRequest(String url, Map<String, String> postBody, Map<String, String> headers) {
         try {
             HttpHeaders httpHeaders = new HttpHeaders();
