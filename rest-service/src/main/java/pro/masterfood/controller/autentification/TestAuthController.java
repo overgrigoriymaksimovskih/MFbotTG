@@ -114,18 +114,11 @@ public class TestAuthController {
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             Map<String, Object> responseData = response.getBody();
             if ("success".equals(responseData.get("status"))) {
-                Boolean authorized = (Boolean) responseData.get("authorized");
-                if (Boolean.TRUE.equals(authorized)) {
-                    model.addAttribute("status", "success");
-                    model.addAttribute("message", "Авторизация успешна!");
-                    model.addAttribute("userId", responseData.get("userId"));
-                    model.addAttribute("phone", responseData.get("phone"));
-                    return "test-verify";
-                } else {
-                    model.addAttribute("status", "failure");
-                    model.addAttribute("message", "Пользователь не авторизован.");
-                    return "test-verify";
-                }
+                model.addAttribute("status", "success");
+                model.addAttribute("message", "Авторизация успешна!");
+                model.addAttribute("userId", responseData.get("userId"));
+                model.addAttribute("phone", responseData.get("phone"));
+                return "test-verify";
             } else {
                 String errorMessage = (String) responseData.get("message");
                 model.addAttribute("status", "failure");
