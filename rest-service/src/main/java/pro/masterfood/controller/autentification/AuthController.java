@@ -91,7 +91,7 @@ public class AuthController {
     private final AuthService authService;
     private final ObjectMapper objectMapper = new ObjectMapper();  // Для JSON сериализации/десериализации только для логгирования
 
-    // Добавлено: читаем API-ключ из application.properties
+    // читаем API-ключ из application.properties
     @Value("${app.api.key}")
     private String apiKey;
 
@@ -155,13 +155,13 @@ public class AuthController {
             return ResponseEntity.ok(successResponse);
 
         } catch (TokenExpiredException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)//401
-                    .body(Map.of("status", "error", "message", "Токен истёк. Обновите токен: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)//400
+                    .body(Map.of("status", "error", "message", "Токен истёк. Обновите токен..."));
         } catch (TokenInvalidException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)//401
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)//400
                     .body(Map.of("status", "error", "message", "Недействительный токен"));
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)//404
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)//400
                     .body(Map.of("status", "error", "message", e.getMessage()));
         } catch (UserSiteIdIsNullException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)//400

@@ -154,8 +154,5 @@ public class RedirectServiceImpl implements RedirectService {
         }else{
             return "Ошибка.  Авторизуйтесь в боте: https://t.me/MasterFoodBot";
         }
-
-
     }
-
 }
