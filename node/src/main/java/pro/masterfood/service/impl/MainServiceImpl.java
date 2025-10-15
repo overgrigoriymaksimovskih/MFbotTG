@@ -1,15 +1,16 @@
 package pro.masterfood.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dao.RawDataDAO;
+import pro.masterfood.dto.ProcessingRequestFromOneS_Queue;
+import pro.masterfood.dto.ProcessingResponseToOneS_Queue;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.entity.RawData;
 import pro.masterfood.exceptions.UploadFileException;
@@ -24,6 +25,7 @@ import pro.masterfood.service.OfferService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static pro.masterfood.enums.UserState.*;
@@ -40,8 +42,9 @@ public class MainServiceImpl implements MainService {
     private final OfferService offerService;
     private final OneCmessageHandler oneCmessageHandler;
     private final HelpOrShareContactButton helpOrShareContactButton;
+    private final ObjectMapper objectMapper;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, OfferService offerService, OneCmessageHandler oneCmessageHandler, HelpOrShareContactButton helpOrShareContactButton) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, OfferService offerService, OneCmessageHandler oneCmessageHandler, HelpOrShareContactButton helpOrShareContactButton, ObjectMapper objectMapper) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
@@ -50,6 +53,7 @@ public class MainServiceImpl implements MainService {
         this.offerService = offerService;
         this.oneCmessageHandler = oneCmessageHandler;
         this.helpOrShareContactButton = helpOrShareContactButton;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -124,25 +128,77 @@ public class MainServiceImpl implements MainService {
         sendAnswer(output, chatId);
     }
 
+//    public void processDocMessage(String messageFromRest) {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("Принято методом обработки очереди из 1С \n");
+//
+//        String message = oneCmessageHandler.getMessageText(messageFromRest, sb);
+//        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(messageFromRest, sb);
+//
+//        if (listOfChatsIds != null && message != null) {
+//            int usersCount = 0;
+//            for (Long chatId : listOfChatsIds) {
+//                sendAnswer(message, chatId); // chatId - это уже telegramUserId
+//                usersCount++;
+//            }
+//            sb.append("сообщение: \"" + message + "\"" + " отправлено: " + usersCount + " пользователям");
+//        } else {
+//            log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
+//            sb.append(", список id пользователей либо поле \"message\" = null");
+//        }
+//        producerService.producerAnswerTo1C(sb.toString());
+//    }
+
     public void processDocMessage(String oneCmessage) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Принято методом обработки очереди из 1С \n");
+        String correlationId = null;  // Для обработки ошибок
+        try {
+            // 1. Десериализуем oneCmessage в ProcessingRequestFromOneS
+            ProcessingRequestFromOneS_Queue request = objectMapper.readValue(oneCmessage, ProcessingRequestFromOneS_Queue.class);
+            correlationId = request.getCorrelationId();
+            String jsonData = request.getJsonData();  // Это {"messageText":"...","userList":[...]}
 
-        String message = oneCmessageHandler.getMessageText(oneCmessage, sb);
-        List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(oneCmessage, sb);
+            // 2. Парсим jsonData как раньше
+            StringBuilder sb = new StringBuilder();
+            sb.append("Принято методом обработки очереди из 1С \n");
 
-        if (listOfChatsIds != null && message != null) {
-            int usersCount = 0;
-            for (Long chatId : listOfChatsIds) {
-                sendAnswer(message, chatId); // chatId - это уже telegramUserId
-                usersCount++;
+            String message = oneCmessageHandler.getMessageText(jsonData, sb);
+            List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(jsonData, sb);
+
+            // 3. Логика обработки и сбор processedUsers
+            List<String> processedUsers = new ArrayList<>();
+            if (listOfChatsIds != null && message != null) {
+                int usersCount = 0;
+                for (Long chatId : listOfChatsIds) {
+                    sendAnswer(message, chatId);  // chatId - это уже telegramUserId
+                    processedUsers.add(chatId.toString());  // Добавляем ID как строку (например, "123456")
+                    usersCount++;
+                }
+                sb.append("сообщение: \"" + message + "\"" + " отправлено: " + usersCount + " пользователям");
+            } else {
+                log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
+                sb.append(", список id пользователей либо поле \"message\" = null");
+                // processedUsers остаётся пустым списком
             }
-            sb.append("сообщение: \"" + message + "\"" + " отправлено: " + usersCount + " пользователям");
-        } else {
-            log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
-            sb.append(", список id пользователей либо поле \"message\" = null");
+
+            // 4. Создаём ответный объект и отправляем в answerTo1CQueue (теперь для REST-сервиса)
+            ProcessingResponseToOneS_Queue response = new ProcessingResponseToOneS_Queue(correlationId, sb.toString(), processedUsers);
+            String responseJson = objectMapper.writeValueAsString(response);
+            producerService.producerAnswerTo1C(responseJson);  // Отправляем JSON в существующую очередь вместо sb.toString()
+
+        } catch (JsonProcessingException e) {
+            log.error("Ошибка десериализации oneCmessage или сериализации ответа: " + e.getMessage());
+            // Если correlationId извлечён, отправляем ошибку; иначе логируем
+            if (correlationId != null) {
+                try {
+                    List<String> emptyProcessedUsers = new ArrayList<>();
+                    ProcessingResponseToOneS_Queue errorResponse = new ProcessingResponseToOneS_Queue(correlationId, "Ошибка обработки: " + e.getMessage(), emptyProcessedUsers);
+                    String errorJson = objectMapper.writeValueAsString(errorResponse);
+                    producerService.producerAnswerTo1C(errorJson);  // Отправляем ошибку в ту же очередь
+                } catch (JsonProcessingException ex) {
+                    log.error("Ошибка сериализации ошибки: " + ex.getMessage());
+                }
+            }
         }
-        producerService.producerAnswerTo1C(sb.toString());
     }
 
     @Override

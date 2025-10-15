@@ -33,8 +33,8 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     @Override
     @RabbitListener(queues = "${spring.rabbitmq.queues.message-from-1C}")
-    public void consumeDocMessageUpdates(String oneCmessage) {
+    public void consumeDocMessageUpdates(String messageFromRest) {
         log.debug("NODE: document message is received");
-        mainService.processDocMessage(oneCmessage);
+        mainService.processDocMessage(messageFromRest);
     }
 }

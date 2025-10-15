@@ -17,6 +17,9 @@ public class ProducerServiceImpl implements ProducerService {
     @Value("${spring.rabbitmq.queues.answer-message}")
     private String answerMessageQueue;
 
+    @Value("${spring.rabbitmq.queues.message-from-1C}")
+    private String messageFromOneSQueue;
+
     public ProducerServiceImpl(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
@@ -27,6 +30,17 @@ public class ProducerServiceImpl implements ProducerService {
             rabbitTemplate.convertAndSend(answerMessageQueue, sendMessage);
         } catch (AmqpException e) {
             log.error("Ошибка при отправке сообщения в очередь {}: {}", answerMessageQueue, e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void producerFromOneS(String requestJson) {
+        try {
+            //{"messageText":"текст сообщения","userList":["1","2"]}
+            //Результат: {"correlationId":"123e4567-e89b-12d3-a456-426614174000","jsonData":"{\"messageText\":\"текст сообщения\",\"userList\":[\"1\",\"2\"]}"}
+            rabbitTemplate.convertAndSend(messageFromOneSQueue, requestJson);
+        } catch (AmqpException e) {
+            log.error("Ошибка при отправке сообщения в очередь {}: {}", messageFromOneSQueue, e.getMessage(), e);
         }
     }
 }

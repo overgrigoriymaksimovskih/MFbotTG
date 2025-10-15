@@ -38,7 +38,7 @@ public class ProducerServiceImpl implements ProducerService {
         try {
             rabbitTemplate.convertAndSend(answerTo1CQueue, answerTo1C); // Используем внедренное имя очереди
         } catch (AmqpException e) {
-            log.error("Ошибка при отправке сообщения в очередь {}: {}", answerMessageQueue, e.getMessage(), e);
+            log.error("Ошибка при отправке сообщения в очередь {}: {}", answerTo1CQueue, e.getMessage(), e);
         }
     }
 }
