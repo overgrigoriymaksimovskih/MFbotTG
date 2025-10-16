@@ -70,7 +70,7 @@
         }
         p {
             text-align: center;
-            font-size: 18px;
+            font-size: 12px;
             color: #333;
         }
     </style>
@@ -94,9 +94,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        document.getElementById('status').innerText = 'Данные обработаны!\n Перенаправляем на сайт...';
+                        document.getElementById('status').innerText = 'success redirect\n...';
                         // Редирект на URL из ответа (например, https://smakmart.ru/api/test-verify?token=...)
-                        setTimeout(() => window.location.href = data.redirectUrl, 1000);
+                        setTimeout(() => window.location.href = data.redirectUrl, 400);
                     } else {
                         // Ошибка: отображаем сообщение с обработкой ссылок
                         const statusElement = document.getElementById('status');

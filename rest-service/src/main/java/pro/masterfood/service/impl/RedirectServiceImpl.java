@@ -140,7 +140,7 @@ public class RedirectServiceImpl implements RedirectService {
         // Ищем пользователя в БД
         Optional<AppUser> optionalUser = appUserDAO.findByTelegramUserId(telegramUserID);
         if (optionalUser.isEmpty()) {
-            return "Ошибка. Авторизуйтесь в боте: https://t.me/MasterFoodBot";  // Пользователь не найден — фронтенд должен обработать ошибку
+            return "Ошибка./n Авторизуйтесь в боте: https://t.me/MasterFoodBot /n Продолжить без авторизации:/n https://master-food.pro/";  // Пользователь не найден — фронтенд должен обработать ошибку
         }
         AppUser user = optionalUser.get();
 

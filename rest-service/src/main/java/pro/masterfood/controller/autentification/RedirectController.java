@@ -21,6 +21,9 @@ public class RedirectController {
     @Value("${telegram.bot.token}")
     private String BOT_TOKEN;
 
+    @Value("${redirect.link}")
+    private String REDIRECT_LINK;
+
     @PostMapping("/api/initdatahandler")
     public String handleInitData(@RequestBody Map<String, String> payload) {
         String initData = payload.get("initData");
@@ -40,7 +43,7 @@ public class RedirectController {
         }
 
         // Сейчас тут наш тестовый ендпоинт и сервис, потом заменим на реалный эндпоинт сайта
-        String redirectUrl = "https://smakmart.ru/api/test-verify?token=" + token;
+        String redirectUrl = REDIRECT_LINK + token;
 //        return "{\"status\": \"success\", \"redirectUrl\":" + redirectUrl + "}";
         return "{\"status\": \"success\", \"redirectUrl\": \"" + redirectUrl + "\"}";
     }

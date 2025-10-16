@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
             Optional<AppUser> optionalUser = appUserDAO.findById(userId);
 
             if (optionalUser.isEmpty()) {
-                throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
+                throw new UserNotFoundException("ID " + userId + " ошибка консистентности 0. Пожалуйста отправьте эту ошибку в форме обратной связи на этом сайте");
             }
 
             AppUser user = optionalUser.get();
@@ -48,11 +48,11 @@ public class AuthServiceImpl implements AuthService {
             String phoneNumber = user.getPhoneNumber();
 
             if (siteUserId == null) {
-                throw new UserSiteIdIsNullException("SiteUserId пользователя с ID " + userId + " не найден");
+                throw new UserSiteIdIsNullException("ID " + userId + " ошибка консистентности 1. Пожалуйста отправьте эту ошибку в форме обратной связи на этом сайте");
             }
 
             if (phoneNumber == null) {
-                throw new UserPhoneIsNullException("PhoneNumber пользователя с ID " + userId + " не найден");
+                throw new UserPhoneIsNullException("ID " + userId + " ошибка консистентности 2. Пожалуйста отправьте эту ошибку в форме обратной связи на этом сайте");
             }
 
             return new AuthResponse(siteUserId, phoneNumber);
@@ -63,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
             // Ловит остальные JwtException (SignatureException, MalformedJwtException и т.д.)
             throw new TokenInvalidException("Токен недействителен: " + e.getMessage());
         } catch (NumberFormatException e) {
-            throw new TokenInvalidException("Неверный формат userId в токене");
+            throw new TokenInvalidException("Ошибка консистентности 3. Пожалуйста отправьте эту ошибку в форме обратной связи на этом сайте");
         }
     }
 }
