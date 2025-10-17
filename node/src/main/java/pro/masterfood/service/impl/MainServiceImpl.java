@@ -265,8 +265,11 @@ public class MainServiceImpl implements MainService {
         }
 
 
-
-        producerService.producerAnswer(sendMessage);
+        try {
+            producerService.producerAnswer(sendMessage);
+        } catch (Exception e) {
+            log.error("Failed to send message to chatId {}: {}", chatId, e.getMessage());
+        }
 
     }
 
