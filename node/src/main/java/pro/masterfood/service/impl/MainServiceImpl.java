@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import pro.masterfood.dao.AppUserDAO;
 import pro.masterfood.dao.RawDataDAO;
+import pro.masterfood.dto.ChatInfo;
 import pro.masterfood.dto.ProcessingRequestFromOneS_Queue;
 import pro.masterfood.dto.ProcessingResponseToOneS_Queue;
 import pro.masterfood.entity.AppUser;
@@ -26,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static pro.masterfood.enums.UserState.*;
 import static pro.masterfood.service.enums.ServiceCommand.*;
@@ -149,36 +152,143 @@ public class MainServiceImpl implements MainService {
 //        producerService.producerAnswerTo1C(sb.toString());
 //    }
 
+//    public void processDocMessage(String oneCmessage) {
+//        String correlationId = null;  // Для обработки ошибок
+//        try {
+//            // 1. Десериализуем oneCmessage в ProcessingRequestFromOneS
+//            ProcessingRequestFromOneS_Queue request = objectMapper.readValue(oneCmessage, ProcessingRequestFromOneS_Queue.class);
+//            correlationId = request.getCorrelationId();
+//            String messageFromRequest = request.getMessageText();
+//            List<String> usersList = request.getUserList();
+//
+//            // 2. Парсим jsonData как раньше
+//            StringBuilder sb = new StringBuilder();
+//            sb.append("Принято методом обработки очереди из 1С \n");
+//
+//////            String message = oneCmessageHandler.getMessageText(usersList, messageFromRequest, sb);
+////            List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(usersList, sb);
+////            // 3. Логика обработки и сбор processedUsers
+////            List<String> processedUsers = new ArrayList<>();
+////            if (listOfChatsIds != null && messageFromRequest != null) {
+////                int usersCount = 0;
+////                for (Long chatId : listOfChatsIds) {
+////                    sendAnswer(messageFromRequest, chatId);  // chatId - это уже telegramUserId
+////                    processedUsers.add(chatId.toString());  // Добавляем ID как строку (например, "123456")
+////                    usersCount++;
+////                }
+////                sb.append("сообщение: \"" + messageFromRequest + "\"" + " отправлено: " + usersCount + " пользователям");
+////            } else {
+////                log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
+////                sb.append(", список id пользователей либо поле \"message\" = null");
+////                // processedUsers остаётся пустым списком
+////            }
+//
+//            // Получаем список пар (chatId, siteId) вместо списка chatId
+//            List<ChatInfo> chatInfos = oneCmessageHandler.getChatsIds(request.getUserList(), sb);  // Теперь List<ChatInfo>
+//
+//            // 3. Логика обработки и сбор processedUsers
+//            Set<String> processedUsersSet = new HashSet<>();  // Set для уникальных siteId (чтобы избежать дубликатов)
+//            int sentCount = 0;  // Счётчик успешных отправок (по chatId)
+//            int totalAttempted = 0;  // Счётчик попыток отправки (по chatId)
+//
+//            if (chatInfos != null && !chatInfos.isEmpty() && messageFromRequest != null) {
+//                for (ChatInfo chatInfo : chatInfos) {
+//                    Long chatId = chatInfo.getChatId();
+//                    String siteId = chatInfo.getSiteId();
+//                    totalAttempted++;
+//
+//                    try {
+//                        sendAnswer(messageFromRequest, chatId);  // chatId - это telegramUserId
+//                        processedUsersSet.add(siteId);  // Добавляем siteId только при успехе (уникально)
+//                        sentCount++;
+////                        sb.append("Сообщение успешно отправлено в chatId ").append(chatId)
+////                                .append(" для siteId ").append(siteId).append("\n");
+//                    } catch (Exception e) {  // Например, TelegramApiException
+//                        sb.append("Ошибка отправки в chatId ").append(chatId)
+//                                .append(" для siteId ").append(siteId).append(": ").append(e.getMessage()).append("\n");
+//                        // Не добавляем siteId в processedUsersSet
+//                    }
+//                }
+//                sb.append("Сообщение: \"").append(messageFromRequest).append("\" отправлено: ").append(sentCount)
+//                        .append(" из ").append(totalAttempted).append(" попыток (уникальных siteId: ").append(processedUsersSet.size()).append(")");
+//            } else {
+//                log.error("Ошибка при обработке сообщения из 1С: chatInfos is null/empty or message is null");
+//                sb.append(", список id пользователей либо поле \"message\" = null");
+//                // processedUsersSet остаётся пустым
+//            }
+//            // Конвертируем Set в List<String> для DTO (processedUsers теперь содержит уникальные siteId)
+//            List<String> processedUsers = new ArrayList<>(processedUsersSet);
+//
+//
+//
+//            // 4. Создаём ответный объект и отправляем в answerTo1CQueue (теперь для REST-сервиса)
+//            ProcessingResponseToOneS_Queue response = new ProcessingResponseToOneS_Queue(correlationId, sb.toString(), processedUsers);
+//            String responseJson = objectMapper.writeValueAsString(response);
+//            producerService.producerAnswerTo1C(responseJson);  // Отправляем JSON в существующую очередь вместо sb.toString()
+//
+//        } catch (JsonProcessingException e) {
+//            log.error("Ошибка десериализации oneCmessage или сериализации ответа: " + e.getMessage());
+//            // Если correlationId извлечён, отправляем ошибку; иначе логируем
+//            if (correlationId != null) {
+//                try {
+//                    List<String> emptyProcessedUsers = new ArrayList<>();
+//                    ProcessingResponseToOneS_Queue errorResponse = new ProcessingResponseToOneS_Queue(correlationId, "Ошибка обработки: " + e.getMessage(), emptyProcessedUsers);
+//                    String errorJson = objectMapper.writeValueAsString(errorResponse);
+//                    producerService.producerAnswerTo1C(errorJson);  // Отправляем ошибку в ту же очередь
+//                } catch (JsonProcessingException ex) {
+//                    log.error("Ошибка сериализации ошибки: " + ex.getMessage());
+//                }
+//            }
+//        }
+//    }
+
     public void processDocMessage(String oneCmessage) {
-        String correlationId = null;  // Для обработки ошибок
+        String correlationId = null;  // Для обработки ошибок, извлекаем как можно раньше
         try {
             // 1. Десериализуем oneCmessage в ProcessingRequestFromOneS
             ProcessingRequestFromOneS_Queue request = objectMapper.readValue(oneCmessage, ProcessingRequestFromOneS_Queue.class);
-            correlationId = request.getCorrelationId();
-            String jsonData = request.getJsonData();  // Это {"messageText":"...","userList":[...]}
+            correlationId = request.getCorrelationId();  // Извлекаем здесь, чтобы использовать в catch
+            String messageFromRequest = request.getMessageText();
+            List<String> usersList = request.getUserList();
 
             // 2. Парсим jsonData как раньше
             StringBuilder sb = new StringBuilder();
             sb.append("Принято методом обработки очереди из 1С \n");
 
-            String message = oneCmessageHandler.getMessageText(jsonData, sb);
-            List<Long> listOfChatsIds = oneCmessageHandler.getChatsIds(jsonData, sb);
+            // Получаем список пар (chatId, siteId) вместо списка chatId
+            List<ChatInfo> chatInfos = oneCmessageHandler.getChatsIds(request.getUserList(), sb);  // Теперь List<ChatInfo>
 
             // 3. Логика обработки и сбор processedUsers
-            List<String> processedUsers = new ArrayList<>();
-            if (listOfChatsIds != null && message != null) {
-                int usersCount = 0;
-                for (Long chatId : listOfChatsIds) {
-                    sendAnswer(message, chatId);  // chatId - это уже telegramUserId
-                    processedUsers.add(chatId.toString());  // Добавляем ID как строку (например, "123456")
-                    usersCount++;
+            Set<String> processedUsersSet = new HashSet<>();  // Set для уникальных siteId (чтобы избежать дубликатов)
+            int sentCount = 0;  // Счётчик успешных отправок (по chatId)
+            int totalAttempted = 0;  // Счётчик попыток отправки (по chatId)
+
+            if (chatInfos != null && !chatInfos.isEmpty() && messageFromRequest != null) {
+                for (ChatInfo chatInfo : chatInfos) {
+                    Long chatId = chatInfo.getChatId();
+                    String siteId = chatInfo.getSiteId();
+                    totalAttempted++;
+
+                    try {
+                        sendAnswer(messageFromRequest, chatId);  // chatId - это telegramUserId
+                        processedUsersSet.add(siteId);  // Добавляем siteId только при успехе (уникально)
+                        sentCount++;
+                        // sb.append(...) можно раскомментировать, если нужно детальное логирование
+                    } catch (Exception e) {  // Например, TelegramApiException
+                        sb.append("Ошибка отправки в chatId ").append(chatId)
+                                .append(" для siteId ").append(siteId).append(": ").append(e.getMessage()).append("\n");
+                        // Не добавляем siteId в processedUsersSet
+                    }
                 }
-                sb.append("сообщение: \"" + message + "\"" + " отправлено: " + usersCount + " пользователям");
+                sb.append("Сообщение: \"").append(messageFromRequest).append("\" отправлено: ").append(sentCount)
+                        .append(" из ").append(totalAttempted).append(" попыток (уникальных siteId: ").append(processedUsersSet.size()).append(")");
             } else {
-                log.error("Ошибка при обработке сообщения из 1С: listOfChatsIds is null or message is null");
+                log.error("Ошибка при обработке сообщения из 1С: chatInfos is null/empty or message is null");
                 sb.append(", список id пользователей либо поле \"message\" = null");
-                // processedUsers остаётся пустым списком
+                // processedUsersSet остаётся пустым
             }
+            // Конвертируем Set в List<String> для DTO (processedUsers теперь содержит уникальные siteId)
+            List<String> processedUsers = new ArrayList<>(processedUsersSet);
 
             // 4. Создаём ответный объект и отправляем в answerTo1CQueue (теперь для REST-сервиса)
             ProcessingResponseToOneS_Queue response = new ProcessingResponseToOneS_Queue(correlationId, sb.toString(), processedUsers);
@@ -198,6 +308,20 @@ public class MainServiceImpl implements MainService {
                     log.error("Ошибка сериализации ошибки: " + ex.getMessage());
                 }
             }
+        } catch (Exception e) {  // Общий catch для всех остальных исключений (RuntimeException, etc.)
+            log.error("Необработанная ошибка в processDocMessage (correlationId: " + correlationId + "): " + e.getMessage(), e);  // Логируем с stack trace
+            // Попробуем отправить ошибку в очередь, если correlationId известен
+            if (correlationId != null) {
+                try {
+                    List<String> emptyProcessedUsers = new ArrayList<>();
+                    ProcessingResponseToOneS_Queue errorResponse = new ProcessingResponseToOneS_Queue(correlationId, "Необработанная ошибка: " + e.getMessage(), emptyProcessedUsers);
+                    String errorJson = objectMapper.writeValueAsString(errorResponse);
+                    producerService.producerAnswerTo1C(errorJson);
+                } catch (Exception ex) {
+                    log.error("Ошибка отправки необработанной ошибки в очередь: " + ex.getMessage());
+                }
+            }
+            // НЕ бросаем исключение дальше — сервис не падает
         }
     }
 
@@ -227,7 +351,7 @@ public class MainServiceImpl implements MainService {
         var userState = appUser.getState();
         if(!appUser.getIsActive()){
             var error = "Активируйте "
-                + "свою учетную запись";
+                    + "свою учетную запись";
             sendAnswer(error, chatId);
             return true;
         } else if (!WAIT_FOR_REPORT_MESSAGE.equals(userState)) {
@@ -282,26 +406,26 @@ public class MainServiceImpl implements MainService {
 
 
 
-//----------------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
     private String processServiceCommand(Long chatId, AppUser appUser, String cmd) {
         var serviceCommand = ServiceCommand.fromValue(cmd);
         //Варианты авторизации
         //выбираем тип авторизации
         if (REGISTRATION.equals(serviceCommand)){
             return appUserService.chooseLoginType(appUser);
-        //если тип по логину паролю
+            //если тип по логину паролю
         } else if (REGISTRATIONEMAIL.equals(serviceCommand)) {
             return appUserService.loginByPassword(appUser);
-        //если тип по телефону но еще не выбрано как именно
+            //если тип по телефону но еще не выбрано как именно
         } else if (REGISTRATIONPHONE.equals(serviceCommand)) {
             return appUserService.loginByPhone(appUser);
-        //если тип по телефону Ручной ввод
+            //если тип по телефону Ручной ввод
         } else if (REGISTRATIONPHONEINPUT.equals(serviceCommand)) {
             return appUserService.loginByPhoneManualInput(appUser);
-        //если тип по телефону Поделиться контактом
+            //если тип по телефону Поделиться контактом
         } else if (REGISTRATIONPHONESHARE.equals(serviceCommand)) {
             return appUserService.loginByPhoneShare(appUser);
-        //-------------------------------------------------------------------------
+            //-------------------------------------------------------------------------
 
         } else if (GET_USER_INFO.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.checkBalance(chatId, appUser);
@@ -316,12 +440,12 @@ public class MainServiceImpl implements MainService {
             return appUserService.quit(chatId, appUser);
         } else if (EXIT.equals(serviceCommand) && appUser.getIsActive()) {
             return appUserService.exit(chatId, appUser);
-        //--------------------------------------------------------------------------------------------------------------
+            //--------------------------------------------------------------------------------------------------------------
         } else if (HELP.equals(serviceCommand) && !appUser.getIsActive()) {
             return help();
         } else if (HELP.equals(serviceCommand)) {
             return helpIsActive();
-        //--------------------------------------------------------------------------------------------------------------
+            //--------------------------------------------------------------------------------------------------------------
         } else if (START.equals(serviceCommand)) {
             return appUserService.loginByPhoneShare(appUser);
 

@@ -3,6 +3,7 @@ package pro.masterfood.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.springframework.stereotype.Component;
+import pro.masterfood.dto.ChatInfo;
 import pro.masterfood.entity.AppUser;
 import pro.masterfood.dao.AppUserDAO;
 
@@ -21,65 +22,95 @@ public class OneCmessageHandler {
         this.appUserDAO = appUserDAO;
     }
 
-    public String getMessageText(String message, StringBuilder sb) {
-        try {
-            DistributionMessage distributionMessage = objectMapper.readValue(message, DistributionMessage.class);
-            sb.append("Сообщение JSON десериализовано успешно\n");
-            return distributionMessage.getMessageText();
-        } catch (IOException e) {
-            System.err.println("Ошибка десериализации JSON: " + e.getMessage());
-            sb.append("Ошибка при десериализации сообщения из JSON \n");
-            return null; // Или выбросить исключение
-        }
-    }
+//    public String getMessageText(String message, StringBuilder sb) {
+//        try {
+//            DistributionMessage distributionMessage = objectMapper.readValue(message, DistributionMessage.class);
+//            sb.append("Сообщение JSON десериализовано успешно\n");
+//            return distributionMessage.getMessageText();
+//        } catch (IOException e) {
+//            System.err.println("Ошибка десериализации JSON: " + e.getMessage());
+//            sb.append("Ошибка при десериализации сообщения из JSON \n");
+//            return null; // Или выбросить исключение
+//        }
+//    }
 
-    public List<Long> getChatsIds(String message, StringBuilder sb) {
-        try {
-            DistributionMessage distributionMessage = objectMapper.readValue(message, DistributionMessage.class);
-            List<Long> usersChatIds = new ArrayList<>();
-            List<String> userList = distributionMessage.getUserList();
-            int botUsersCount = 0;
-            sb.append("Список пользователей САЙТА успешно десериализован из JSON\n");
+//    public List<Long> getChatsIds(String message, StringBuilder sb) {
+//    public List<Long> getChatsIds(List<String> usersList, StringBuilder sb) {
+//        List<Long> usersChatIds = new ArrayList<>();
+//        List<String> userList = usersList;
+//        int botUsersCount = 0;
+//        sb.append("Список пользователей САЙТА успешно десериализован из JSON\n");
+//
+//        for (String siteUserIdString : userList) { // Итерируемся по списку строк
+//            try {
+//                Long siteUserId = Long.parseLong(siteUserIdString); // Преобразуем строку в Long
+//                List<AppUser> appUsers = appUserDAO.findBySiteUserId(siteUserId);
+//                if (!appUsers.isEmpty()) {
+//                    for (AppUser appUser : appUsers) {
+//                        botUsersCount++;
+//                        Long telegramUserId = appUser.getTelegramUserId();
+//                        Boolean userIsActive = appUser.getIsActive();
+//                        if (telegramUserId != null && userIsActive) {
+//                            usersChatIds.add(telegramUserId);
+//                        } else {
+//                            System.err.println("Для siteUserId " + siteUserIdString + " не найден telegramUserId");
+//                        }
+//                    }
+//                } else {
+//                    sb.append("Не найден AppUser с siteUserId: " + siteUserIdString + "\n");
+//                    System.err.println("Не найден AppUser с siteUserId: " + siteUserIdString);
+//                }
+//            } catch (NumberFormatException e) {
+//                System.err.println("Ошибка преобразования siteUserId в Long: " + e.getMessage());
+//                sb.append("Ошибка при составлении списка пользователей бота для рассылки\n");
+//            }
+//        }
+//        sb.append("Список пользователей БОТА для рассылки составлен успешно\n");
+//        sb.append("Найдено " + botUsersCount + " пользователей\n");
+//        return usersChatIds;
+//    }
 
-            for (String siteUserIdString : userList) { // Итерируемся по списку строк
-                try {
-                    Long siteUserId = Long.parseLong(siteUserIdString); // Преобразуем строку в Long
-                    List<AppUser> appUsers = appUserDAO.findBySiteUserId(siteUserId);
-                    if (!appUsers.isEmpty()) {
-                        for (AppUser appUser : appUsers) {
-                            botUsersCount++;
-                            Long telegramUserId = appUser.getTelegramUserId();
-                            Boolean userIsActive = appUser.getIsActive();
-                            if (telegramUserId != null && userIsActive) {
-                                usersChatIds.add(telegramUserId);
-                            } else {
-                                System.err.println("Для siteUserId " + siteUserIdString + " не найден telegramUserId");
-                            }
+    public List<ChatInfo> getChatsIds(List<String> usersList, StringBuilder sb) {
+        List<ChatInfo> chatInfos = new ArrayList<>();  // Теперь список пар
+        List<String> userList = usersList;
+        int botUsersCount = 0;
+        sb.append("Список пользователей САЙТА успешно десериализован из JSON\n");
+
+        for (String siteUserIdString : userList) {
+            try {
+                Long siteUserId = Long.parseLong(siteUserIdString);
+                List<AppUser> appUsers = appUserDAO.findBySiteUserId(siteUserId);
+                if (!appUsers.isEmpty()) {
+                    for (AppUser appUser : appUsers) {
+                        botUsersCount++;
+                        Long telegramUserId = appUser.getTelegramUserId();
+                        Boolean userIsActive = appUser.getIsActive();
+                        if (telegramUserId != null && userIsActive != null && userIsActive) {  // Уточнил: userIsActive != null
+                            chatInfos.add(new ChatInfo(telegramUserId, siteUserIdString));  // Добавляем пару
+                        } else {
+                            sb.append("Для siteUserId ").append(siteUserIdString)
+                                    .append(" не найден активный telegramUserId (chatId=").append(telegramUserId)
+                                    .append(", isActive=").append(userIsActive).append(")\n");
                         }
-                    } else {
-                        sb.append("Не найден AppUser с siteUserId: " + siteUserIdString + "\n");
-                        System.err.println("Не найден AppUser с siteUserId: " + siteUserIdString);
                     }
-                } catch (NumberFormatException e) {
-                    System.err.println("Ошибка преобразования siteUserId в Long: " + e.getMessage());
-                    sb.append("Ошибка при составлении списка пользователей бота для рассылки\n");
+                } else {
+                    sb.append("Не найден AppUser с siteUserId: ").append(siteUserIdString).append("\n");
                 }
+            } catch (NumberFormatException e) {
+                sb.append("Ошибка преобразования siteUserId в Long для ").append(siteUserIdString)
+                        .append(": ").append(e.getMessage()).append("\n");
             }
-            sb.append("Список пользователей БОТА для рассылки составлен успешно\n");
-            sb.append("Найдено " + botUsersCount + " пользователей\n");
-            return usersChatIds;
-
-        } catch (IOException e) {
-            System.err.println("Ошибка десериализации JSON: " + e.getMessage());
-            sb.append("НЕ УДАЛОСЬ десериализовать список пользователей из JSON\n");
-            return null; // Или выбросить исключение
         }
+        sb.append("Список пользователей БОТА для рассылки составлен успешно\n");
+        sb.append("Найдено ").append(botUsersCount).append(" пользователей (активных chatId: ").append(chatInfos.size()).append(")\n");
+        return chatInfos;
     }
+
 
     @Data
     static class DistributionMessage {
         private String messageText;
-//        private List<User> userList;
+        //        private List<User> userList;
         private List<String> userList; // Теперь это список строк
     }
 
