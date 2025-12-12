@@ -189,3 +189,28 @@ services:
       retries: 3
       start_period: 60s
     restart: unless-stopped
+
+  # Сервис для бэкапов
+  backup-postgres:
+    container_name: backup-postgres
+    build:
+      context: ./backup  # Папка с Dockerfile и backup.sh
+    environment:
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      S3_BUCKET: ${S3_BUCKET}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      # Добавляем MAIL_* для email-уведомлений
+      MAIL_FROM: ${MAIL_FROM}
+      MAIL_TO: ${MAIL_TO}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_PROTOCOL: ${MAIL_PROTOCOL}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    restart: unless-stopped

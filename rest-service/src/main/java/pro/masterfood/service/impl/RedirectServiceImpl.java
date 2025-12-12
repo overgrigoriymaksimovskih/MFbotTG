@@ -96,7 +96,7 @@ public class RedirectServiceImpl implements RedirectService {
     private final AppUserDAO appUserDAO;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${jwt.secret}")  // Добавьте в application.properties: jwt.secret=your-secure-secret-key-here
+    @Value("${jwt.secret}")
     private String JWT_SECRET;
 
     public RedirectServiceImpl(AppUserDAO appUserDAO, InitDataChecker initDataChecker) {
